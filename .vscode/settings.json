@@ -8,12 +8,15 @@
     "dtos": "typescript",
     "presenters": "typescript",
     "repositories": "database",
-    "implementations": "controller"
+    "implementations": "controller",
+    "entities": "class"
   },
   "cSpell.words": [
+    "alvaro",
     "encrypter",
     "Encrypter",
     "hasher",
-    "strategys"
+    "strategys",
+    "websockets"
   ]
 }
