@@ -2,7 +2,6 @@ import { Test } from '@nestjs/testing'
 import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
 import { AppModule } from '@infra/app.module'
-import request from 'supertest'
 import { statusCode } from 'src/config/statusCode'
 import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
 import { Administrator, AdministratorRole } from '../entities/Administrator'
@@ -11,6 +10,7 @@ import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import request from 'supertest'
 
 describe('Create administrator (E2E)', () => {
   let app: INestApplication
