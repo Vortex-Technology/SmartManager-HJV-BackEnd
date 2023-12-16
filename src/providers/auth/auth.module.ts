@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { PassportModule } from '@nestjs/passport'
 import { JwtStrategy } from './strategys/jwtStrategy'
 import { APP_GUARD } from '@nestjs/core'
-import { JwtAuthGuard } from './guards/jwtAuthGuard'
+import { JwtAuthGuard } from './guards/jwtAuth.guard'
 import { EnvService } from '@infra/env/env.service'
 import { EnvModule } from '@infra/env/env.module'
 
