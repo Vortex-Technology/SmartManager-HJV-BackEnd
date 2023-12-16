@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { envSchema } from './env'
-import { FakerModule } from '@modules/faker/faker.module'
-import { RealModule } from '@modules/real/real.module'
-import { TableModule } from '@modules/table/table.module'
 import { AuthProvider } from '@providers/auth/auth.module'
 import { EnvModule } from './env/env.module'
+import { AdministratorModule } from '@modules/administrator/administrator.module'
+// import { SocketModule } from '@providers/socket/socket.module'
 
 @Module({
   imports: [
@@ -15,9 +14,8 @@ import { EnvModule } from './env/env.module'
     }),
     EnvModule,
     AuthProvider,
-    FakerModule,
-    RealModule,
-    TableModule,
+    // SocketModule,
+    AdministratorModule,
   ],
 })
 export class AppModule {}
