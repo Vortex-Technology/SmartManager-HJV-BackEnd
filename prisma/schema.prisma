@@ -10,33 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum InformationType {
-  FAKER
-  REAL
+enum RoleAdministrator {
+  MASTER
+  FULL_ACCESS
+  CREATOR
+  VIEWER
 }
 
-model Information {
-  id              String          @unique @default(uuid())
-  name            String          @unique
-  information     String
-  informationType InformationType @default(FAKER) @map("information_type")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime?       @updatedAt @map("updated_at")
-  tableId         String?         @map("table_id")
+model Administrator {
+  id       String            @id @unique @default(uuid())
+  name     String
+  image    String?
+  login    String            @unique
+  password String
+  role     RoleAdministrator @default(FULL_ACCESS)
 
-  table Table? @relation(fields: [tableId], references: [id])
-
-  @@map("Information")
-}
-
-model Table {
-  id           String    @unique @default(uuid())
-  name         String    @unique
-  passwordHash String    @map("password_hash")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime? @updatedAt @map("updated_at")
-
-  informations Information[]
-
-  @@map("tables")
+  @@map("administrator")
 }
