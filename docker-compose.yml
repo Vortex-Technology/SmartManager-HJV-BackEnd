@@ -1,16 +1,16 @@
 version: "3.8"
 
-services: 
-  postgres: 
-    container_name: clean-nest-templete
+services:
+  postgres:
+    container_name: smart-manager-db
     # For prodution is recomendly use bitnami images
     image: postgres
-    ports: 
+    ports:
       - 5432:5432
-    environment: 
+    environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: docker
-      POSTGRES_DB: clean-nest-template
+      POSTGRES_DB: SM-DB
       PGDATA: /data/postgres
-    volumes: 
-      - ./database/pg:/data/postgres
+    volumes:
+      - ./data/pg:/data/postgres
