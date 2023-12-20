@@ -5,6 +5,12 @@ export const envSchema = z.object({
   PORT: z.coerce.number().optional().default(3030),
   JWT_PRIVATE_kEY: z.string(),
   JWT_PUBLIC_KEY: z.string(),
+  JWT_USER_ACCESS_EXPIRES_IN: z.string(),
+  JWT_USER_REFRESH_EXPIRES_IN: z.string(),
+  JWT_ADM_ACCESS_EXPIRES_IN: z.string(),
+  JWT_ADM_REFRESH_EXPIRES_IN: z.string(),
+  ADM_REFRESH_EXPIRES_IN: z.coerce.number(),
+  USER_REFRESH_EXPIRES_IN: z.coerce.number(),
 })
 
 export type Env = z.infer<typeof envSchema>
