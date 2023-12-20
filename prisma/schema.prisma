@@ -10,6 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model RefreshToken {
+  id        String    @id @unique @default(uuid())
+  token     String
+  expiresIn DateTime  @map("expires_in")
+  expiredAt DateTime? @map("expired_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  administrator   Administrator? @relation(fields: [administratorId], references: [id])
+  administratorId String?        @map("administrator_id")
+
+  @@map("refresh_tokens")
+}
+
 enum RoleAdministrator {
   MASTER
   FULL_ACCESS
@@ -18,12 +31,16 @@ enum RoleAdministrator {
 }
 
 model Administrator {
-  id       String            @id @unique @default(uuid())
-  name     String
-  image    String?
-  login    String            @unique
-  password String
-  role     RoleAdministrator @default(FULL_ACCESS)
+  id        String            @id @unique @default(uuid())
+  name      String
+  image     String?
+  login     String            @unique
+  password  String
+  role      RoleAdministrator @default(VIEWER)
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime?         @updatedAt @map("udpated_at")
+
+  refreshTokens RefreshToken[]
 
   @@map("administrator")
 }
