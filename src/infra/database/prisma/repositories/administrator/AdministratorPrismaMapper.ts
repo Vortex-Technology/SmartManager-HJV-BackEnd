@@ -14,6 +14,8 @@ export class AdministratorPrismaMapper {
         password: raw.password,
         image: raw.image,
         role: raw.role as AdministratorRole,
+        createdAt: raw.createdAt,
+        updatedAt: raw.updatedAt,
       },
       new UniqueEntityId(raw.id),
     )
@@ -29,6 +31,8 @@ export class AdministratorPrismaMapper {
       id: administrator.id.toString(),
       image: administrator.image,
       role: administrator.role,
+      createdAt: administrator.createdAt,
+      updatedAt: administrator.updatedAt,
     }
   }
 }
