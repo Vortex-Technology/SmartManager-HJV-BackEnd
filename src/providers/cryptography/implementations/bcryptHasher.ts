@@ -6,13 +6,12 @@ export class BcryptHasher implements HashGenerator, HashComparer {
   async hash(plain: string): Promise<string> {
     const hashSalt = 10
 
-    const plainHashed = await hash(plain, hashSalt)
-    const encryptedPlainFinal = `${plainHashed}${hashSalt}`
+    const hashCreated = await hash(plain, hashSalt)
 
-    return encryptedPlainFinal
+    return hashCreated
   }
 
   async compare(plain: string, hash: string): Promise<boolean> {
-    return compare(plain, hash)
+    return await compare(plain, hash)
   }
 }

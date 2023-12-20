@@ -15,11 +15,16 @@ export interface AdministratorProps {
   image?: string | null
   password: string
   role: AdministratorRole
+  createdAt: Date
+  updatedAt: Date | null
 }
 
 export class Administrator extends AggregateRoot<AdministratorProps> {
   static create(
-    props: Optional<AdministratorProps, 'image' | 'role'>,
+    props: Optional<
+      AdministratorProps,
+      'image' | 'role' | 'createdAt' | 'updatedAt'
+    >,
     id?: UniqueEntityId,
   ) {
     const administratorProps: AdministratorProps = {
@@ -31,6 +36,8 @@ export class Administrator extends AggregateRoot<AdministratorProps> {
         .replace(/[^\w\s-]/gi, ''),
       image: props.image ?? null,
       role: props.role ?? AdministratorRole.FULL_ACCESS,
+      createdAt: props.createdAt ?? new Date(),
+      updatedAt: props.updatedAt ?? null,
     }
 
     const administrator = new Administrator(administratorProps, id)
@@ -56,5 +63,17 @@ export class Administrator extends AggregateRoot<AdministratorProps> {
 
   get role() {
     return this.props.role
+  }
+
+  get createdAt() {
+    return this.props.createdAt
+  }
+
+  get updatedAt() {
+    return this.props.updatedAt
+  }
+
+  touch() {
+    this.props.updatedAt = new Date()
   }
 }
