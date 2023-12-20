@@ -7,10 +7,20 @@ import { LoginAdministratorService } from './services/loginAdministrator.service
 import { EnvModule } from '@infra/env/env.module'
 import { DateModule } from '@providers/date/date.module'
 import { LoginAdministratorController } from './controllers/loginAdministrator.controller'
+import { GetAdministratorController } from './controllers/getAdministrator.controller'
+import { GetAdministratorService } from './services/getAdministrator.service'
 
 @Module({
-  controllers: [CreateAdministratorController, LoginAdministratorController],
+  controllers: [
+    CreateAdministratorController,
+    LoginAdministratorController,
+    GetAdministratorController,
+  ],
   imports: [DatabaseModule, CryptographyModule, DateModule, EnvModule],
-  providers: [CreateAdministratorService, LoginAdministratorService],
+  providers: [
+    CreateAdministratorService,
+    LoginAdministratorService,
+    GetAdministratorService,
+  ],
 })
 export class AdministratorModule {}
