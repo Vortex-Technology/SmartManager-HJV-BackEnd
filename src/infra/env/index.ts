@@ -11,6 +11,9 @@ export const envSchema = z.object({
   JWT_ADM_REFRESH_EXPIRES_IN: z.string(),
   ADM_REFRESH_EXPIRES_IN: z.coerce.number(),
   USER_REFRESH_EXPIRES_IN: z.coerce.number(),
+  NODE_ENV: z
+    .enum(['development', 'production', 'debug'])
+    .default('production'),
 })
 
 export type Env = z.infer<typeof envSchema>
