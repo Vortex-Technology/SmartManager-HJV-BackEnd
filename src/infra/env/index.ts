@@ -12,7 +12,7 @@ export const envSchema = z.object({
   ADM_REFRESH_EXPIRES_IN: z.coerce.number(),
   USER_REFRESH_EXPIRES_IN: z.coerce.number(),
   NODE_ENV: z
-    .enum(['development', 'production', 'debug'])
+    .enum(['development', 'production', 'debug', 'test'])
     .default('production'),
 })
 
