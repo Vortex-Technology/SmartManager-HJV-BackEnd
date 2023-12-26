@@ -17,30 +17,37 @@ model RefreshToken {
   expiredAt DateTime? @map("expired_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  administrator   Administrator? @relation(fields: [administratorId], references: [id])
-  administratorId String?        @map("administrator_id")
+  collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
+  collaboratorId String?       @map("collaborator_id")
 
   @@map("refresh_tokens")
 }
 
-enum RoleAdministrator {
+enum RoleCollaborator {
   MASTER
   FULL_ACCESS
-  CREATOR
+  EDITOR
   VIEWER
 }
 
-model Administrator {
-  id        String            @id @unique @default(uuid())
+enum CollaboratorType {
+  ADMINISTRATOR
+  SALLER
+  ATTENDANT
+}
+
+model Collaborator {
+  id        String           @id @unique @default(uuid())
   name      String
   image     String?
-  login     String            @unique
+  login     String           @unique
   password  String
-  role      RoleAdministrator @default(VIEWER)
-  createdAt DateTime          @default(now()) @map("created_at")
-  updatedAt DateTime?         @updatedAt @map("udpated_at")
+  type      CollaboratorType @default(ATTENDANT)
+  role      RoleCollaborator @default(MASTER)
+  createdAt DateTime         @default(now()) @map("created_at")
+  updatedAt DateTime?        @updatedAt @map("udpated_at")
 
   refreshTokens RefreshToken[]
 
-  @@map("administrator")
+  @@map("collaborators")
 }
