@@ -28,7 +28,7 @@ const createAdministratorBodySchema = z.object({
   login: z.string().min(4).max(30),
   password: z.string().min(8),
   image: z.string().optional(),
-  role: z.enum(['FULL_ACCESS', 'CREATOR', 'VIEWER']).optional(),
+  role: z.enum(['FULL_ACCESS', 'EDITOR', 'VIEWER']).optional(),
 })
 
 type CreateAdministratorBody = z.infer<typeof createAdministratorBodySchema>

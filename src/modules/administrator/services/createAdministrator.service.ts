@@ -12,7 +12,7 @@ interface Request {
   login: string
   password: string
   image?: string
-  role?: 'FULL_ACCESS' | 'CREATOR' | 'VIEWER'
+  role?: 'FULL_ACCESS' | 'EDITOR' | 'VIEWER'
   creatorId: string
 }
 
@@ -62,7 +62,7 @@ export class CreateAdministratorService {
 
     const roleMapper = {
       FULL_ACCESS: AdministratorRole.FULL_ACCESS,
-      CREATOR: AdministratorRole.CREATOR,
+      EDITOR: AdministratorRole.EDITOR,
       VIEWER: AdministratorRole.VIEWER,
     }
 

@@ -7,7 +7,7 @@ import { z } from 'zod'
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
   role: z
-    .enum(['MASTER', 'FULL_ACCESS', 'CREATOR', 'VIEWER'])
+    .enum(['MASTER', 'FULL_ACCESS', 'EDITOR', 'VIEWER'])
     .nullable()
     .optional(),
 })

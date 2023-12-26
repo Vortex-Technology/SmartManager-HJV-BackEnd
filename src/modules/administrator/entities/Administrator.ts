@@ -5,7 +5,7 @@ import { Optional } from '@shared/core/types/Optional'
 export enum AdministratorRole {
   MASTER = 'MASTER',
   FULL_ACCESS = 'FULL_ACCESS',
-  CREATOR = 'CREATOR',
+  EDITOR = 'EDITOR',
   VIEWER = 'VIEWER',
 }
 
