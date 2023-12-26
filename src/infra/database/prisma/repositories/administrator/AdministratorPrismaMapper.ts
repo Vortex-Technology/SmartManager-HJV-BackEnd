@@ -2,7 +2,7 @@ import {
   Administrator,
   AdministratorRole,
 } from '@modules/administrator/entities/Administrator'
-import { Prisma, Administrator as AdministratorPrisma } from '@prisma/client'
+import { Prisma, Collaborator as AdministratorPrisma } from '@prisma/client'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
 export class AdministratorPrismaMapper {
@@ -23,7 +23,7 @@ export class AdministratorPrismaMapper {
 
   static toPrisma(
     administrator: Administrator,
-  ): Prisma.AdministratorUncheckedCreateInput {
+  ): Prisma.CollaboratorUncheckedCreateInput {
     return {
       login: administrator.login,
       name: administrator.name,
@@ -31,6 +31,7 @@ export class AdministratorPrismaMapper {
       id: administrator.id.toString(),
       image: administrator.image,
       role: administrator.role,
+      type: 'ADMINISTRATOR',
       createdAt: administrator.createdAt,
       updatedAt: administrator.updatedAt,
     }

@@ -59,7 +59,7 @@ describe('Create administrator (E2E)', () => {
 
     const refreshTokenOnDatabase = await prisma.refreshToken.findFirst({
       where: {
-        administratorId: administrator.id.toString(),
+        collaboratorId: administrator.id.toString(),
       },
     })
 

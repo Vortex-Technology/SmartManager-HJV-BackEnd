@@ -6,10 +6,10 @@ import { AdministratorPrismaMapper } from './AdministratorPrismaMapper'
 
 @Injectable()
 export class AdministratorPrismaRepository implements AdministratorRepository {
-  constructor(private readonly primsa: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string): Promise<Administrator | null> {
-    const administrator = await this.primsa.administrator.findUnique({
+    const administrator = await this.prisma.collaborator.findUnique({
       where: {
         id,
       },
@@ -21,7 +21,7 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
   }
 
   async findByLogin(login: string): Promise<Administrator | null> {
-    const administrator = await this.primsa.administrator.findUnique({
+    const administrator = await this.prisma.collaborator.findUnique({
       where: {
         login,
       },
@@ -33,7 +33,7 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
   }
 
   async create(administrator: Administrator): Promise<void> {
-    await this.primsa.administrator.create({
+    await this.prisma.collaborator.create({
       data: AdministratorPrismaMapper.toPrisma(administrator),
     })
   }

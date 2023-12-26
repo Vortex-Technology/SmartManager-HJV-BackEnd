@@ -66,7 +66,7 @@ describe('Create administrator (E2E)', () => {
     expect(response.statusCode).toEqual(statusCode.Created)
     expect(response.headers.location).toBeTruthy()
 
-    const administratorOnDatabase = await prisma.administrator.findUnique({
+    const administratorOnDatabase = await prisma.collaborator.findUnique({
       where: {
         login: 'jonas12',
       },
@@ -110,7 +110,11 @@ describe('Create administrator (E2E)', () => {
 
     expect(response2.statusCode).toEqual(statusCode.Conflict)
 
-    const administratorsOnDatabase = await prisma.administrator.count()
+    const administratorsOnDatabase = await prisma.collaborator.count({
+      where: {
+        type: 'ADMINISTRATOR',
+      },
+    })
     expect(administratorsOnDatabase).toEqual(2)
   })
 
@@ -134,7 +138,11 @@ describe('Create administrator (E2E)', () => {
 
     expect(response.statusCode).toEqual(statusCode.Forbidden)
 
-    const administratorsOnDatabase = await prisma.administrator.count()
+    const administratorsOnDatabase = await prisma.collaborator.count({
+      where: {
+        type: 'ADMINISTRATOR',
+      },
+    })
     expect(administratorsOnDatabase).toEqual(2)
   })
 })

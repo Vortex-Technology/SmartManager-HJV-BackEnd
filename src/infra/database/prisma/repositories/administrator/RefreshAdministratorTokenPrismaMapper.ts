@@ -6,7 +6,7 @@ export class RefreshAdministratorTokenPrismaMapper {
   static toEntity(raw: RefreshToken): RefreshAdministratorToken {
     return RefreshAdministratorToken.create(
       {
-        administratorId: new UniqueEntityId(raw.administratorId!),
+        administratorId: new UniqueEntityId(raw.collaboratorId!),
         expiresIn: raw.expiresIn,
         token: raw.token,
         createdAt: raw.createdAt,
@@ -22,7 +22,7 @@ export class RefreshAdministratorTokenPrismaMapper {
     return {
       expiresIn: refreshAdministratorToken.expiresIn,
       token: refreshAdministratorToken.token,
-      administratorId: refreshAdministratorToken.administratorId.toString(),
+      collaboratorId: refreshAdministratorToken.administratorId.toString(),
       createdAt: refreshAdministratorToken.createdAt,
       expiredAt: refreshAdministratorToken.expiredAt,
       id: refreshAdministratorToken.id.toString(),

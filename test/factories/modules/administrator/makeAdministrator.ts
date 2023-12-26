@@ -35,7 +35,7 @@ export class MakeAdministrator {
   ) {
     const administrator = makeAdministrator(override, id)
 
-    await this.prisma.administrator.create({
+    await this.prisma.collaborator.create({
       data: AdministratorPrismaMapper.toPrisma(administrator),
     })
 
