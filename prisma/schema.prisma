@@ -32,7 +32,7 @@ enum RoleCollaborator {
 
 enum CollaboratorType {
   ADMINISTRATOR
-  SALLER
+  SELLER
   ATTENDANT
 }
 
@@ -43,7 +43,7 @@ model Collaborator {
   login     String           @unique
   password  String
   type      CollaboratorType @default(ATTENDANT)
-  role      RoleCollaborator @default(MASTER)
+  role      RoleCollaborator @default(EDITOR)
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime?        @updatedAt @map("udpated_at")
   deletedAt DateTime?        @map("deleted_at")
