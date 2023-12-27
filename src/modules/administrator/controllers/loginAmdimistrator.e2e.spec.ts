@@ -11,7 +11,7 @@ import { DatabaseModule } from '@infra/database/database.module'
 import request from 'supertest'
 import { EnvModule } from '@infra/env/env.module'
 
-describe('Create administrator (E2E)', () => {
+describe('Login administrator (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let makeAdministrator: MakeAdministrator
