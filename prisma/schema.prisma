@@ -46,6 +46,7 @@ model Collaborator {
   role      RoleCollaborator @default(MASTER)
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime?        @updatedAt @map("udpated_at")
+  deletedAt DateTime?        @map("deleted_at")
 
   refreshTokens RefreshToken[]
 

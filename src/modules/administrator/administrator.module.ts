@@ -9,18 +9,22 @@ import { DateModule } from '@providers/date/date.module'
 import { LoginAdministratorController } from './controllers/loginAdministrator.controller'
 import { GetAdministratorController } from './controllers/getAdministrator.controller'
 import { GetAdministratorService } from './services/getAdministrator.service'
+import { DeleteAdministratorController } from './controllers/deleteAdministrator.controller'
+import { DeleteAdministratorService } from './services/deleteAdministrator.service'
 
 @Module({
   controllers: [
     CreateAdministratorController,
     LoginAdministratorController,
     GetAdministratorController,
+    DeleteAdministratorController,
   ],
   imports: [DatabaseModule, CryptographyModule, DateModule, EnvModule],
   providers: [
     CreateAdministratorService,
     LoginAdministratorService,
     GetAdministratorService,
+    DeleteAdministratorService,
   ],
 })
 export class AdministratorModule {}

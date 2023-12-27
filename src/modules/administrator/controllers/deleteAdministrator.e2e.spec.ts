@@ -7,20 +7,23 @@ import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdm
 import { Administrator, AdministratorRole } from '../entities/Administrator'
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
+import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
 import request from 'supertest'
-import { EnvModule } from '@infra/env/env.module'
 
-describe('Login administrator (E2E)', () => {
+describe('Delete administrator (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let makeAdministrator: MakeAdministrator
   let hasherGenerator: HashGenerator
+  let encrypter: Encrypter
+  let excluder: Administrator
   let administrator: Administrator
+  let token: string
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, CryptographyModule, DatabaseModule, EnvModule],
+      imports: [AppModule, CryptographyModule, DatabaseModule],
       providers: [MakeAdministrator],
     }).compile()
 
@@ -28,65 +31,61 @@ describe('Login administrator (E2E)', () => {
     prisma = moduleRef.get(PrismaService)
     makeAdministrator = moduleRef.get(MakeAdministrator)
     hasherGenerator = moduleRef.get(HashGenerator)
+    encrypter = moduleRef.get(Encrypter)
 
     const hashedPassword = await hasherGenerator.hash('12345678')
 
-    administrator = await makeAdministrator.create({
-      name: 'master',
-      login: 'master',
-      role: AdministratorRole.MASTER,
+    excluder = await makeAdministrator.create({
+      name: 'excluder',
+      login: 'excluder',
+      role: AdministratorRole.FULL_ACCESS,
       password: hashedPassword,
     })
+
+    administrator = await makeAdministrator.create({
+      role: AdministratorRole.VIEWER,
+    })
+
+    token = await encrypter.encrypt({
+      sub: excluder.id.toString(),
+      role: excluder.role,
+    })
+
     await app.init()
   })
 
-  test('[POST] /administrator/login [201]', async () => {
+  test('[DELETE] /administrator/:id [204]', async () => {
+    const idOfAdministratorToDelete = administrator.id.toString()
+
     const response = await request(app.getHttpServer())
-      .post('/administrator/login')
-      .send({
-        login: 'master',
-        password: '12345678',
+      .delete(`/administrator/${idOfAdministratorToDelete}`)
+      .set({
+        Authorization: `Bearer ${token}`,
       })
       .timeout({ deadline: 10000, response: 10000 })
 
-    expect(response.statusCode).toEqual(statusCode.Created)
-    expect(response.body).toEqual(
-      expect.objectContaining({
-        accessToken: expect.any(String),
-        refreshToken: expect.any(String),
-      }),
-    )
+    expect(response.statusCode).toEqual(statusCode.NoContent)
 
-    const refreshTokenOnDatabase = await prisma.refreshToken.findFirst({
+    const administratorOnDatabase = await prisma.collaborator.findUnique({
       where: {
-        collaboratorId: administrator.id.toString(),
+        id: idOfAdministratorToDelete,
       },
     })
 
-    expect(refreshTokenOnDatabase).toBeTruthy()
+    expect(administratorOnDatabase).toBeTruthy()
+    expect(administratorOnDatabase?.deletedAt).toBeInstanceOf(Date)
   })
 
-  test('[POST] /administrator [403]', async () => {
-    // Existent administrator
+  test('[DELETE] /administrator/:id [404]', async () => {
+    const idOfAdministratorToDelete = administrator.id.toString()
+
     const response = await request(app.getHttpServer())
-      .post('/administrator/login')
-      .send({
-        login: 'master',
-        password: 'wrong-password',
+      .delete(`/administrator/${idOfAdministratorToDelete}`)
+      .set({
+        Authorization: `Bearer ${token}`,
       })
       .timeout({ deadline: 10000, response: 10000 })
 
-    expect(response.statusCode).toEqual(statusCode.Forbidden)
-
-    // Inexistent administrator
-    const response2 = await request(app.getHttpServer())
-      .post('/administrator/login')
-      .send({
-        login: 'inexistent-administrator',
-        password: '12345678',
-      })
-      .timeout({ deadline: 10000, response: 10000 })
-
-    expect(response2.statusCode).toEqual(statusCode.Forbidden)
+    expect(response.statusCode).toEqual(statusCode.NotFound)
   })
 })

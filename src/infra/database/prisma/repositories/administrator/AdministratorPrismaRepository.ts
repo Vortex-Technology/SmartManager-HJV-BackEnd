@@ -12,6 +12,7 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
     const administrator = await this.prisma.collaborator.findUnique({
       where: {
         id,
+        deletedAt: null,
       },
     })
 
@@ -24,6 +25,7 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
     const administrator = await this.prisma.collaborator.findUnique({
       where: {
         login,
+        deletedAt: null,
       },
     })
 
@@ -34,6 +36,15 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
 
   async create(administrator: Administrator): Promise<void> {
     await this.prisma.collaborator.create({
+      data: AdministratorPrismaMapper.toPrisma(administrator),
+    })
+  }
+
+  async save(administrator: Administrator): Promise<void> {
+    await this.prisma.collaborator.update({
+      where: {
+        id: administrator.id.toString(),
+      },
       data: AdministratorPrismaMapper.toPrisma(administrator),
     })
   }

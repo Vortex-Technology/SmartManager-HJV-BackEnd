@@ -29,4 +29,12 @@ export class AdministratorInMemoryRepository
 
     return administrator
   }
+
+  async save(administrator: Administrator): Promise<void> {
+    const administratorIndex = this.administrators.findIndex((adm) =>
+      adm.equals(administrator),
+    )
+
+    this.administrators[administratorIndex] = administrator
+  }
 }
