@@ -16,6 +16,7 @@ export class AdministratorPrismaMapper {
         role: raw.role as AdministratorRole,
         createdAt: raw.createdAt,
         updatedAt: raw.updatedAt,
+        deletedAt: raw.deletedAt,
       },
       new UniqueEntityId(raw.id),
     )
@@ -34,6 +35,7 @@ export class AdministratorPrismaMapper {
       type: 'ADMINISTRATOR',
       createdAt: administrator.createdAt,
       updatedAt: administrator.updatedAt,
+      deletedAt: administrator.deletedAt,
     }
   }
 }
