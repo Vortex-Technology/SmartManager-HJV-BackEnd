@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { DateAddition } from '../contracts/dateAddition'
-import dayjs from 'dayjs'
+// don't convert it for default import
+import * as dayjs from 'dayjs'
 
 @Injectable()
 export class DayJs implements DateAddition {
