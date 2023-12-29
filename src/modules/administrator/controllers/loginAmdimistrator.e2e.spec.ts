@@ -66,7 +66,7 @@ describe('Login administrator (E2E)', () => {
     expect(refreshTokenOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /administrator [403]', async () => {
+  test('[POST] /administrator/login [403]', async () => {
     // Existent administrator
     const response = await request(app.getHttpServer())
       .post('/administrator/login')
