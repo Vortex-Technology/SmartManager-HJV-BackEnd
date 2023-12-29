@@ -1,20 +1,37 @@
 import {
+  OnGatewayConnection,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  OnGatewayConnection,
+  ConnectedSocket,
 } from '@nestjs/websockets'
-import { Server } from 'http'
+import { Server, Socket } from 'socket.io'
 
-@WebSocketGateway(3003)
+@WebSocketGateway(3005, {
+  transports: ['websocket', 'polling'],
+  cors: {
+    origin: 'http://localhost:1212',
+    credentials: true,
+  },
+})
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection {
   @WebSocketServer() server!: Server
 
-  afterInit() {
-    console.log('Socket is running')
+  afterInit(server: Server) {
+    this.server = server
+    console.log('Socket server running')
   }
 
-  handleConnection(client: any, ...args: any[]) {
+  // temporary
+  @SubscribeMessage('ping')
+  handlePing(@ConnectedSocket() client: Socket) {
+    console.log('ping')
+    client.emit('pong')
+  }
+
+  handleConnection(@ConnectedSocket() client: Socket) {
+    // temporary
     console.log(client.id)
   }
 }
