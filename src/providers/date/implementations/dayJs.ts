@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common'
 import { DateAddition } from '../contracts/dateAddition'
-// don't convert it for default import
-import * as dayjs from 'dayjs'
+// Don't touch this
+import * as dayjsProd from 'dayjs'
+import dayjsTest from 'dayjs'
+
+const dayjs = process.env.NODE_ENV === 'test' ? dayjsTest : dayjsProd
 
 @Injectable()
 export class DayJs implements DateAddition {
