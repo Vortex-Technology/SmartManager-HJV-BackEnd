@@ -4,7 +4,7 @@ import { envSchema } from './env'
 import { AuthProvider } from '@providers/auth/auth.module'
 import { EnvModule } from './env/env.module'
 import { AdministratorModule } from '@modules/administrator/administrator.module'
-// import { SocketModule } from '@providers/socket/socket.module'
+import { SocketModule } from '@providers/socket/socket.module'
 
 @Module({
   imports: [
@@ -14,7 +14,7 @@ import { AdministratorModule } from '@modules/administrator/administrator.module
     }),
     EnvModule,
     AuthProvider,
-    // SocketModule,
+    SocketModule,
     AdministratorModule,
   ],
 })
