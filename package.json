@@ -27,6 +27,7 @@
     "@nestjs/passport": "^10.0.1",
     "@nestjs/platform-express": "^10.2.10",
     "@nestjs/platform-socket.io": "^10.2.10",
+    "@nestjs/websockets": "^10.3.0",
     "@prisma/client": "^5.2.0",
     "bcryptjs": "^2.4.3",
     "dayjs": "^1.11.10",
@@ -36,6 +37,7 @@
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
     "socket.io": "^4.7.2",
+    "websocket": "^1.0.34",
     "zod": "^3.22.2",
     "zod-validation-error": "^1.5.0"
   },
