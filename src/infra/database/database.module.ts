@@ -8,6 +8,8 @@ import { SellerRepository } from '@modules/seller/repositories/SellerRepository'
 import { SellerPrismaRepository } from './prisma/repositories/seller/SellerPrismaRepository'
 import { AttendantRepository } from '@modules/attendant/repositories/AttendantRepository'
 import { AttendantPrismaRepository } from './prisma/repositories/attendant/AttendantPrismaRepository'
+import { RefreshSellerTokenRepository } from '@modules/seller/repositories/RefreshSellerTokenRepository'
+import { RefreshSellerTokenPrismaRepository } from './prisma/repositories/seller/RefreshSellerTokenPrismaRepository'
 
 @Module({
   providers: [
@@ -28,6 +30,10 @@ import { AttendantPrismaRepository } from './prisma/repositories/attendant/Atten
       provide: AttendantRepository,
       useClass: AttendantPrismaRepository,
     },
+    {
+      provide: RefreshSellerTokenRepository,
+      useClass: RefreshSellerTokenPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -35,6 +41,7 @@ import { AttendantPrismaRepository } from './prisma/repositories/attendant/Atten
     RefreshAdministratorTokenRepository,
     SellerRepository,
     AttendantRepository,
+    RefreshSellerTokenRepository,
   ],
 })
 export class DatabaseModule {}

@@ -53,6 +53,7 @@ export class LoginAdministratorService {
       {
         sub: administrator.id.toString(),
         role: administrator.role,
+        type: 'ADMINISTRATOR',
       },
       {
         expiresIn: this.env.get('JWT_ADM_ACCESS_EXPIRES_IN'),
@@ -63,6 +64,7 @@ export class LoginAdministratorService {
       {
         sub: administrator.id.toString(),
         role: administrator.role,
+        type: 'ADMINISTRATOR',
       },
       {
         expiresIn: this.env.get('JWT_ADM_REFRESH_EXPIRES_IN'),

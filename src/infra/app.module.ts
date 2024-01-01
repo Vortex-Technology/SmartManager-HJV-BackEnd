@@ -5,6 +5,7 @@ import { AuthProvider } from '@providers/auth/auth.module'
 import { EnvModule } from './env/env.module'
 import { AdministratorModule } from '@modules/administrator/administrator.module'
 import { SocketModule } from '@providers/socket/socket.module'
+import { SellerModule } from '@modules/seller/seller.module'
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SocketModule } from '@providers/socket/socket.module'
     AuthProvider,
     SocketModule,
     AdministratorModule,
+    SellerModule,
   ],
 })
 export class AppModule {}
