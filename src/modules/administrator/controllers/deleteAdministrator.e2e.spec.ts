@@ -49,6 +49,7 @@ describe('Delete administrator (E2E)', () => {
     token = await encrypter.encrypt({
       sub: excluder.id.toString(),
       role: excluder.role,
+      type: 'ADMINISTRATOR',
     })
 
     await app.init()
