@@ -45,6 +45,7 @@ describe('Create seller (E2E)', () => {
     token = await encrypter.encrypt({
       sub: master.id.toString(),
       role: master.role,
+      type: 'ADMINISTRATOR',
     })
 
     await app.init()
@@ -95,6 +96,7 @@ describe('Create seller (E2E)', () => {
       // A random inexistent uuid
       sub: new UniqueEntityId().toString(),
       role: master.role,
+      type: 'ADMINISTRATOR',
     })
 
     const response2 = await request(app.getHttpServer())
@@ -123,6 +125,7 @@ describe('Create seller (E2E)', () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
+      type: 'ADMINISTRATOR',
     })
 
     const response = await request(app.getHttpServer())

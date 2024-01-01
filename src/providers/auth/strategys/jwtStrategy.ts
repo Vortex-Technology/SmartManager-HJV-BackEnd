@@ -10,6 +10,7 @@ const tokenPayloadSchema = z.object({
     .enum(['MASTER', 'FULL_ACCESS', 'EDITOR', 'VIEWER'])
     .nullable()
     .optional(),
+  type: z.enum(['ADMINISTRATOR', 'ATTENDANT', 'SELLER']),
 })
 
 export type TokenPayloadSchema = z.infer<typeof tokenPayloadSchema>

@@ -12,6 +12,8 @@ import { RefreshSellerTokenRepository } from '@modules/seller/repositories/Refre
 import { RefreshSellerTokenPrismaRepository } from './prisma/repositories/seller/RefreshSellerTokenPrismaRepository'
 import { RefreshAttendantTokenRepository } from '@modules/attendant/repositories/RefreshAttendantTokenRepository'
 import { RefreshAttendantTokenPrismaRepository } from './prisma/repositories/attendant/RefreshAttendantTokenPrismaRepository'
+import { ProductCategoriesRepository } from '@modules/productCategory/repositories/ProductCategoriesRepository'
+import { ProductCategoryPrismaRepository } from './prisma/repositories/productCategory/ProductCategoryPrismaRepository'
 
 @Module({
   providers: [
@@ -40,6 +42,10 @@ import { RefreshAttendantTokenPrismaRepository } from './prisma/repositories/att
       provide: RefreshAttendantTokenRepository,
       useClass: RefreshAttendantTokenPrismaRepository,
     },
+    {
+      provide: ProductCategoriesRepository,
+      useClass: ProductCategoryPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -49,6 +55,7 @@ import { RefreshAttendantTokenPrismaRepository } from './prisma/repositories/att
     AttendantRepository,
     RefreshSellerTokenRepository,
     RefreshAttendantTokenRepository,
+    ProductCategoriesRepository,
   ],
 })
 export class DatabaseModule {}

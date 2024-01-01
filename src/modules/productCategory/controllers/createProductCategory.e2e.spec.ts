@@ -3,20 +3,21 @@ import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
 import { AppModule } from '@infra/app.module'
 import { statusCode } from 'src/config/statusCode'
-import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
-import { Administrator, AdministratorRole } from '../entities/Administrator'
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
-import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
 import request from 'supertest'
+import {
+  Administrator,
+  AdministratorRole,
+} from '@modules/administrator/entities/Administrator'
 
-describe('Create administrator (E2E)', () => {
+describe('Create product category (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
   let makeAdministrator: MakeAdministrator
-  let hasherGenerator: HashGenerator
   let encrypter: Encrypter
   let master: Administrator
   let token: string
@@ -30,16 +31,10 @@ describe('Create administrator (E2E)', () => {
     app = moduleRef.createNestApplication()
     prisma = moduleRef.get(PrismaService)
     makeAdministrator = moduleRef.get(MakeAdministrator)
-    hasherGenerator = moduleRef.get(HashGenerator)
     encrypter = moduleRef.get(Encrypter)
 
-    const hashedPassword = await hasherGenerator.hash('12345678')
-
     master = await makeAdministrator.create({
-      name: 'master',
-      login: 'master',
-      role: AdministratorRole.MASTER,
-      password: hashedPassword,
+      role: AdministratorRole.FULL_ACCESS,
     })
 
     token = await encrypter.encrypt({
@@ -51,41 +46,39 @@ describe('Create administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /administrator [201]', async () => {
+  test('[POST] /categories/products [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/categories/products')
       .set({
         Authorization: `Bearer ${token}`,
       })
       .send({
-        name: 'Jonas',
-        login: 'jonas12',
-        password: 'jonas12345',
+        name: 'product category',
+        description: 'A new product category to test the creation',
       })
       .timeout({ deadline: 10000, response: 10000 })
 
     expect(response.statusCode).toEqual(statusCode.Created)
     expect(response.headers.location).toBeTruthy()
 
-    const administratorOnDatabase = await prisma.collaborator.findUnique({
+    const productCategoryOnDatabase = await prisma.productCategory.findUnique({
       where: {
-        login: 'jonas12',
+        name: 'product-category',
       },
     })
 
-    expect(administratorOnDatabase).toBeTruthy()
+    expect(productCategoryOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /administrator [409]', async () => {
+  test('[POST] /categories/products [409]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/categories/products')
       .set({
         Authorization: `Bearer ${token}`,
       })
       .send({
-        name: 'Jonas',
-        login: 'jonas12',
-        password: 'jonas12345',
+        name: 'product category',
+        description: 'A new product category to test the creation',
       })
       .timeout({ deadline: 10000, response: 10000 })
 
@@ -99,28 +92,23 @@ describe('Create administrator (E2E)', () => {
     })
 
     const response2 = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/categories/products')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
       .send({
-        name: 'Amauri',
-        login: 'ama12',
-        password: '12345678',
+        name: 'product category 2',
+        description: 'A new product category to test the creation',
       })
       .timeout({ deadline: 10000, response: 10000 })
 
     expect(response2.statusCode).toEqual(statusCode.Conflict)
 
-    const administratorsOnDatabase = await prisma.collaborator.count({
-      where: {
-        type: 'ADMINISTRATOR',
-      },
-    })
-    expect(administratorsOnDatabase).toEqual(2)
+    const productCategoriesOnDatabase = await prisma.productCategory.count()
+    expect(productCategoriesOnDatabase).toEqual(1)
   })
 
-  test('[POST] /administrator [403]', async () => {
+  test('[POST] /categories/products [403]', async () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
@@ -128,24 +116,19 @@ describe('Create administrator (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/categories/products')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
       .send({
-        name: 'Filipe',
-        login: 'filipe12',
-        password: '12345678',
+        name: 'product category 3',
+        description: 'A new product category to test the creation',
       })
       .timeout({ deadline: 10000, response: 10000 })
 
     expect(response.statusCode).toEqual(statusCode.Forbidden)
 
-    const administratorsOnDatabase = await prisma.collaborator.count({
-      where: {
-        type: 'ADMINISTRATOR',
-      },
-    })
-    expect(administratorsOnDatabase).toEqual(2)
+    const productCategoriesOnDatabase = await prisma.productCategory.count()
+    expect(productCategoriesOnDatabase).toEqual(1)
   })
 })
