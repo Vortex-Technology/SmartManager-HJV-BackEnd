@@ -6,6 +6,7 @@ import { EnvModule } from './env/env.module'
 import { AdministratorModule } from '@modules/administrator/administrator.module'
 import { SocketModule } from '@providers/socket/socket.module'
 import { SellerModule } from '@modules/seller/seller.module'
+import { AttendantModule } from '@modules/attendant/attendant.module'
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { SellerModule } from '@modules/seller/seller.module'
     SocketModule,
     AdministratorModule,
     SellerModule,
+    AttendantModule,
   ],
 })
 export class AppModule {}
