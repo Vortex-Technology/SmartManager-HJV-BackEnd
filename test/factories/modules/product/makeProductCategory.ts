@@ -1,10 +1,11 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductCategoryPrismaMapper } from '@infra/database/prisma/repositories/productCategory/ProductCategoryPrismaMapper'
+import { ProductCategoryPrismaMapper } from '@infra/database/prisma/repositories/product/ProductCategoryPrismaMapper'
 import {
   ProductCategory,
   ProductCategoryProps,
-} from '@modules/productCategory/entities/ProductCategory'
+} from '@modules/product/entities/ProductCategory'
+
 import { Injectable } from '@nestjs/common'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 

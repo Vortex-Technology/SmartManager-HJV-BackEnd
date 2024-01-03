@@ -7,7 +7,7 @@ import { AdministratorModule } from '@modules/administrator/administrator.module
 import { SocketModule } from '@providers/socket/socket.module'
 import { SellerModule } from '@modules/seller/seller.module'
 import { AttendantModule } from '@modules/attendant/attendant.module'
-import { ProductCategoryModule } from '@modules/productCategory/productCategory.module'
+import { ProductModule } from '@modules/product/product.module'
 
 @Module({
   imports: [
@@ -21,7 +21,7 @@ import { ProductCategoryModule } from '@modules/productCategory/productCategory.
     AdministratorModule,
     SellerModule,
     AttendantModule,
-    ProductCategoryModule,
+    ProductModule,
   ],
 })
 export class AppModule {}

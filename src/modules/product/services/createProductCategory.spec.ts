@@ -1,13 +1,13 @@
 import { AdministratorInMemoryRepository } from '@test/repositories/modules/administrator/AdministratorInMemoryRepository'
 import { makeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
 import { CreateProductCategoryService } from './createProductCategory.service'
-import { ProductCategoryInMemoryRepository } from '@test/repositories/modules/productCategory/ProductCategoryInMemoryRepository'
 import { AdministratorRole } from '@modules/administrator/entities/Administrator'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
-import { makeProductCategory } from '@test/factories/modules/productCategory/makeProductCategory'
 import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'
+import { makeProductCategory } from '@test/factories/modules/product/makeProductCategory'
+import { ProductCategoryInMemoryRepository } from '@test/repositories/modules/product/ProductCategoryInMemoryRepository'
 
 let administratorInMemoryRepository: AdministratorInMemoryRepository
 let productCategoryInMemoryRepository: ProductCategoryInMemoryRepository
