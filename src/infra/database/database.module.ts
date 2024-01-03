@@ -12,8 +12,12 @@ import { RefreshSellerTokenRepository } from '@modules/seller/repositories/Refre
 import { RefreshSellerTokenPrismaRepository } from './prisma/repositories/seller/RefreshSellerTokenPrismaRepository'
 import { RefreshAttendantTokenRepository } from '@modules/attendant/repositories/RefreshAttendantTokenRepository'
 import { RefreshAttendantTokenPrismaRepository } from './prisma/repositories/attendant/RefreshAttendantTokenPrismaRepository'
-import { ProductCategoriesRepository } from '@modules/productCategory/repositories/ProductCategoriesRepository'
-import { ProductCategoryPrismaRepository } from './prisma/repositories/productCategory/ProductCategoryPrismaRepository'
+import { ProductCategoriesRepository } from '@modules/product/repositories/ProductCategoriesRepository'
+import { ProductCategoryPrismaRepository } from './prisma/repositories/product/ProductCategoryPrismaRepository'
+import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
+import { ProductVariantPrismaRepository } from './prisma/repositories/product/ProductVariantPrismaRepository'
+import { ProductsRepository } from '@modules/product/repositories/ProductsRepository'
+import { ProductPrismaRepository } from './prisma/repositories/product/ProductPrismaRepository'
 
 @Module({
   providers: [
@@ -46,6 +50,14 @@ import { ProductCategoryPrismaRepository } from './prisma/repositories/productCa
       provide: ProductCategoriesRepository,
       useClass: ProductCategoryPrismaRepository,
     },
+    {
+      provide: ProductVariantsRepository,
+      useClass: ProductVariantPrismaRepository,
+    },
+    {
+      provide: ProductsRepository,
+      useClass: ProductPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -56,6 +68,8 @@ import { ProductCategoryPrismaRepository } from './prisma/repositories/productCa
     RefreshSellerTokenRepository,
     RefreshAttendantTokenRepository,
     ProductCategoriesRepository,
+    ProductVariantsRepository,
+    ProductsRepository,
   ],
 })
 export class DatabaseModule {}
