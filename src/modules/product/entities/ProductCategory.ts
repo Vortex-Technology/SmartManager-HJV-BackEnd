@@ -18,10 +18,7 @@ export class ProductCategory extends AggregateRoot<ProductCategoryProps> {
     id?: UniqueEntityId,
   ) {
     const productCategoryProps: ProductCategoryProps = {
-      name: props.name
-        .toLowerCase()
-        .replaceAll(' ', '-')
-        .replace(/[^\w\s-]/gi, ''),
+      name: ProductCategory.normalizeName(props.name),
       createdAt: props.createdAt ?? new Date(),
       deletedAt: props.deletedAt ?? null,
       description: props.description ?? null,
@@ -30,6 +27,13 @@ export class ProductCategory extends AggregateRoot<ProductCategoryProps> {
     const productCategory = new ProductCategory(productCategoryProps, id)
 
     return productCategory
+  }
+
+  static normalizeName(name: string) {
+    return name
+      .toLowerCase()
+      .replaceAll(' ', '-')
+      .replace(/[^\w\s-]/gi, '')
   }
 
   get name() {

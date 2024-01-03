@@ -46,9 +46,9 @@ describe('Create product category (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /categories/products [201]', async () => {
+  test('[POST] /products/categories [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/categories/products')
+      .post('/products/categories')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -70,9 +70,9 @@ describe('Create product category (E2E)', () => {
     expect(productCategoryOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /categories/products [409]', async () => {
+  test('[POST] /products/categories [409]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/categories/products')
+      .post('/products/categories')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -92,7 +92,7 @@ describe('Create product category (E2E)', () => {
     })
 
     const response2 = await request(app.getHttpServer())
-      .post('/categories/products')
+      .post('/products/categories')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
@@ -108,7 +108,7 @@ describe('Create product category (E2E)', () => {
     expect(productCategoriesOnDatabase).toEqual(1)
   })
 
-  test('[POST] /categories/products [403]', async () => {
+  test('[POST] /products/categories [403]', async () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
@@ -116,7 +116,7 @@ describe('Create product category (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .post('/categories/products')
+      .post('/products/categories')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

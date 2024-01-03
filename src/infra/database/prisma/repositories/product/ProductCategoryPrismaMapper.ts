@@ -1,4 +1,4 @@
-import { ProductCategory } from '@modules/productCategory/entities/ProductCategory'
+import { ProductCategory } from '@modules/product/entities/ProductCategory'
 import {
   Prisma,
   ProductCategory as ProductCategoryPrisma,

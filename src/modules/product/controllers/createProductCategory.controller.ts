@@ -33,7 +33,7 @@ const bodyValidationPipe = new ZodValidationPipe(
   createProductCategoryBodySchema,
 )
 
-@Controller('/categories/products')
+@Controller('/products/categories')
 export class CreateProductCategoryController {
   constructor(
     private readonly createProductCategoryService: CreateProductCategoryService,
@@ -84,7 +84,7 @@ export class CreateProductCategoryController {
 
     res.header(
       'Location',
-      `/categories/products/${productCategory.id.toString()}`,
+      `/products/categories/${productCategory.id.toString()}`,
     )
     return res.status(statusCode.Created).end()
   }
