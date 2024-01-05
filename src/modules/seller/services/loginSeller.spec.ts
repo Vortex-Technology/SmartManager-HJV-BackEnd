@@ -5,16 +5,16 @@ import { makeSeller } from '@test/factories/modules/seller/makeSeller'
 import { FakeEncrypter } from '@test/repositories/providers/cryptography/fakeEncrypter'
 import { FakeEnv } from '@test/config/env/fakeEnv'
 import { DayJs } from '@providers/date/implementations/dayJs'
-import { RefreshSellerTokenInMemoryRepository } from '@test/repositories/modules/seller/RefreshSellerTokenInMemoryRepository'
 import { EnvService } from '@infra/env/env.service'
 import { SellerWrongCredentials } from '../errors/SellerWrongCredentials'
+import { RefreshTokenInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokenInMemoryRepository'
 
 let sellerInMemoryRepository: SellerInMemoryRepository
 let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
 let fakeEnv: FakeEnv
 let fakeDateProvider: DayJs
-let refreshSellerTokenInMemoryRepository: RefreshSellerTokenInMemoryRepository
+let refreshTokenInMemoryRepository: RefreshTokenInMemoryRepository
 
 let sut: LoginSellerService
 
@@ -25,8 +25,7 @@ describe('Login Seller', () => {
     fakeEncrypter = new FakeEncrypter()
     fakeEnv = new FakeEnv()
     fakeDateProvider = new DayJs()
-    refreshSellerTokenInMemoryRepository =
-      new RefreshSellerTokenInMemoryRepository()
+    refreshTokenInMemoryRepository = new RefreshTokenInMemoryRepository()
 
     sut = new LoginSellerService(
       sellerInMemoryRepository,
@@ -34,7 +33,7 @@ describe('Login Seller', () => {
       fakeEncrypter,
       fakeEnv as EnvService,
       fakeDateProvider,
-      refreshSellerTokenInMemoryRepository,
+      refreshTokenInMemoryRepository,
     )
   })
 

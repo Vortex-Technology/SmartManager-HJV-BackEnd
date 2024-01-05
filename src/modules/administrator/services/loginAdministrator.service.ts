@@ -6,8 +6,8 @@ import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { EnvService } from '@infra/env/env.service'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
-import { RefreshAdministratorToken } from '../entities/RefreshAdministratorToken'
-import { RefreshAdministratorTokenRepository } from '../repositories/RefreshAdministratorTokenRepository'
+import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
+import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
 
 interface Request {
   login: string
@@ -30,7 +30,7 @@ export class LoginAdministratorService {
     private readonly encrypter: Encrypter,
     private readonly env: EnvService,
     private readonly dateAddition: DateAddition,
-    private readonly refreshAdministratorTokenRepository: RefreshAdministratorTokenRepository,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
 
   async execute({ login, password }: Request): Promise<Response> {
@@ -71,15 +71,15 @@ export class LoginAdministratorService {
       },
     )
 
-    const refreshToken = RefreshAdministratorToken.create({
-      administratorId: administrator.id,
+    const refreshToken = RefreshToken.create({
+      collaboratorId: administrator.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
         this.env.get('ADM_REFRESH_EXPIRES_IN'),
       ),
     })
 
-    await this.refreshAdministratorTokenRepository.create(refreshToken)
+    await this.refreshTokenRepository.create(refreshToken)
 
     return right({
       accessToken,
