@@ -5,16 +5,16 @@ import { makeAttendant } from '@test/factories/modules/attendant/makeAttendant'
 import { FakeEncrypter } from '@test/repositories/providers/cryptography/fakeEncrypter'
 import { FakeEnv } from '@test/config/env/fakeEnv'
 import { DayJs } from '@providers/date/implementations/dayJs'
-import { RefreshAttendantTokenInMemoryRepository } from '@test/repositories/modules/attendant/RefreshAttendantTokenInMemoryRepository'
 import { EnvService } from '@infra/env/env.service'
 import { AttendantWrongCredentials } from '../errors/AttendantWrongCredentials'
+import { RefreshTokenInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokenInMemoryRepository'
 
 let attendantInMemoryRepository: AttendantInMemoryRepository
 let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
 let fakeEnv: FakeEnv
 let fakeDateProvider: DayJs
-let refreshAttendantTokenInMemoryRepository: RefreshAttendantTokenInMemoryRepository
+let refreshTokenInMemoryRepository: RefreshTokenInMemoryRepository
 
 let sut: LoginAttendantService
 
@@ -25,8 +25,7 @@ describe('Login Attendant', () => {
     fakeEncrypter = new FakeEncrypter()
     fakeEnv = new FakeEnv()
     fakeDateProvider = new DayJs()
-    refreshAttendantTokenInMemoryRepository =
-      new RefreshAttendantTokenInMemoryRepository()
+    refreshTokenInMemoryRepository = new RefreshTokenInMemoryRepository()
 
     sut = new LoginAttendantService(
       attendantInMemoryRepository,
@@ -34,7 +33,7 @@ describe('Login Attendant', () => {
       fakeEncrypter,
       fakeEnv as EnvService,
       fakeDateProvider,
-      refreshAttendantTokenInMemoryRepository,
+      refreshTokenInMemoryRepository,
     )
   })
 

@@ -26,4 +26,17 @@ export class SellerPrismaRepository implements SellerRepository {
 
     return SellerPrismaMapper.toEntity(seller)
   }
+
+  async findById(id: string): Promise<Seller | null> {
+    const seller = await this.prisma.collaborator.findUnique({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    })
+
+    if (!seller) return null
+
+    return SellerPrismaMapper.toEntity(seller)
+  }
 }

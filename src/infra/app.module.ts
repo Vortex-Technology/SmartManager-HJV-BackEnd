@@ -8,6 +8,7 @@ import { SocketModule } from '@providers/socket/socket.module'
 import { SellerModule } from '@modules/seller/seller.module'
 import { AttendantModule } from '@modules/attendant/attendant.module'
 import { ProductModule } from '@modules/product/product.module'
+import { RefreshTokenModule } from '@modules/refreshToken/refreshToken.module'
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProductModule } from '@modules/product/product.module'
     SellerModule,
     AttendantModule,
     ProductModule,
+    RefreshTokenModule,
   ],
 })
 export class AppModule {}

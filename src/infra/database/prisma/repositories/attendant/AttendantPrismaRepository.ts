@@ -26,4 +26,17 @@ export class AttendantPrismaRepository implements AttendantRepository {
 
     return AttendantPrismaMapper.toEntity(attendant)
   }
+
+  async findById(id: string): Promise<Attendant | null> {
+    const attendant = await this.prisma.collaborator.findUnique({
+      where: {
+        id,
+        deletedAt: null,
+      },
+    })
+
+    if (!attendant) return null
+
+    return AttendantPrismaMapper.toEntity(attendant)
+  }
 }

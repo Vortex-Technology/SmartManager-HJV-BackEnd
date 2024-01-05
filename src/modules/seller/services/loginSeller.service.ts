@@ -6,8 +6,8 @@ import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { EnvService } from '@infra/env/env.service'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
-import { RefreshSellerToken } from '../entities/RefreshSellerToken'
-import { RefreshSellerTokenRepository } from '../repositories/RefreshSellerTokenRepository'
+import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
+import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
 
 interface Request {
   login: string
@@ -30,7 +30,7 @@ export class LoginSellerService {
     private readonly encrypter: Encrypter,
     private readonly env: EnvService,
     private readonly dateAddition: DateAddition,
-    private readonly refreshSellerTokenRepository: RefreshSellerTokenRepository,
+    private readonly refreshTokenRepository: RefreshTokenRepository,
   ) {}
 
   async execute({ login, password }: Request): Promise<Response> {
@@ -69,15 +69,15 @@ export class LoginSellerService {
       },
     )
 
-    const refreshToken = RefreshSellerToken.create({
-      sellerId: seller.id,
+    const refreshToken = RefreshToken.create({
+      collaboratorId: seller.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
         this.env.get('USER_REFRESH_EXPIRES_IN'),
       ),
     })
 
-    await this.refreshSellerTokenRepository.create(refreshToken)
+    await this.refreshTokenRepository.create(refreshToken)
 
     return right({
       accessToken,

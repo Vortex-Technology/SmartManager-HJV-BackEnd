@@ -2,31 +2,28 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 
-interface RefreshSellerTokenProps {
+export interface RefreshTokenProps {
   token: string
   expiresIn: Date
   expiredAt: Date | null
   createdAt: Date
-  sellerId: UniqueEntityId
+  collaboratorId: UniqueEntityId
 }
 
-export class RefreshSellerToken extends AggregateRoot<RefreshSellerTokenProps> {
+export class RefreshToken extends AggregateRoot<RefreshTokenProps> {
   static create(
-    props: Optional<RefreshSellerTokenProps, 'expiredAt' | 'createdAt'>,
+    props: Optional<RefreshTokenProps, 'expiredAt' | 'createdAt'>,
     id?: UniqueEntityId,
   ) {
-    const refreshSellerTokenProps: RefreshSellerTokenProps = {
+    const refreshTokenProps: RefreshTokenProps = {
       ...props,
       expiredAt: props.expiredAt ?? null,
       createdAt: props.createdAt ?? new Date(),
     }
 
-    const refreshSellerToken = new RefreshSellerToken(
-      refreshSellerTokenProps,
-      id,
-    )
+    const refreshToken = new RefreshToken(refreshTokenProps, id)
 
-    return refreshSellerToken
+    return refreshToken
   }
 
   get token() {
@@ -45,7 +42,7 @@ export class RefreshSellerToken extends AggregateRoot<RefreshSellerTokenProps> {
     return this.props.createdAt
   }
 
-  get sellerId() {
-    return this.props.sellerId
+  get collaboratorId() {
+    return this.props.collaboratorId
   }
 }

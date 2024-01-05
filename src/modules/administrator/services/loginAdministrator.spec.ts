@@ -5,16 +5,16 @@ import { makeAdministrator } from '@test/factories/modules/administrator/makeAdm
 import { FakeEncrypter } from '@test/repositories/providers/cryptography/fakeEncrypter'
 import { FakeEnv } from '@test/config/env/fakeEnv'
 import { DayJs } from '@providers/date/implementations/dayJs'
-import { RefreshAdministratorTokenInMemoryRepository } from '@test/repositories/modules/administrator/RefreshAdministratorTokenInMemoryRepository'
 import { EnvService } from '@infra/env/env.service'
 import { AdministratorWrongCredentials } from '../errors/AdministratorWrongCredentials'
+import { RefreshTokenInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokenInMemoryRepository'
 
 let administratorInMemoryRepository: AdministratorInMemoryRepository
 let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
 let fakeEnv: FakeEnv
 let fakeDateProvider: DayJs
-let refreshAdministratorTokenInMemoryRepository: RefreshAdministratorTokenInMemoryRepository
+let refreshTokenInMemoryRepository: RefreshTokenInMemoryRepository
 
 let sut: LoginAdministratorService
 
@@ -25,8 +25,7 @@ describe('Login Administrator', () => {
     fakeEncrypter = new FakeEncrypter()
     fakeEnv = new FakeEnv()
     fakeDateProvider = new DayJs()
-    refreshAdministratorTokenInMemoryRepository =
-      new RefreshAdministratorTokenInMemoryRepository()
+    refreshTokenInMemoryRepository = new RefreshTokenInMemoryRepository()
 
     sut = new LoginAdministratorService(
       administratorInMemoryRepository,
@@ -34,7 +33,7 @@ describe('Login Administrator', () => {
       fakeEncrypter,
       fakeEnv as EnvService,
       fakeDateProvider,
-      refreshAdministratorTokenInMemoryRepository,
+      refreshTokenInMemoryRepository,
     )
   })
 
