@@ -15,4 +15,12 @@ export class SellerInMemoryRepository implements SellerRepository {
 
     return seller
   }
+
+  async findById(id: string): Promise<Seller | null> {
+    const seller = this.sellers.find((seller) => seller.id.toString() === id)
+
+    if (!seller) return null
+
+    return seller
+  }
 }

@@ -17,4 +17,14 @@ export class AttendantInMemoryRepository implements AttendantRepository {
 
     return attendant
   }
+
+  async findById(id: string): Promise<Attendant | null> {
+    const attendant = this.attendants.find(
+      (attendant) => attendant.id.toString() === id,
+    )
+
+    if (!attendant) return null
+
+    return attendant
+  }
 }
