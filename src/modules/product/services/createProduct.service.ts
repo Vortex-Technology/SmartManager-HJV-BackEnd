@@ -15,11 +15,17 @@ import { ProductVariantAlreadyExistsWithSame } from '../errors/ProductVariantAlr
 import { AllProductVariantAlreadyExists } from '../errors/AllProductVariantAlreadyExists'
 import { ProvideAtLeastOneProductVariant } from '../errors/ProvideAlmostOneProductVariant'
 import { ProductsRepository } from '../repositories/ProductsRepository'
+import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
+import { InventoryNotFount } from '@modules/inventory/errors/InventoryNotFound'
+import { Inventory } from '@modules/inventory/entities/Inventory'
+import { ProductVariantInventoriesList } from '@modules/inventory/entities/ProductVariantInventoriesList'
+import { ProductVariantInventory } from '@modules/inventory/entities/ProductVariantInventory'
 
 interface Request {
   creatorId: string
   name: string
   categories?: string[]
+  inventoryId?: string
   variants: Array<{
     name: string
     description?: string
@@ -29,6 +35,7 @@ interface Request {
     image?: string
     barCode: string
     unitType: ProductUnitType
+    quantity: number
   }>
 }
 
@@ -36,7 +43,8 @@ type Response = Either<
   | PermissionDenied
   | AdministratorNotFount
   | AllProductVariantAlreadyExists
-  | ProvideAtLeastOneProductVariant,
+  | ProvideAtLeastOneProductVariant
+  | InventoryNotFount,
   {
     product: Product
     errors: ProductVariantAlreadyExistsWithSame[]
@@ -50,11 +58,13 @@ export class CreateProductService {
     private readonly productCategoriesRepository: ProductCategoriesRepository,
     private readonly productRepository: ProductsRepository,
     private readonly productsVariantsRepository: ProductVariantsRepository,
+    private readonly inventoriesRepository: InventoriesRepository,
   ) {}
 
   async execute({
     name,
     variants,
+    inventoryId,
     categories = [],
     creatorId,
   }: Request): Promise<Response> {
@@ -76,6 +86,23 @@ export class CreateProductService {
 
     if (!acceptCreateProductForRoles.includes(creator.role)) {
       return left(new PermissionDenied())
+    }
+
+    let inventory: Inventory | null = null
+
+    if (inventoryId) {
+      inventory = await this.inventoriesRepository.findById(inventoryId)
+
+      if (!inventory) {
+        return left(new InventoryNotFount())
+      }
+    }
+
+    if (!inventory) {
+      inventory = Inventory.create({
+        name: 'Novo estoque',
+        productVariantInventories: new ProductVariantInventoriesList(),
+      })
     }
 
     const categoriesExistentsWithNullResults =
@@ -134,30 +161,46 @@ export class CreateProductService {
       ...inexistentCategories,
     ])
 
+    if (!inventory.productVariantInventories) {
+      inventory.productVariantInventories = new ProductVariantInventoriesList()
+    }
+
     const product = Product.create({
       name,
       productCategories,
       productVariants: new ProductVariantsList(),
     })
 
-    inexistentVariants.forEach(
-      (variant) =>
-        product.productVariants?.add(
-          ProductVariant.create({
-            name: variant.name,
-            barCode: variant.barCode,
-            brand: variant.brand,
-            pricePerUnit: variant.pricePerUnit,
-            unitType: variant.unitType,
-            description: variant.description,
-            image: variant.image,
-            model: variant.model,
-            productId: product.id,
-          }),
-        ),
-    )
+    inexistentVariants.forEach((variant) => {
+      const newProductVariant = ProductVariant.create({
+        name: variant.name,
+        barCode: variant.barCode,
+        brand: variant.brand,
+        pricePerUnit: variant.pricePerUnit,
+        unitType: variant.unitType,
+        description: variant.description,
+        image: variant.image,
+        model: variant.model,
+        productId: product.id,
+      })
+
+      const newProductVariantInventory = ProductVariantInventory.create({
+        inventoryId: (inventory as Inventory).id,
+        productVariantId: newProductVariant.id,
+        quantity: variant.quantity,
+      })
+
+      product.productVariants?.add(newProductVariant)
+      inventory?.productVariantInventories?.add(newProductVariantInventory)
+    })
 
     await this.productRepository.create(product)
+
+    if (inventoryId) {
+      await this.inventoriesRepository.save(inventory)
+    } else {
+      await this.inventoriesRepository.create(inventory)
+    }
 
     return right({
       product,
