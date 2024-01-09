@@ -14,6 +14,10 @@ import { ProductsRepository } from '@modules/product/repositories/ProductsReposi
 import { ProductPrismaRepository } from './prisma/repositories/product/ProductPrismaRepository'
 import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
 import { RefreshTokenPrismaRepository } from './prisma/repositories/refreshToken/RefreshTokenPrismaRepository'
+import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
+import { InventoryPrismaRepository } from './prisma/repositories/inventory/InventoryPrismaRepository'
+import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
+import { ProductVariantInventoryPrismaRepository } from './prisma/repositories/inventory/ProductVariantInventoryPrismaRepository'
 
 @Module({
   providers: [
@@ -46,6 +50,15 @@ import { RefreshTokenPrismaRepository } from './prisma/repositories/refreshToken
       provide: ProductsRepository,
       useClass: ProductPrismaRepository,
     },
+
+    {
+      provide: ProductVariantInventoriesRepository,
+      useClass: ProductVariantInventoryPrismaRepository,
+    },
+    {
+      provide: InventoriesRepository,
+      useClass: InventoryPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -56,6 +69,8 @@ import { RefreshTokenPrismaRepository } from './prisma/repositories/refreshToken
     ProductCategoriesRepository,
     ProductVariantsRepository,
     ProductsRepository,
+    ProductVariantInventoriesRepository,
+    InventoriesRepository,
   ],
 })
 export class DatabaseModule {}

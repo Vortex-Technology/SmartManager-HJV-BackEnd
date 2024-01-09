@@ -70,6 +70,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '123456',
+            quantity: 10,
           },
         ],
       })
@@ -110,6 +111,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '123456',
+            quantity: 10,
           },
           {
             name: 'variant',
@@ -117,6 +119,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '12345678',
+            quantity: 10,
           },
         ],
       })
@@ -162,6 +165,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '123456',
+            quantity: 10,
           },
         ],
       })
@@ -191,6 +195,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '123456',
+            quantity: 10,
           },
         ],
       })
@@ -221,6 +226,7 @@ describe('Create product (E2E)', () => {
             unitType: 'UN',
             brand: 'vanilla',
             barCode: '123456',
+            quantity: 10,
           },
         ],
       })

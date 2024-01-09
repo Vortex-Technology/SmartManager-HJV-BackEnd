@@ -29,6 +29,7 @@ import { ProductErrosPresenter } from '../presenters/ProductErrosPresenter'
 const createProductBodySchema = z.object({
   name: z.string().min(3).max(60),
   categories: z.array(z.string()).optional(),
+  inventoryId: z.string().uuid().optional(),
   variants: z
     .array(
       z.object({
@@ -39,6 +40,7 @@ const createProductBodySchema = z.object({
         brand: z.string().min(2).max(60),
         image: z.string().url().optional(),
         barCode: z.string().max(48),
+        quantity: z.coerce.number().min(0),
         unitType: z.enum([
           ProductUnitType.UNIT,
           ProductUnitType.KILOS,
