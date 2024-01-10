@@ -15,6 +15,8 @@ import { CreateSellerController } from './controllers/createSeller.controller'
 import { CreateSellerService } from './services/createSeller.service'
 import { CreateAttendantController } from './controllers/createAttendant.controller'
 import { CreateAttendantService } from './services/createAttendant.service'
+import { ListAdministratorsController } from './controllers/listAdministrators.controller'
+import { ListAdministratorsService } from './services/listAdministrators.service'
 
 @Module({
   controllers: [
@@ -24,6 +26,7 @@ import { CreateAttendantService } from './services/createAttendant.service'
     DeleteAdministratorController,
     CreateSellerController,
     CreateAttendantController,
+    ListAdministratorsController,
   ],
   imports: [DatabaseModule, CryptographyModule, DateModule, EnvModule],
   providers: [
@@ -33,6 +36,7 @@ import { CreateAttendantService } from './services/createAttendant.service'
     DeleteAdministratorService,
     CreateSellerService,
     CreateAttendantService,
+    ListAdministratorsService,
   ],
 })
 export class AdministratorModule {}
