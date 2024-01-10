@@ -23,4 +23,20 @@ export class SellerInMemoryRepository implements SellerRepository {
 
     return seller
   }
+
+  async findMany({
+    limit,
+    page,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Seller[]> {
+    return this.sellers
+      .filter((administrator) => !administrator.deletedAt)
+      .slice((page - 1) * limit, page * limit)
+  }
+
+  async count(): Promise<number> {
+    return this.sellers.length
+  }
 }
