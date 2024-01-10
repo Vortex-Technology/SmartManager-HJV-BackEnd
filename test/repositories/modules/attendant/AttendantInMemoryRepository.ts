@@ -27,4 +27,20 @@ export class AttendantInMemoryRepository implements AttendantRepository {
 
     return attendant
   }
+
+  async findMany({
+    limit,
+    page,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Attendant[]> {
+    return this.attendants
+      .filter((administrator) => !administrator.deletedAt)
+      .slice((page - 1) * limit, page * limit)
+  }
+
+  async count(): Promise<number> {
+    return this.attendants.length
+  }
 }
