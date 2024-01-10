@@ -5,4 +5,10 @@ export abstract class AdministratorRepository {
   abstract findByLogin(login: string): Promise<Administrator | null>
   abstract findById(id: string): Promise<Administrator | null>
   abstract save(administrator: Administrator): Promise<void>
+  abstract findMany(props: {
+    page: number
+    limit: number
+  }): Promise<Administrator[]>
+
+  abstract count(): Promise<number>
 }
