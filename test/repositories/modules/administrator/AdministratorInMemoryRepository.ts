@@ -37,4 +37,20 @@ export class AdministratorInMemoryRepository
 
     this.administrators[administratorIndex] = administrator
   }
+
+  async findMany({
+    limit,
+    page,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Administrator[]> {
+    return this.administrators
+      .filter((administrator) => !administrator.deletedAt)
+      .slice((page - 1) * limit, page * limit)
+  }
+
+  async count(): Promise<number> {
+    return this.administrators.length
+  }
 }
