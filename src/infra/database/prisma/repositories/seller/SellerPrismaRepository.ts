@@ -39,4 +39,35 @@ export class SellerPrismaRepository implements SellerRepository {
 
     return SellerPrismaMapper.toEntity(seller)
   }
+
+  async findMany({
+    page,
+    limit,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Seller[]> {
+    const sellers = await this.prisma.collaborator.findMany({
+      where: {
+        deletedAt: null,
+        type: 'SELLER',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+
+    return sellers.map(SellerPrismaMapper.toEntity)
+  }
+
+  async count(): Promise<number> {
+    return await this.prisma.collaborator.count({
+      where: {
+        deletedAt: null,
+        type: 'SELLER',
+      },
+    })
+  }
 }
