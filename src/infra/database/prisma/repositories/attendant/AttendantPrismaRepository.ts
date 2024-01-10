@@ -39,4 +39,35 @@ export class AttendantPrismaRepository implements AttendantRepository {
 
     return AttendantPrismaMapper.toEntity(attendant)
   }
+
+  async findMany({
+    page,
+    limit,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Attendant[]> {
+    const attendants = await this.prisma.collaborator.findMany({
+      where: {
+        deletedAt: null,
+        type: 'ATTENDANT',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+
+    return attendants.map(AttendantPrismaMapper.toEntity)
+  }
+
+  async count(): Promise<number> {
+    return await this.prisma.collaborator.count({
+      where: {
+        deletedAt: null,
+        type: 'ATTENDANT',
+      },
+    })
+  }
 }

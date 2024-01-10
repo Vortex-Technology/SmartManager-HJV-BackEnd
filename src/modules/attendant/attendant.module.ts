@@ -7,10 +7,20 @@ import { LoginAttendantService } from './services/loginAttendant.service'
 import { LoginAttendantController } from './controllers/loginAttendant.controller'
 import { GetAttendantController } from './controllers/getAttendant.controller'
 import { GetAttendantService } from './services/getAttendant.service'
+import { ListAttendantsController } from './controllers/listAttendants.controller'
+import { ListAttendantsService } from './services/listAttendants.service'
 
 @Module({
-  controllers: [LoginAttendantController, GetAttendantController],
+  controllers: [
+    LoginAttendantController,
+    GetAttendantController,
+    ListAttendantsController,
+  ],
   imports: [DatabaseModule, CryptographyModule, EnvModule, DateModule],
-  providers: [LoginAttendantService, GetAttendantService],
+  providers: [
+    LoginAttendantService,
+    GetAttendantService,
+    ListAttendantsService,
+  ],
 })
 export class AttendantModule {}
