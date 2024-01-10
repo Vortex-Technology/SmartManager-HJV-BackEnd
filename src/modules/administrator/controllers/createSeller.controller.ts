@@ -32,7 +32,7 @@ const createSellerBodySchema = z.object({
 type CreateSellerBody = z.infer<typeof createSellerBodySchema>
 const bodyValidationPipe = new ZodValidationPipe(createSellerBodySchema)
 
-@Controller('/seller')
+@Controller('/sellers')
 export class CreateSellerController {
   constructor(private readonly createSellerService: CreateSellerService) {}
 
@@ -80,7 +80,7 @@ export class CreateSellerController {
 
     const { seller } = response.value
 
-    res.header('Location', `/seller/${seller.id.toString()}`)
+    res.header('Location', `/sellers/${seller.id.toString()}`)
     return res.status(statusCode.Created).end()
   }
 }

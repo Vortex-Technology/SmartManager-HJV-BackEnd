@@ -51,9 +51,9 @@ describe('Create administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /administrator [201]', async () => {
+  test('[POST] /administrators [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/administrators')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -76,9 +76,9 @@ describe('Create administrator (E2E)', () => {
     expect(administratorOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /administrator [409]', async () => {
+  test('[POST] /administrators [409]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/administrators')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -99,7 +99,7 @@ describe('Create administrator (E2E)', () => {
     })
 
     const response2 = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/administrators')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
@@ -120,7 +120,7 @@ describe('Create administrator (E2E)', () => {
     expect(administratorsOnDatabase).toEqual(2)
   })
 
-  test('[POST] /administrator [403]', async () => {
+  test('[POST] /administrators [403]', async () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
@@ -128,7 +128,7 @@ describe('Create administrator (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .post('/administrator')
+      .post('/administrators')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

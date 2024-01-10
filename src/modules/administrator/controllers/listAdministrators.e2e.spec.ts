@@ -40,7 +40,7 @@ describe('List administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[GET] /administrator/list [200]', async () => {
+  test('[GET] /administrators/list [200]', async () => {
     for (let i = 0; i < 20; i++) {
       await makeAdministrator.create({
         login: new UniqueEntityId().toString(),
@@ -48,7 +48,7 @@ describe('List administrator (E2E)', () => {
     }
 
     const response = await request(app.getHttpServer())
-      .get('/administrator/list?page=1&limit=10')
+      .get('/administrators/list?page=1&limit=10')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -60,7 +60,7 @@ describe('List administrator (E2E)', () => {
     expect(response.headers['x-page']).toBe('1')
   })
 
-  test('[GET] /administrator/list [409]', async () => {
+  test('[GET] /administrators/list [409]', async () => {
     const invalidToken = await encrypter.encrypt({
       // A random inexistent uuid
       sub: new UniqueEntityId().toString(),
@@ -69,7 +69,7 @@ describe('List administrator (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .get('/administrator/list')
+      .get('/administrators/list')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

@@ -34,7 +34,7 @@ const createAdministratorBodySchema = z.object({
 type CreateAdministratorBody = z.infer<typeof createAdministratorBodySchema>
 const bodyValidationPipe = new ZodValidationPipe(createAdministratorBodySchema)
 
-@Controller('/administrator')
+@Controller('/administrators')
 export class CreateAdministratorController {
   constructor(
     private readonly createAdministratorService: CreateAdministratorService,
@@ -82,7 +82,7 @@ export class CreateAdministratorController {
 
     const { administrator } = response.value
 
-    res.header('Location', `/administrator/${administrator.id.toString()}`)
+    res.header('Location', `/administrators/${administrator.id.toString()}`)
     return res.status(statusCode.Created).end()
   }
 }

@@ -12,7 +12,7 @@ import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { AttendantNotFount } from '../errors/AttendantNotFound'
 import { AttendantPresenter } from '../presenters/attendantPresenter'
 
-@Controller('/attendant')
+@Controller('/attendants')
 export class GetAttendantController {
   constructor(private readonly getAttendantService: GetAttendantService) {}
 

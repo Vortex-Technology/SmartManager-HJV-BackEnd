@@ -39,9 +39,9 @@ describe('Login attendant (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /attendant/login [201]', async () => {
+  test('[POST] /attendants/login [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/attendant/login')
+      .post('/attendants/login')
       .send({
         login: 'master',
         password: '12345678',
@@ -65,10 +65,10 @@ describe('Login attendant (E2E)', () => {
     expect(refreshTokenOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /attendant/login [403]', async () => {
+  test('[POST] /attendants/login [403]', async () => {
     // Existent attendant
     const response = await request(app.getHttpServer())
-      .post('/attendant/login')
+      .post('/attendants/login')
       .send({
         login: 'master',
         password: 'wrong-password',
@@ -79,7 +79,7 @@ describe('Login attendant (E2E)', () => {
 
     // Inexistent attendant
     const response2 = await request(app.getHttpServer())
-      .post('/attendant/login')
+      .post('/attendants/login')
       .send({
         login: 'inexistent-attendant',
         password: '12345678',

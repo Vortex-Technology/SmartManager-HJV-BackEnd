@@ -40,9 +40,9 @@ describe('Login administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /administrator/login [201]', async () => {
+  test('[POST] /administrators/login [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/administrator/login')
+      .post('/administrators/login')
       .send({
         login: 'master',
         password: '12345678',
@@ -66,10 +66,10 @@ describe('Login administrator (E2E)', () => {
     expect(refreshTokenOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /administrator/login [403]', async () => {
+  test('[POST] /administrators/login [403]', async () => {
     // Existent administrator
     const response = await request(app.getHttpServer())
-      .post('/administrator/login')
+      .post('/administrators/login')
       .send({
         login: 'master',
         password: 'wrong-password',
@@ -80,7 +80,7 @@ describe('Login administrator (E2E)', () => {
 
     // Inexistent administrator
     const response2 = await request(app.getHttpServer())
-      .post('/administrator/login')
+      .post('/administrators/login')
       .send({
         login: 'inexistent-administrator',
         password: '12345678',

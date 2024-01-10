@@ -48,9 +48,9 @@ describe('Get administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[GET] /administrator [200]', async () => {
+  test('[GET] /administrators [200]', async () => {
     const response = await request(app.getHttpServer())
-      .get('/administrator')
+      .get('/administrators')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -66,7 +66,7 @@ describe('Get administrator (E2E)', () => {
     )
   })
 
-  test('[GET] /administrator [409]', async () => {
+  test('[GET] /administrators [409]', async () => {
     const invalidToken = await encrypter.encrypt({
       // A random inexistent uuid
       sub: new UniqueEntityId().toString(),
@@ -75,7 +75,7 @@ describe('Get administrator (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .get('/administrator')
+      .get('/administrators')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

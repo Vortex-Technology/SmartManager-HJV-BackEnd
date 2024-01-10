@@ -31,7 +31,7 @@ const listAdministratorQuerySchema = z.object({
 type ListAdministratorsQuery = z.infer<typeof listAdministratorQuerySchema>
 const queryValidationPipe = new ZodValidationPipe(listAdministratorQuerySchema)
 
-@Controller('/administrator/list')
+@Controller('/administrators/list')
 export class ListAdministratorsController {
   constructor(
     private readonly listAdministratorsService: ListAdministratorsService,

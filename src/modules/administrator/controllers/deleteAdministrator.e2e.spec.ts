@@ -55,11 +55,11 @@ describe('Delete administrator (E2E)', () => {
     await app.init()
   })
 
-  test('[DELETE] /administrator/:id [204]', async () => {
+  test('[DELETE] /administrators/:id [204]', async () => {
     const idOfAdministratorToDelete = administrator.id.toString()
 
     const response = await request(app.getHttpServer())
-      .delete(`/administrator/${idOfAdministratorToDelete}`)
+      .delete(`/administrators/${idOfAdministratorToDelete}`)
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -77,11 +77,11 @@ describe('Delete administrator (E2E)', () => {
     expect(administratorOnDatabase?.deletedAt).toBeInstanceOf(Date)
   })
 
-  test('[DELETE] /administrator/:id [404]', async () => {
+  test('[DELETE] /administrators/:id [404]', async () => {
     const idOfAdministratorToDelete = administrator.id.toString()
 
     const response = await request(app.getHttpServer())
-      .delete(`/administrator/${idOfAdministratorToDelete}`)
+      .delete(`/administrators/${idOfAdministratorToDelete}`)
       .set({
         Authorization: `Bearer ${token}`,
       })

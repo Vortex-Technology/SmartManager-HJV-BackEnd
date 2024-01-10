@@ -39,9 +39,9 @@ describe('Login seller (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /seller/login [201]', async () => {
+  test('[POST] /sellers/login [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/seller/login')
+      .post('/sellers/login')
       .send({
         login: 'master',
         password: '12345678',
@@ -65,10 +65,10 @@ describe('Login seller (E2E)', () => {
     expect(refreshTokenOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /seller/login [403]', async () => {
+  test('[POST] /sellers/login [403]', async () => {
     // Existent seller
     const response = await request(app.getHttpServer())
-      .post('/seller/login')
+      .post('/sellers/login')
       .send({
         login: 'master',
         password: 'wrong-password',
@@ -79,7 +79,7 @@ describe('Login seller (E2E)', () => {
 
     // Inexistent seller
     const response2 = await request(app.getHttpServer())
-      .post('/seller/login')
+      .post('/sellers/login')
       .send({
         login: 'inexistent-seller',
         password: '12345678',

@@ -21,7 +21,7 @@ const loginSellerBodySchema = z.object({
 type LoginSellerBody = z.infer<typeof loginSellerBodySchema>
 const bodyValidationPipe = new ZodValidationPipe(loginSellerBodySchema)
 
-@Controller('/seller/login')
+@Controller('/sellers/login')
 export class LoginSellerController {
   constructor(private readonly loginSellerService: LoginSellerService) {}
 

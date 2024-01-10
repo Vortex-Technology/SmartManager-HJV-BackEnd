@@ -12,7 +12,7 @@ import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { AdministratorNotFount } from '../errors/AdministratorNotFound'
 import { AdministratorPresenter } from '../presenters/administratorPresenter'
 
-@Controller('/administrator')
+@Controller('/administrators')
 export class GetAdministratorController {
   constructor(
     private readonly getAdministratorService: GetAdministratorService,

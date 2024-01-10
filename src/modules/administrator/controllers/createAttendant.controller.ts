@@ -32,7 +32,7 @@ const createAttendantBodySchema = z.object({
 type CreateAttendantBody = z.infer<typeof createAttendantBodySchema>
 const bodyValidationPipe = new ZodValidationPipe(createAttendantBodySchema)
 
-@Controller('/attendant')
+@Controller('/attendants')
 export class CreateAttendantController {
   constructor(
     private readonly createAttendantService: CreateAttendantService,
@@ -82,7 +82,7 @@ export class CreateAttendantController {
 
     const { attendant } = response.value
 
-    res.header('Location', `/attendant/${attendant.id.toString()}`)
+    res.header('Location', `/attendants/${attendant.id.toString()}`)
     return res.status(statusCode.Created).end()
   }
 }

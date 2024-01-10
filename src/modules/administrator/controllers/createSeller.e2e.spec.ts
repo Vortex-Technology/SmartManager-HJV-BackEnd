@@ -51,9 +51,9 @@ describe('Create seller (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /seller [201]', async () => {
+  test('[POST] /sellers [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/seller')
+      .post('/sellers')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -77,9 +77,9 @@ describe('Create seller (E2E)', () => {
     expect(sellerOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /seller [409]', async () => {
+  test('[POST] /sellers [409]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/seller')
+      .post('/sellers')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -100,7 +100,7 @@ describe('Create seller (E2E)', () => {
     })
 
     const response2 = await request(app.getHttpServer())
-      .post('/seller')
+      .post('/sellers')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
@@ -121,7 +121,7 @@ describe('Create seller (E2E)', () => {
     expect(sellersOnDatabase).toEqual(1)
   })
 
-  test('[POST] /seller [403]', async () => {
+  test('[POST] /sellers [403]', async () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
@@ -129,7 +129,7 @@ describe('Create seller (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .post('/seller')
+      .post('/sellers')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

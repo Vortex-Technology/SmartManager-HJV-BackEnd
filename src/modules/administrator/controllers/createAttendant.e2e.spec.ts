@@ -51,9 +51,9 @@ describe('Create attendant (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /attendant [201]', async () => {
+  test('[POST] /attendants [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/attendant')
+      .post('/attendants')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -77,9 +77,9 @@ describe('Create attendant (E2E)', () => {
     expect(attendantOnDatabase).toBeTruthy()
   })
 
-  test('[POST] /attendant [409]', async () => {
+  test('[POST] /attendants [409]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/attendant')
+      .post('/attendants')
       .set({
         Authorization: `Bearer ${token}`,
       })
@@ -100,7 +100,7 @@ describe('Create attendant (E2E)', () => {
     })
 
     const response2 = await request(app.getHttpServer())
-      .post('/attendant')
+      .post('/attendants')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
@@ -121,7 +121,7 @@ describe('Create attendant (E2E)', () => {
     expect(attendantsOnDatabase).toEqual(1)
   })
 
-  test('[POST] /attendant [403]', async () => {
+  test('[POST] /attendants [403]', async () => {
     const invalidToken = await encrypter.encrypt({
       sub: master.id.toString(),
       role: AdministratorRole.VIEWER,
@@ -129,7 +129,7 @@ describe('Create attendant (E2E)', () => {
     })
 
     const response = await request(app.getHttpServer())
-      .post('/attendant')
+      .post('/attendants')
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })

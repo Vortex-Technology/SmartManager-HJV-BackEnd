@@ -31,7 +31,7 @@ const paramsValidationPipe = new ZodValidationPipe(
   deleteAdministratorParamsSchema,
 )
 
-@Controller('/administrator/:id')
+@Controller('/administrators/:id')
 export class DeleteAdministratorController {
   constructor(
     private readonly deleteAdministratorService: DeleteAdministratorService,

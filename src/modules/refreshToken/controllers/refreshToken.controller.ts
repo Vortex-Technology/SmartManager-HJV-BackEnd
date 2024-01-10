@@ -27,7 +27,7 @@ const refreshTokenBodySchema = z.object({
 type RefreshTokenBody = z.infer<typeof refreshTokenBodySchema>
 const bodyValidationPipe = new ZodValidationPipe(refreshTokenBodySchema)
 
-@Controller('/refreshToken')
+@Controller('/refreshTokens')
 export class RefreshTokenController {
   constructor(private readonly refreshTokenService: RefreshTokenService) {}
 

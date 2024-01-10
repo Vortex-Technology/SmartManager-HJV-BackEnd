@@ -61,9 +61,9 @@ describe('Refresh token (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /refreshToken [201]', async () => {
+  test('[POST] /refreshTokens [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post('/refreshToken')
+      .post('/refreshTokens')
       .send({
         refreshToken: token,
       })
