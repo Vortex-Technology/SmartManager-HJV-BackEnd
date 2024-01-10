@@ -48,4 +48,35 @@ export class AdministratorPrismaRepository implements AdministratorRepository {
       data: AdministratorPrismaMapper.toPrisma(administrator),
     })
   }
+
+  async findMany({
+    page,
+    limit,
+  }: {
+    page: number
+    limit: number
+  }): Promise<Administrator[]> {
+    const administrators = await this.prisma.collaborator.findMany({
+      where: {
+        deletedAt: null,
+        type: 'ADMINISTRATOR',
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+    })
+
+    return administrators.map(AdministratorPrismaMapper.toEntity)
+  }
+
+  async count(): Promise<number> {
+    return await this.prisma.collaborator.count({
+      where: {
+        deletedAt: null,
+        type: 'ADMINISTRATOR',
+      },
+    })
+  }
 }
