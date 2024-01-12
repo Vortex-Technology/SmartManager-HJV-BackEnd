@@ -9,6 +9,7 @@ import { SellerModule } from '@modules/seller/seller.module'
 import { AttendantModule } from '@modules/attendant/attendant.module'
 import { ProductModule } from '@modules/product/product.module'
 import { RefreshTokenModule } from '@modules/refreshToken/refreshToken.module'
+import { OwnerModule } from '@modules/owner/owner.module'
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RefreshTokenModule } from '@modules/refreshToken/refreshToken.module'
     AttendantModule,
     ProductModule,
     RefreshTokenModule,
+    OwnerModule,
   ],
 })
 export class AppModule {}
