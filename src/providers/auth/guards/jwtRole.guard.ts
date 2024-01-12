@@ -1,4 +1,4 @@
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
@@ -13,7 +13,7 @@ export class JwtRoleGuard extends AuthGuard('jwt') {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const allowedRoles = this.reflector.get<AdministratorRole[]>(
+    const allowedRoles = this.reflector.get<CollaboratorRole[]>(
       'roles',
       context.getHandler(),
     )
