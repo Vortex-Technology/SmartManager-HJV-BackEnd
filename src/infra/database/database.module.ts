@@ -18,6 +18,10 @@ import { InventoriesRepository } from '@modules/inventory/repositories/Inventori
 import { InventoryPrismaRepository } from './prisma/repositories/inventory/InventoryPrismaRepository'
 import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
 import { ProductVariantInventoryPrismaRepository } from './prisma/repositories/inventory/ProductVariantInventoryPrismaRepository'
+import { MastersRepository } from '@modules/master/repositories/MastersRepository'
+import { MastersPrismaRepository } from './prisma/repositories/master/MastersPrismaRepository'
+import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
+import { OwnersPrismaRepository } from './prisma/repositories/owners/OwnersPrismaRepository'
 
 @Module({
   providers: [
@@ -59,6 +63,14 @@ import { ProductVariantInventoryPrismaRepository } from './prisma/repositories/i
       provide: InventoriesRepository,
       useClass: InventoryPrismaRepository,
     },
+    {
+      provide: MastersRepository,
+      useClass: MastersPrismaRepository,
+    },
+    {
+      provide: OwnersRepository,
+      useClass: OwnersPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -71,6 +83,8 @@ import { ProductVariantInventoryPrismaRepository } from './prisma/repositories/i
     ProductsRepository,
     ProductVariantInventoriesRepository,
     InventoriesRepository,
+    MastersRepository,
+    OwnersRepository,
   ],
 })
 export class DatabaseModule {}
