@@ -25,31 +25,26 @@ model RefreshToken {
 
 enum RoleCollaborator {
   MASTER
-  FULL_ACCESS
-  EDITOR
-  VIEWER
-}
-
-enum CollaboratorType {
-  ADMINISTRATOR
+  OWNER
+  MANAGER
+  STOCKIST
   SELLER
-  ATTENDANT
 }
 
 model Collaborator {
   id        String           @id @unique @default(uuid())
   name      String
   image     String?
-  login     String           @unique
+  login     String
   password  String
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime?        @updatedAt @map("udpated_at")
   deletedAt DateTime?        @map("deleted_at")
-  type      CollaboratorType @default(ATTENDANT)
-  role      RoleCollaborator @default(EDITOR)
+  role      RoleCollaborator @default(SELLER)
 
   refreshTokens RefreshToken[]
 
+  @@unique([login, role])
   @@map("collaborators")
 }
 
