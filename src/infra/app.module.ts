@@ -10,6 +10,7 @@ import { AttendantModule } from '@modules/attendant/attendant.module'
 import { ProductModule } from '@modules/product/product.module'
 import { RefreshTokenModule } from '@modules/refreshToken/refreshToken.module'
 import { OwnerModule } from '@modules/owner/owner.module'
+import { CollaboratorModule } from '@modules/collaborator/collaborator.module'
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { OwnerModule } from '@modules/owner/owner.module'
     ProductModule,
     RefreshTokenModule,
     OwnerModule,
+    CollaboratorModule,
   ],
 })
 export class AppModule {}
