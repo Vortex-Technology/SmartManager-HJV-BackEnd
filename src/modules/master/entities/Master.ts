@@ -10,11 +10,9 @@ export class Master extends Collaborator<CollaboratorRole.MASTER> {
     props: CollaboratorCreatePropsOptional<TRole>,
     id?: UniqueEntityId,
   ) {
-    const master = Collaborator.create<TRole>(
-      {
-        ...props,
-        role: CollaboratorRole.MASTER as TRole,
-      },
+    const masterProps = Collaborator.setupProps<TRole>(props)
+    const master = new Master(
+      { ...masterProps, role: CollaboratorRole.MASTER },
       id,
     )
 

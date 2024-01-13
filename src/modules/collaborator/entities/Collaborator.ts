@@ -1,5 +1,4 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 
 export enum CollaboratorRole {
@@ -33,9 +32,8 @@ export type CollaboratorCreatePropsOptional<TRole extends CollaboratorRole> =
 export class Collaborator<T extends CollaboratorRole> extends AggregateRoot<
   CollaboratorProps<T>
 > {
-  static create<TRole extends CollaboratorRole>(
+  static setupProps<TRole extends CollaboratorRole>(
     props: CollaboratorCreatePropsOptional<TRole>,
-    id?: UniqueEntityId,
   ) {
     const collaboratorProps: CollaboratorProps<TRole> = {
       ...props,
@@ -51,9 +49,7 @@ export class Collaborator<T extends CollaboratorRole> extends AggregateRoot<
       deletedAt: props.deletedAt ?? null,
     }
 
-    const collaborator = new Collaborator<TRole>(collaboratorProps, id)
-
-    return collaborator
+    return collaboratorProps
   }
 
   get name() {

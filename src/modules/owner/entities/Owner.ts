@@ -10,14 +10,8 @@ export class Owner extends Collaborator<CollaboratorRole.OWNER> {
     props: CollaboratorCreatePropsOptional<TRole>,
     id?: UniqueEntityId,
   ) {
-    const owner = Collaborator.create<TRole>(
-      {
-        ...props,
-        role: CollaboratorRole.OWNER as TRole,
-      },
-      id,
-    )
-
+    const ownerProps = Owner.setupProps<TRole>(props)
+    const owner = new Owner({ ...ownerProps, role: CollaboratorRole.OWNER }, id)
     return owner
   }
 }
