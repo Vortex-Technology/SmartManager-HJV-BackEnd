@@ -3,10 +3,12 @@ import { CreateOwnerService } from './services/createOwner.service'
 import { DatabaseModule } from '@infra/database/database.module'
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { CreateOwnerController } from './controllers/createOwner.controller'
+import { GetOwnerController } from './controllers/getOwner.controller'
+import { GetOwnerService } from './services/getOwner.service'
 
 @Module({
-  controllers: [CreateOwnerController],
-  providers: [CreateOwnerService],
+  controllers: [CreateOwnerController, GetOwnerController],
+  providers: [CreateOwnerService, GetOwnerService],
   imports: [DatabaseModule, CryptographyModule],
 })
 export class OwnerModule {}
