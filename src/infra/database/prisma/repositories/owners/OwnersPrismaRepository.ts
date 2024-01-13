@@ -28,4 +28,18 @@ export class OwnersPrismaRepository implements OwnersRepository {
       data: OwnersPrismaMapper.toPrisma(owner),
     })
   }
+
+  async findById(id: string): Promise<Owner | null> {
+    const owner = await this.prisma.collaborator.findFirst({
+      where: {
+        id,
+        role: CollaboratorRole.OWNER,
+        deletedAt: null,
+      },
+    })
+
+    if (!owner) return null
+
+    return OwnersPrismaMapper.toEntity(owner)
+  }
 }

@@ -17,4 +17,14 @@ export class OwnersInMemoryRepository implements OwnersRepository {
   async create(owner: Owner): Promise<void> {
     this.owners.push(owner)
   }
+
+  async findById(id: string): Promise<Owner | null> {
+    const owner = this.owners.find((owner) => owner.id.toString() === id)
+
+    if (!owner) {
+      return null
+    }
+
+    return owner
+  }
 }
