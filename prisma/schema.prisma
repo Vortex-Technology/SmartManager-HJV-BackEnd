@@ -38,7 +38,7 @@ model Collaborator {
   login     String
   password  String
   createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime?        @updatedAt @map("udpated_at")
+  updatedAt DateTime?        @updatedAt @map("updated_at")
   deletedAt DateTime?        @map("deleted_at")
   role      RoleCollaborator @default(SELLER)
 
@@ -130,5 +130,5 @@ model ProductVariantInventory {
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inventoryId String    @map("inventory_id")
 
-  @@map("products_variatns_inventories")
+  @@map("products_variants_inventories")
 }
