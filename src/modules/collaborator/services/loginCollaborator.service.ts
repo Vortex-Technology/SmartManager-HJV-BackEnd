@@ -55,7 +55,7 @@ export class LoginCollaboratorService {
         role: collaborator.role,
       },
       {
-        expiresIn: this.env.get('JWT_ADM_ACCESS_EXPIRES_IN'),
+        expiresIn: this.env.get('JWT_USER_ACCESS_EXPIRES_IN'),
       },
     )
 
@@ -65,7 +65,7 @@ export class LoginCollaboratorService {
         role: collaborator.role,
       },
       {
-        expiresIn: this.env.get('JWT_ADM_REFRESH_EXPIRES_IN'),
+        expiresIn: this.env.get('JWT_USER_REFRESH_EXPIRES_IN'),
       },
     )
 
@@ -73,7 +73,7 @@ export class LoginCollaboratorService {
       collaboratorId: collaborator.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
-        this.env.get('ADM_REFRESH_EXPIRES_IN'),
+        this.env.get('USER_REFRESH_EXPIRES_IN'),
       ),
     })
 
