@@ -1,10 +1,8 @@
 import { Module } from '@nestjs/common'
 import { DatabaseModule } from '@infra/database/database.module'
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
-import { LoginAdministratorService } from './services/loginAdministrator.service'
 import { EnvModule } from '@infra/env/env.module'
 import { DateModule } from '@providers/date/date.module'
-import { LoginAdministratorController } from './controllers/loginAdministrator.controller'
 import { DeleteAdministratorController } from './controllers/deleteAdministrator.controller'
 import { DeleteAdministratorService } from './services/deleteAdministrator.service'
 import { CreateSellerController } from './controllers/createSeller.controller'
@@ -16,7 +14,6 @@ import { ListAdministratorsService } from './services/listAdministrators.service
 
 @Module({
   controllers: [
-    LoginAdministratorController,
     DeleteAdministratorController,
     CreateSellerController,
     CreateAttendantController,
@@ -24,7 +21,6 @@ import { ListAdministratorsService } from './services/listAdministrators.service
   ],
   imports: [DatabaseModule, CryptographyModule, DateModule, EnvModule],
   providers: [
-    LoginAdministratorService,
     DeleteAdministratorService,
     CreateSellerService,
     CreateAttendantService,
