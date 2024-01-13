@@ -35,7 +35,7 @@ model Collaborator {
   id        String           @id @unique @default(uuid())
   name      String
   image     String?
-  login     String
+  login     String           @unique
   password  String
   createdAt DateTime         @default(now()) @map("created_at")
   updatedAt DateTime?        @updatedAt @map("updated_at")
@@ -44,7 +44,6 @@ model Collaborator {
 
   refreshTokens RefreshToken[]
 
-  @@unique([login, role])
   @@map("collaborators")
 }
 
