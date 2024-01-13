@@ -5,8 +5,6 @@ import { LoginAdministratorService } from './services/loginAdministrator.service
 import { EnvModule } from '@infra/env/env.module'
 import { DateModule } from '@providers/date/date.module'
 import { LoginAdministratorController } from './controllers/loginAdministrator.controller'
-import { GetAdministratorController } from './controllers/getAdministrator.controller'
-import { GetAdministratorService } from './services/getAdministrator.service'
 import { DeleteAdministratorController } from './controllers/deleteAdministrator.controller'
 import { DeleteAdministratorService } from './services/deleteAdministrator.service'
 import { CreateSellerController } from './controllers/createSeller.controller'
@@ -19,7 +17,6 @@ import { ListAdministratorsService } from './services/listAdministrators.service
 @Module({
   controllers: [
     LoginAdministratorController,
-    GetAdministratorController,
     DeleteAdministratorController,
     CreateSellerController,
     CreateAttendantController,
@@ -28,7 +25,6 @@ import { ListAdministratorsService } from './services/listAdministrators.service
   imports: [DatabaseModule, CryptographyModule, DateModule, EnvModule],
   providers: [
     LoginAdministratorService,
-    GetAdministratorService,
     DeleteAdministratorService,
     CreateSellerService,
     CreateAttendantService,
