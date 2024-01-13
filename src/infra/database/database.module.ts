@@ -22,6 +22,8 @@ import { MastersRepository } from '@modules/master/repositories/MastersRepositor
 import { MastersPrismaRepository } from './prisma/repositories/master/MastersPrismaRepository'
 import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
 import { OwnersPrismaRepository } from './prisma/repositories/owners/OwnersPrismaRepository'
+import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
+import { CollaboratorsPrismaRepository } from './prisma/repositories/collaborator/CollaboratorsPrismaRepository'
 
 @Module({
   providers: [
@@ -71,6 +73,10 @@ import { OwnersPrismaRepository } from './prisma/repositories/owners/OwnersPrism
       provide: OwnersRepository,
       useClass: OwnersPrismaRepository,
     },
+    {
+      provide: CollaboratorsRepository,
+      useClass: CollaboratorsPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -85,6 +91,7 @@ import { OwnersPrismaRepository } from './prisma/repositories/owners/OwnersPrism
     InventoriesRepository,
     MastersRepository,
     OwnersRepository,
+    CollaboratorsRepository,
   ],
 })
 export class DatabaseModule {}
