@@ -1,4 +1,7 @@
-import { Collaborator } from '@modules/collaborator/entities/Collaborator'
+import {
+  Collaborator,
+  CollaboratorRole,
+} from '@modules/collaborator/entities/Collaborator'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 
 export class CollaboratorsInMemoryRepository
@@ -16,5 +19,11 @@ export class CollaboratorsInMemoryRepository
     }
 
     return collaborator
+  }
+
+  async createMany(
+    collaborator: Collaborator<CollaboratorRole>[],
+  ): Promise<void> {
+    this.collaborators.push(...collaborator)
   }
 }
