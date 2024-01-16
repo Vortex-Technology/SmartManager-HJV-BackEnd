@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
+import { AttendantPrismaMapper } from '@infra/database/prisma/attendant/AttendantPrismaMapper'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { AttendantPrismaMapper } from '@infra/database/prisma/repositories/attendant/AttendantPrismaMapper'
 import {
   Attendant,
   AttendantProps,

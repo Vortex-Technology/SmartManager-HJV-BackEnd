@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { SellerPrismaMapper } from '@infra/database/prisma/repositories/seller/SellerPrismaMapper'
+import { SellerPrismaMapper } from '@infra/database/prisma/seller/SellerPrismaMapper'
 import { Seller, SellerProps } from '@modules/seller/entities/Seller'
 import { Injectable } from '@nestjs/common'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'

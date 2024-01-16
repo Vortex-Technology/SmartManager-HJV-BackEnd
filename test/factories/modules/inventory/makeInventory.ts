@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { InventoryPrismaMapper } from '@infra/database/prisma/repositories/inventory/InventoryPrismaMapper'
+import { InventoryPrismaMapper } from '@infra/database/prisma/inventory/InventoryPrismaMapper'
 import {
   Inventory,
   InventoryProps,

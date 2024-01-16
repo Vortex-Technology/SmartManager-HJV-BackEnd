@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductVariantPrismaMapper } from '@infra/database/prisma/repositories/product/ProductVariantPrismaMapper'
+import { ProductVariantPrismaMapper } from '@infra/database/prisma/product/ProductVariantPrismaMapper'
 import { ProductUnitType } from '@modules/product/entities/Product'
 import {
   ProductVariant,

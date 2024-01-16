@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { MastersPrismaMapper } from '@infra/database/prisma/repositories/master/MastersPrismaMapper'
+import { MastersPrismaMapper } from '@infra/database/prisma/master/MastersPrismaMapper'
 import {
   CollaboratorCreatePropsOptional,
   CollaboratorRole,

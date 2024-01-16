@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
+import { AdministratorPrismaMapper } from '@infra/database/prisma/administrator/AdministratorPrismaMapper'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { AdministratorPrismaMapper } from '@infra/database/prisma/repositories/administrator/AdministratorPrismaMapper'
 import {
   Administrator,
   AdministratorProps,

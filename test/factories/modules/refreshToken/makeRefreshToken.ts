@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { RefreshTokenPrismaMapper } from '@infra/database/prisma/repositories/refreshToken/RefreshTokenPrismaMapper'
+import { RefreshTokenPrismaMapper } from '@infra/database/prisma/refreshToken/RefreshTokenPrismaMapper'
 import {
   RefreshToken,
   RefreshTokenProps,
