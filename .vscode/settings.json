@@ -20,8 +20,10 @@
     "alvaro",
     "encrypter",
     "Encrypter",
+    "fkey",
     "hasher",
     "KG",
+    "pkey",
     "strategys",
     "unexistendt",
     "websockets"
