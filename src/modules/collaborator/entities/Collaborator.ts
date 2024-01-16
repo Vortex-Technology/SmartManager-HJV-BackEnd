@@ -3,8 +3,6 @@ import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityI
 import { Optional } from '@shared/core/types/Optional'
 
 export enum CollaboratorRole {
-  'MASTER' = 'MASTER',
-  'OWNER' = 'OWNER',
   'MANAGER' = 'MANAGER',
   'STOCKIST' = 'STOCKIST',
   'SELLER' = 'SELLER',
@@ -14,26 +12,28 @@ export enum CollaboratorRole {
 export interface CollaboratorProps<
   TRole extends CollaboratorRole = CollaboratorRole,
 > {
-  name: string
-  login: string
-  image?: string | null
+  email: string
   password: string
+  actualRemuneration: number
   role: TRole
   createdAt: Date
   updatedAt: Date | null
   deletedAt: Date | null
+  inactivatedAt: Date | null
+  marketId: UniqueEntityId
+  userId: UniqueEntityId
 }
 
 export type CollaboratorCreatePropsOptional<TRole extends CollaboratorRole> =
   Optional<
     CollaboratorProps<TRole>,
-    'image' | 'role' | 'createdAt' | 'updatedAt' | 'deletedAt'
+    'createdAt' | 'deletedAt' | 'updatedAt' | 'inactivatedAt' | 'role'
   >
 
 export class Collaborator<
   T extends CollaboratorRole = CollaboratorRole,
 > extends AggregateRoot<CollaboratorProps<T>> {
-  static create<TRole extends CollaboratorRole = CollaboratorRole>(
+  static createUntyped<TRole extends CollaboratorRole = CollaboratorRole>(
     props: CollaboratorCreatePropsOptional<TRole>,
     id?: UniqueEntityId,
   ) {
@@ -47,35 +47,26 @@ export class Collaborator<
   ) {
     const collaboratorProps: CollaboratorProps<TRole> = {
       ...props,
-      login: props.login
-        .normalize('NFD')
-        .toLowerCase()
-        .replaceAll(' ', '-')
-        .replace(/[^\w\s-]/gi, ''),
-      image: props.image ?? null,
       role: props.role ?? (CollaboratorRole.NOT_DEFINED as TRole),
       createdAt: props.createdAt ?? new Date(),
       updatedAt: props.updatedAt ?? null,
       deletedAt: props.deletedAt ?? null,
+      inactivatedAt: props.inactivatedAt ?? null,
     }
 
     return collaboratorProps
   }
 
-  get name() {
-    return this.props.name
-  }
-
-  get login() {
-    return this.props.login
-  }
-
-  get image() {
-    return this.props.image
+  get email() {
+    return this.props.email
   }
 
   get password() {
     return this.props.password
+  }
+
+  get actualRemuneration() {
+    return this.props.actualRemuneration
   }
 
   get role() {
@@ -99,7 +90,32 @@ export class Collaborator<
     this.touch()
   }
 
+  get inactivatedAt() {
+    return this.props.inactivatedAt
+  }
+
+  set inactivatedAt(inactivatedAt: Date | null) {
+    this.props.inactivatedAt = inactivatedAt
+    this.touch()
+  }
+
+  get marketId() {
+    return this.props.marketId
+  }
+
+  get userId() {
+    return this.props.userId
+  }
+
   touch() {
     this.props.updatedAt = new Date()
   }
+
+  // public equals(entity: Collaborator): boolean {
+  //   if (entity instanceof Collaborator) {
+  //     return entity.id.equals(this.id) && entity.props.role === this.props.role
+  //   }
+
+  //   return false
+  // }
 }
