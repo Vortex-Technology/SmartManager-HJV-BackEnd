@@ -11,7 +11,9 @@ export class Owner extends Collaborator<CollaboratorRole.OWNER> {
     id?: UniqueEntityId,
   ) {
     const ownerProps = Owner.setupProps<TRole>(props)
+
     const owner = new Owner({ ...ownerProps, role: CollaboratorRole.OWNER }, id)
+
     return owner
   }
 }
