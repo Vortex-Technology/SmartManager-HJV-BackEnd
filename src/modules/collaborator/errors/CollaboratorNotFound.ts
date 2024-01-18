@@ -4,7 +4,7 @@ import { statusCode } from 'src/config/statusCode'
 export class CollaboratorNotFound extends Error implements ServiceError {
   status = statusCode.Conflict
 
-  constructor(collaboratorType: string) {
-    super(`${collaboratorType} not found`)
+  constructor(collaboratorType?: string) {
+    super(`${collaboratorType || 'Collaborator'} not found`)
   }
 }
