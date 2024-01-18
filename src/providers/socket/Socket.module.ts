@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { SocketGateway } from './socket.gateway'
-import { EnvModule } from '@infra/env/env.module'
+import { EnvModule } from '@infra/env/Env.module'
 
 @Module({
   imports: [EnvModule],
