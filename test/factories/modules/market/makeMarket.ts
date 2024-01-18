@@ -16,6 +16,7 @@ export function makeMarket(
       postalCode: fakerPT_BR.location.zipCode(),
       state: fakerPT_BR.location.state(),
       street: fakerPT_BR.location.street(),
+      inventoryId: new UniqueEntityId(),
       ...override,
     },
     id,
