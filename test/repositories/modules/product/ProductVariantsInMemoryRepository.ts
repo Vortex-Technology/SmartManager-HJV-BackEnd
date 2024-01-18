@@ -1,7 +1,7 @@
 import { ProductVariant } from '@modules/product/entities/ProductVariant'
 import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
 
-export class ProductVariantInMemoryRepository
+export class ProductVariantsInMemoryRepository
   implements ProductVariantsRepository
 {
   productVariants: ProductVariant[] = []

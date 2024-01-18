@@ -1,28 +1,26 @@
 import { AdministratorInMemoryRepository } from '@test/repositories/modules/administrator/AdministratorInMemoryRepository'
 import { makeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
-import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { makeProductCategory } from '@test/factories/modules/product/makeProductCategory'
 import { ProductCategoryInMemoryRepository } from '@test/repositories/modules/product/ProductCategoryInMemoryRepository'
-import { CreateProductService } from './createProduct.service'
+import { CreateProductService } from './CreateProduct.service'
 import { ProductInMemoryRepository } from '@test/repositories/modules/product/ProductInMemoryRepository'
 import { ProductVariantInMemoryRepository } from '@test/repositories/modules/product/ProductVariantInMemoryRepository'
 import { Product, ProductUnitType } from '../entities/Product'
 import { makeProductVariant } from '@test/factories/modules/product/makeProductVariant'
 import { ProductVariantAlreadyExistsWithSame } from '../errors/ProductVariantAlreadyExistsWithSame'
 import { AllProductVariantAlreadyExists } from '../errors/AllProductVariantAlreadyExists'
-import { InventoryInMemoryRepository } from '@test/repositories/modules/inventory/inventoryInMemoryRepository'
-import { ProductVariantInventoryInMemoryRepository } from '@test/repositories/modules/inventory/productVariantInventoryInMemoryRepository'
 import { makeInventory } from '@test/factories/modules/inventory/makeInventory'
+import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
+import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 
 let administratorInMemoryRepository: AdministratorInMemoryRepository
 let productCategoryInMemoryRepository: ProductCategoryInMemoryRepository
 let productInMemoryRepository: ProductInMemoryRepository
 let productVariantInMemoryRepository: ProductVariantInMemoryRepository
-let inventoryInMemoryRepository: InventoryInMemoryRepository
-let productVariantInventoryInMemoryRepository: ProductVariantInventoryInMemoryRepository
+let inventoriesInMemoryRepository: InventoriesInMemoryRepository
+let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 
 let sut: CreateProductService
 
@@ -34,10 +32,10 @@ describe('Create product', () => {
     productInMemoryRepository = new ProductInMemoryRepository(
       productVariantInMemoryRepository,
     )
-    productVariantInventoryInMemoryRepository =
-      new ProductVariantInventoryInMemoryRepository()
-    inventoryInMemoryRepository = new InventoryInMemoryRepository(
-      productVariantInventoryInMemoryRepository,
+    productVariantInventoriesInMemoryRepository =
+      new ProductVariantInventoriesInMemoryRepository()
+    inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
+      productVariantInventoriesInMemoryRepository,
     )
 
     sut = new CreateProductService(
@@ -45,7 +43,7 @@ describe('Create product', () => {
       productCategoryInMemoryRepository,
       productInMemoryRepository,
       productVariantInMemoryRepository,
-      inventoryInMemoryRepository,
+      inventoriesInMemoryRepository,
     )
   })
 
@@ -84,9 +82,9 @@ describe('Create product', () => {
       expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
         1,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(1)
       expect(
         productVariantInMemoryRepository.productVariants[0].barCode,
@@ -188,9 +186,9 @@ describe('Create product', () => {
       expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
         2,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(2)
     }
   })
@@ -234,9 +232,9 @@ describe('Create product', () => {
       expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
         2,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(1)
     }
   })
@@ -288,9 +286,9 @@ describe('Create product', () => {
       expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
         3,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(1)
     }
   })
@@ -347,9 +345,9 @@ describe('Create product', () => {
       expect(response.value.errors[0]).toBeInstanceOf(
         ProductVariantAlreadyExistsWithSame,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(1)
     }
   })
@@ -413,7 +411,7 @@ describe('Create product', () => {
     const inventory = makeInventory({}, new UniqueEntityId('inventory-id'))
 
     await administratorInMemoryRepository.create(administrator)
-    await inventoryInMemoryRepository.create(inventory)
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: '1',
@@ -441,9 +439,9 @@ describe('Create product', () => {
       expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
         1,
       )
-      expect(inventoryInMemoryRepository.inventories).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
       expect(
-        productVariantInventoryInMemoryRepository.productVariantInventories,
+        productVariantInventoriesInMemoryRepository.productVariantInventories,
       ).toHaveLength(1)
       expect(
         productVariantInMemoryRepository.productVariants[0].barCode,

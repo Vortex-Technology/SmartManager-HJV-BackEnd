@@ -1,7 +1,7 @@
 import { ProductVariantInventory } from '@modules/inventory/entities/ProductVariantInventory'
 import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
 
-export class ProductVariantInventoryInMemoryRepository
+export class ProductVariantInventoriesInMemoryRepository
   implements ProductVariantInventoriesRepository
 {
   productVariantInventories: ProductVariantInventory[] = []

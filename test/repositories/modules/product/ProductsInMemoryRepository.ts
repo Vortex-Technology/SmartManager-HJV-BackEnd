@@ -1,10 +1,10 @@
 import { Product } from '@modules/product/entities/Product'
-import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
 import { ProductsRepository } from '@modules/product/repositories/ProductsRepository'
+import { ProductVariantsInMemoryRepository } from './ProductVariantsInMemoryRepository'
 
-export class ProductInMemoryRepository implements ProductsRepository {
+export class ProductsInMemoryRepository implements ProductsRepository {
   constructor(
-    private readonly productVariantsRepository: ProductVariantsRepository,
+    private readonly productVariantsRepository: ProductVariantsInMemoryRepository,
   ) {}
 
   products: Product[] = []

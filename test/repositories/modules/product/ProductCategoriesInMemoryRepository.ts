@@ -1,7 +1,7 @@
 import { ProductCategory } from '@modules/product/entities/ProductCategory'
 import { ProductCategoriesRepository } from '@modules/product/repositories/ProductCategoriesRepository'
 
-export class ProductCategoryInMemoryRepository
+export class ProductCategoriesInMemoryRepository
   implements ProductCategoriesRepository
 {
   productCategories: ProductCategory[] = []
