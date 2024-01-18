@@ -1,9 +1,7 @@
 import { Either, left, right } from '@shared/core/error/Either'
 import { SessionExpired } from '../errors/SessionExpired'
 import { Injectable } from '@nestjs/common'
-import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
-import { EnvService } from '@infra/env/env.service'
 import { Decoder } from '@providers/cryptography/contracts/decoder'
 import { AdministratorRepository } from '@modules/administrator/repositories/AdministratorRepository'
 import { SellerRepository } from '@modules/seller/repositories/SellerRepository'
@@ -13,6 +11,8 @@ import { DateVerifications } from '@providers/date/contracts/dateVerifications'
 import { Administrator } from '@modules/administrator/entities/Administrator'
 import { RefreshToken } from '../entities/RefreshToken'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
+import { RefreshTokensRepository } from '../repositories/RefreshTokensRepository'
+import { EnvService } from '@infra/env/Env.service'
 
 interface Request {
   refreshToken: string
@@ -30,7 +30,7 @@ type Response = Either<
 export class RefreshTokenService {
   constructor(
     private readonly administratorRepository: AdministratorRepository,
-    private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly refreshTokenRepository: RefreshTokensRepository,
     private readonly attendantRepository: AttendantRepository,
     private readonly dateVerifications: DateVerifications,
     private readonly sellerRepository: SellerRepository,

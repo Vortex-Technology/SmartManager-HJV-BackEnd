@@ -1,7 +1,9 @@
 import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
-import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
+import { RefreshTokensRepository } from '@modules/refreshToken/repositories/RefreshTokensRepository'
 
-export class RefreshTokenInMemoryRepository implements RefreshTokenRepository {
+export class RefreshTokensInMemoryRepository
+  implements RefreshTokensRepository
+{
   refreshTokens: RefreshToken[] = []
 
   async create(refreshToken: RefreshToken): Promise<void> {
