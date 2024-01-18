@@ -5,7 +5,7 @@ import {
 } from '@prisma/client'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
-export class ProductVariantInventoryPrismaMapper {
+export class ProductVariantInventoriesPrismaMapper {
   static toEntity(raw: ProductVariantInventoryPrisma): ProductVariantInventory {
     return ProductVariantInventory.create(
       {

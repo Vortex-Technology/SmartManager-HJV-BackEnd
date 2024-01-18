@@ -1,12 +1,12 @@
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../../index.service'
-import { InventoryPrismaMapper } from './InventoryPrismaMapper'
+import { PrismaService } from '../index.service'
 import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
+import { InventoriesPrismaMapper } from './InventoriesPrismaMapper'
 
 @Injectable()
-export class InventoryPrismaRepository implements InventoriesRepository {
+export class InventoriesPrismaRepository implements InventoriesRepository {
   constructor(
     private readonly prisma: PrismaService,
     private readonly productVariantInventoryRepository: ProductVariantInventoriesRepository,
@@ -14,7 +14,7 @@ export class InventoryPrismaRepository implements InventoriesRepository {
 
   async create(inventory: Inventory): Promise<void> {
     await this.prisma.inventory.create({
-      data: InventoryPrismaMapper.toPrisma(inventory),
+      data: InventoriesPrismaMapper.toPrisma(inventory),
     })
 
     const productVariantInventory =
@@ -32,7 +32,7 @@ export class InventoryPrismaRepository implements InventoriesRepository {
       where: {
         id: inventory.id.toString(),
       },
-      data: InventoryPrismaMapper.toPrisma(inventory),
+      data: InventoriesPrismaMapper.toPrisma(inventory),
     })
 
     const productVariantInventory =
@@ -55,6 +55,6 @@ export class InventoryPrismaRepository implements InventoriesRepository {
 
     if (!inventory) return null
 
-    return InventoryPrismaMapper.toEntity(inventory)
+    return InventoriesPrismaMapper.toEntity(inventory)
   }
 }

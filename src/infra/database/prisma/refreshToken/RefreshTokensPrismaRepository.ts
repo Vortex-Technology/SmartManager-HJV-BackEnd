@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../../index.service'
-import { RefreshTokenPrismaMapper } from './RefreshTokenPrismaMapper'
-import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
+import { PrismaService } from '../index.service'
 import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
+import { RefreshTokensPrismaMapper } from './RefreshTokensPrismaMapper'
+import { RefreshTokensRepository } from '@modules/refreshToken/repositories/RefreshTokensRepository'
 
 @Injectable()
-export class RefreshTokenPrismaRepository implements RefreshTokenRepository {
+export class RefreshTokensPrismaRepository implements RefreshTokensRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(refreshToken: RefreshToken): Promise<void> {
     await this.prisma.refreshToken.create({
-      data: RefreshTokenPrismaMapper.toPrisma(refreshToken),
+      data: RefreshTokensPrismaMapper.toPrisma(refreshToken),
     })
   }
 
@@ -20,7 +20,7 @@ export class RefreshTokenPrismaRepository implements RefreshTokenRepository {
   }): Promise<RefreshToken | null> {
     const refreshToken = await this.prisma.refreshToken.findFirst({
       where: {
-        collaboratorId: props.collaboratorId,
+        userId: props.collaboratorId,
         token: props.refreshToken,
       },
     })
@@ -29,7 +29,7 @@ export class RefreshTokenPrismaRepository implements RefreshTokenRepository {
       return null
     }
 
-    return RefreshTokenPrismaMapper.toEntity(refreshToken)
+    return RefreshTokensPrismaMapper.toEntity(refreshToken)
   }
 
   async permanentlyDeleteByCollaboratorId(
@@ -37,7 +37,7 @@ export class RefreshTokenPrismaRepository implements RefreshTokenRepository {
   ): Promise<void> {
     await this.prisma.refreshToken.deleteMany({
       where: {
-        collaboratorId,
+        userId: collaboratorId,
       },
     })
   }

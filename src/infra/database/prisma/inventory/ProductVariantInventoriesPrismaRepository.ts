@@ -1,11 +1,11 @@
 import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
-import { PrismaService } from '../../index.service'
+import { PrismaService } from '../index.service'
 import { ProductVariantInventory } from '@modules/inventory/entities/ProductVariantInventory'
-import { ProductVariantInventoryPrismaMapper } from './ProductVariantInventoryPrismaMapper'
 import { Injectable } from '@nestjs/common'
+import { ProductVariantInventoriesPrismaMapper } from './ProductVariantInventoriesPrismaMapper'
 
 @Injectable()
-export class ProductVariantInventoryPrismaRepository
+export class ProductVariantInventoriesPrismaRepository
   implements ProductVariantInventoriesRepository
 {
   constructor(private readonly prisma: PrismaService) {}
@@ -15,7 +15,7 @@ export class ProductVariantInventoryPrismaRepository
   ): Promise<void> {
     await this.prisma.productVariantInventory.createMany({
       data: productVariantInventories.map(
-        ProductVariantInventoryPrismaMapper.toPrisma,
+        ProductVariantInventoriesPrismaMapper.toPrisma,
       ),
       skipDuplicates: true,
     })

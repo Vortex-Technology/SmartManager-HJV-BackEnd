@@ -5,7 +5,7 @@ import {
 } from '@prisma/client'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
-export class ProductCategoryPrismaMapper {
+export class ProductCategoriesPrismaMapper {
   static toEntity(raw: ProductCategoryPrisma): ProductCategory {
     return ProductCategory.create(
       {

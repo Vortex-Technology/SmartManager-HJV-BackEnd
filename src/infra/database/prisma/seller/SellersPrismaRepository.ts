@@ -1,30 +1,17 @@
-import { Seller } from '@modules/seller/entities/Seller'
-import { SellerRepository } from '@modules/seller/repositories/SellerRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../../index.service'
-import { SellerPrismaMapper } from './SellerPrismaMapper'
+import { PrismaService } from '../index.service'
+import { Seller } from '@modules/seller/entities/Seller'
+import { SellersRepository } from '@modules/seller/repositories/SellersRepository'
+import { SellersPrismaMapper } from './SellersPrismaMapper'
 
 @Injectable()
-export class SellerPrismaRepository implements SellerRepository {
+export class SellersPrismaRepository implements SellersRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(seller: Seller): Promise<void> {
     await this.prisma.collaborator.create({
-      data: SellerPrismaMapper.toPrisma(seller),
+      data: SellersPrismaMapper.toPrisma(seller),
     })
-  }
-
-  async findByLogin(login: string): Promise<Seller | null> {
-    const seller = await this.prisma.collaborator.findUnique({
-      where: {
-        login,
-        deletedAt: null,
-      },
-    })
-
-    if (!seller) return null
-
-    return SellerPrismaMapper.toEntity(seller)
   }
 
   async findById(id: string): Promise<Seller | null> {
@@ -37,7 +24,7 @@ export class SellerPrismaRepository implements SellerRepository {
 
     if (!seller) return null
 
-    return SellerPrismaMapper.toEntity(seller)
+    return SellersPrismaMapper.toEntity(seller)
   }
 
   async findMany({
@@ -50,7 +37,7 @@ export class SellerPrismaRepository implements SellerRepository {
     const sellers = await this.prisma.collaborator.findMany({
       where: {
         deletedAt: null,
-        type: 'SELLER',
+        role: 'SELLER',
       },
       orderBy: {
         createdAt: 'desc',
@@ -59,14 +46,14 @@ export class SellerPrismaRepository implements SellerRepository {
       take: limit,
     })
 
-    return sellers.map(SellerPrismaMapper.toEntity)
+    return sellers.map(SellersPrismaMapper.toEntity)
   }
 
   async count(): Promise<number> {
     return await this.prisma.collaborator.count({
       where: {
         deletedAt: null,
-        type: 'SELLER',
+        role: 'SELLER',
       },
     })
   }

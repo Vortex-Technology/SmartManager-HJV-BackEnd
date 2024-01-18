@@ -1,24 +1,24 @@
 import { ProductVariant } from '@modules/product/entities/ProductVariant'
 import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../../index.service'
-import { ProductVariantPrismaMapper } from './ProductVariantPrismaMapper'
+import { PrismaService } from '../index.service'
+import { ProductVariantsPrismaMapper } from './ProductVariantsPrismaMapper'
 
 @Injectable()
-export class ProductVariantPrismaRepository
+export class ProductVariantsPrismaRepository
   implements ProductVariantsRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(productVariant: ProductVariant): Promise<void> {
     await this.prisma.productVariant.create({
-      data: ProductVariantPrismaMapper.toPrisma(productVariant),
+      data: ProductVariantsPrismaMapper.toPrisma(productVariant),
     })
   }
 
   async createMany(productVariants: ProductVariant[]): Promise<void> {
     await this.prisma.productVariant.createMany({
-      data: productVariants.map(ProductVariantPrismaMapper.toPrisma),
+      data: productVariants.map(ProductVariantsPrismaMapper.toPrisma),
     })
   }
 
@@ -31,7 +31,7 @@ export class ProductVariantPrismaRepository
 
     if (!productVariant) return null
 
-    return ProductVariantPrismaMapper.toEntity(productVariant)
+    return ProductVariantsPrismaMapper.toEntity(productVariant)
   }
 
   async findByBarCodes(barCodes: string[]): Promise<(ProductVariant | null)[]> {
@@ -53,7 +53,7 @@ export class ProductVariantPrismaRepository
 
     return productsVariantsWithNullValues.map((productVariant) =>
       productVariant
-        ? ProductVariantPrismaMapper.toEntity(productVariant)
+        ? ProductVariantsPrismaMapper.toEntity(productVariant)
         : null,
     )
   }

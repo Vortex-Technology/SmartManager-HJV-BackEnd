@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../../index.service'
-import { ProductCategoryPrismaMapper } from './ProductCategoryPrismaMapper'
 import { ProductCategoriesRepository } from '@modules/product/repositories/ProductCategoriesRepository'
 import { ProductCategory } from '@modules/product/entities/ProductCategory'
+import { PrismaService } from '../index.service'
+import { ProductCategoriesPrismaMapper } from './ProductCategoriesPrismaMapper'
 
 @Injectable()
-export class ProductCategoryPrismaRepository
+export class ProductCategoriesPrismaRepository
   implements ProductCategoriesRepository
 {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(productCategory: ProductCategory): Promise<void> {
     await this.prisma.productCategory.create({
-      data: ProductCategoryPrismaMapper.toPrisma(productCategory),
+      data: ProductCategoriesPrismaMapper.toPrisma(productCategory),
     })
   }
 
@@ -25,12 +25,12 @@ export class ProductCategoryPrismaRepository
 
     if (!productCategory) return null
 
-    return ProductCategoryPrismaMapper.toEntity(productCategory)
+    return ProductCategoriesPrismaMapper.toEntity(productCategory)
   }
 
   async createMany(productCategories: ProductCategory[]): Promise<void> {
     await this.prisma.productCategory.createMany({
-      data: productCategories.map(ProductCategoryPrismaMapper.toPrisma),
+      data: productCategories.map(ProductCategoriesPrismaMapper.toPrisma),
     })
   }
 
@@ -50,7 +50,7 @@ export class ProductCategoryPrismaRepository
     })
 
     return productsCategoriesWithNullValues.map((category) =>
-      category ? ProductCategoryPrismaMapper.toEntity(category) : null,
+      category ? ProductCategoriesPrismaMapper.toEntity(category) : null,
     )
   }
 }

@@ -7,7 +7,7 @@ import {
 } from '@prisma/client'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
-export class ProductVariantPrismaMapper {
+export class ProductVariantsPrismaMapper {
   static toEntity(raw: ProductVariantPrisma): ProductVariant {
     const unitTypeMapper = {
       [UnitType.CM]: ProductUnitType.CENTIMETERS,

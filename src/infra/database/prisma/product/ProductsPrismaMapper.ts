@@ -2,7 +2,7 @@ import { Product } from '@modules/product/entities/Product'
 import { Prisma, Product as ProductPrisma } from '@prisma/client'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
-export class ProductPrismaMapper {
+export class ProductsPrismaMapper {
   static toEntity(raw: ProductPrisma): Product {
     return Product.create(
       {
