@@ -8,6 +8,7 @@ import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
 import { CompanyMarketsList } from '../entities/CompanyMarketsList'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import { Market } from '@modules/market/entities/Market'
+import { Inventory } from '@modules/inventory/entities/Inventory'
 
 interface Request {
   startedIssueInvoicesNow: boolean
@@ -84,9 +85,15 @@ export class CreateCompanyService {
     })
 
     for (const m of markets) {
+      const inventory = Inventory.create({
+        name: m.tradeName,
+      })
+
       const market = Market.create({
         ...m,
         companyId: company.id,
+        inventoryId: inventory.id,
+        inventory,
       })
 
       company.markets?.add(market)

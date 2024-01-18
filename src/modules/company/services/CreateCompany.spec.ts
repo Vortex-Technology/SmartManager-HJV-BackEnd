@@ -9,8 +9,12 @@ import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
+import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
+import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 
 let usersInMemoryRepository: UsersInMemoryRepository
+let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
+let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
@@ -21,8 +25,14 @@ describe('Create company', () => {
   beforeEach(() => {
     usersInMemoryRepository = new UsersInMemoryRepository()
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    productVariantInventoriesInMemoryRepository =
+      new ProductVariantInventoriesInMemoryRepository()
+    inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
+      productVariantInventoriesInMemoryRepository,
+    )
     marketsInMemoryRepository = new MarketsInMemoryRepository(
       collaboratorsInMemoryRepository,
+      inventoriesInMemoryRepository,
     )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
@@ -63,6 +73,7 @@ describe('Create company', () => {
       expect(response.value.company).toBeInstanceOf(Company)
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
     }
   })
 
@@ -113,6 +124,7 @@ describe('Create company', () => {
       expect(response.value.company).toBeInstanceOf(Company)
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(3)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(3)
     }
   })
 
