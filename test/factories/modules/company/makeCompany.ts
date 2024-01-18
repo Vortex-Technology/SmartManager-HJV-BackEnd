@@ -1,5 +1,9 @@
 import { fakerPT_BR } from '@faker-js/faker'
-import { Company, CompanyProps } from '@modules/company/entities/Company'
+import {
+  Company,
+  CompanyProps,
+  CompanyStatus,
+} from '@modules/company/entities/Company'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
 export function makeCompany(
@@ -11,6 +15,7 @@ export function makeCompany(
       companyName: fakerPT_BR.company.name(),
       ownerId: new UniqueEntityId(),
       sector: 'IT',
+      status: CompanyStatus.ACTIVE,
       ...override,
     },
     id,
