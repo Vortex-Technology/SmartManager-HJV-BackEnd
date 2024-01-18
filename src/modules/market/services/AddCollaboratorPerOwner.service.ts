@@ -8,12 +8,12 @@ import {
   Collaborator,
   CollaboratorRole,
 } from '@modules/collaborator/entities/Collaborator'
-import { OwnerNotFount } from '@modules/owner/errors/OwnerNotFound'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { MarketNotFound } from '../errors/MarketNorFound'
 import { User } from '@modules/user/entities/User'
 import { MarketCollaboratorsList } from '../entities/MarketCollaboratorsList'
+import { UserNotFount } from '@modules/user/errors/UserNotFound'
 
 interface Request {
   name: string
@@ -28,14 +28,14 @@ interface Request {
 }
 
 type Response = Either<
-  OwnerNotFount,
+  UserNotFount | PermissionDenied | CompanyNotFound | MarketNotFound,
   {
     collaborator: Collaborator
   }
 >
 
 @Injectable()
-export class AddCollaboratorPerOwner {
+export class AddCollaboratorPerOwnerService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly companiesRepository: CompaniesRepository,
@@ -44,20 +44,20 @@ export class AddCollaboratorPerOwner {
   ) {}
 
   async execute({
-    collaboratorRole,
-    companyId,
-    email,
-    marketId,
     name,
-    ownerId,
-    password,
     image,
+    email,
+    ownerId,
+    marketId,
+    password,
+    companyId,
+    collaboratorRole,
     actualRemuneration,
   }: Request): Promise<Response> {
     const owner = await this.usersRepository.findById(ownerId)
 
     if (!owner) {
-      return left(new OwnerNotFount())
+      return left(new UserNotFount())
     }
 
     const company = await this.companiesRepository.findById(companyId)
