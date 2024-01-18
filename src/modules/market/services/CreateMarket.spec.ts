@@ -9,8 +9,14 @@ import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/
 import { makeCompany } from '@test/factories/modules/company/makeCompany'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
+import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
+import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
+import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 
 let usersInMemoryRepository: UsersInMemoryRepository
+let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
+let inventoriesInMemoryRepository: InventoriesInMemoryRepository
+let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
 
@@ -19,7 +25,16 @@ let sut: CreateMarketService
 describe('Create market', () => {
   beforeEach(() => {
     usersInMemoryRepository = new UsersInMemoryRepository()
-    marketsInMemoryRepository = new MarketsInMemoryRepository()
+    productVariantInventoriesInMemoryRepository =
+      new ProductVariantInventoriesInMemoryRepository()
+    inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
+      productVariantInventoriesInMemoryRepository,
+    )
+    collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    marketsInMemoryRepository = new MarketsInMemoryRepository(
+      collaboratorsInMemoryRepository,
+      inventoriesInMemoryRepository,
+    )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
     )
@@ -58,6 +73,7 @@ describe('Create market', () => {
       expect(response.value.market).toBeInstanceOf(Market)
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(1)
+      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
     }
   })
 

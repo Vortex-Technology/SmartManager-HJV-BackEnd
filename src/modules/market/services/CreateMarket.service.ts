@@ -7,6 +7,7 @@ import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepo
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { CompanyMarketsList } from '@modules/company/entities/CompanyMarketsList'
+import { Inventory } from '@modules/inventory/entities/Inventory'
 
 interface Request {
   tradeName: string
@@ -60,6 +61,10 @@ export class CreateMarketService {
       return left(new PermissionDenied())
     }
 
+    const inventory = Inventory.create({
+      name: `${tradeName} - Estoque`,
+    })
+
     const market = Market.create({
       city,
       companyId: company.id,
@@ -71,6 +76,8 @@ export class CreateMarketService {
       tradeName,
       complement,
       country,
+      inventoryId: inventory.id,
+      inventory,
     })
 
     company.markets = new CompanyMarketsList()
