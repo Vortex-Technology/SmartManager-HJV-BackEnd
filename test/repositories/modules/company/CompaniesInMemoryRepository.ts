@@ -15,7 +15,7 @@ export class CompaniesInMemoryRepository implements CompaniesRepository {
     const markets = company.markets?.getNewItems()
 
     if (markets) {
-      await this.marketsInMemoryRepository.createMarket(markets)
+      await this.marketsInMemoryRepository.createMany(markets)
     }
   }
 
@@ -43,7 +43,7 @@ export class CompaniesInMemoryRepository implements CompaniesRepository {
     const markets = company.markets?.getNewItems()
 
     if (markets) {
-      await this.marketsInMemoryRepository.createMarket(markets)
+      await this.marketsInMemoryRepository.createMany(markets)
     }
   }
 }
