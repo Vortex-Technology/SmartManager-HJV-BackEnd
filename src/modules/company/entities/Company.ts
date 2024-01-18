@@ -8,8 +8,14 @@ export enum CompanyDocumentationType {
   LE = 'LE', // legal person
 }
 
+export enum CompanyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+}
+
 export interface CompanyProps {
   email: string | null
+  status: CompanyStatus
   companyName: string
   documentation: string | null
   documentationType: CompanyDocumentationType | null
@@ -36,6 +42,7 @@ export class Company extends AggregateRoot<CompanyProps> {
       | 'deletedAt'
       | 'startedIssueInvoicesAt'
       | 'markets'
+      | 'status'
     >,
     id?: UniqueEntityId,
   ) {
@@ -50,6 +57,7 @@ export class Company extends AggregateRoot<CompanyProps> {
       documentationType: props.documentationType ?? null,
       stateRegistration: props.stateRegistration ?? null,
       markets: props.markets ?? null,
+      status: props.status ?? CompanyStatus.INACTIVE,
     }
 
     const company = new Company(companyProps, id)
@@ -59,6 +67,10 @@ export class Company extends AggregateRoot<CompanyProps> {
 
   get email() {
     return this.props.email
+  }
+
+  get status() {
+    return this.props.status
   }
 
   get companyName() {
