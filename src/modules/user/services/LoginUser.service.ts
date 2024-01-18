@@ -2,12 +2,12 @@ import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
 import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
-import { EnvService } from '@infra/env/env.service'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
-import { RefreshTokenRepository } from '@modules/refreshToken/repositories/RefreshTokenRepository'
 import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
 import { UserWrongCredentials } from '../errors/UserWrongCredentials'
 import { UsersRepository } from '../repositories/UsersRepository'
+import { EnvService } from '@infra/env/Env.service'
+import { RefreshTokensRepository } from '@modules/refreshToken/repositories/RefreshTokensRepository'
 
 interface Request {
   email: string
@@ -30,7 +30,7 @@ export class LoginUserService {
     private readonly encrypter: Encrypter,
     private readonly env: EnvService,
     private readonly dateAddition: DateAddition,
-    private readonly refreshTokenRepository: RefreshTokenRepository,
+    private readonly refreshTokenRepository: RefreshTokensRepository,
   ) {}
 
   async execute({ email, password }: Request): Promise<Response> {

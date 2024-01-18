@@ -3,18 +3,18 @@ import { makeUser } from '@test/factories/modules/user/makeUser'
 import { FakeEncrypter } from '@test/repositories/providers/cryptography/fakeEncrypter'
 import { FakeEnv } from '@test/config/env/fakeEnv'
 import { DayJs } from '@providers/date/implementations/dayJs'
-import { EnvService } from '@infra/env/env.service'
 import { UserWrongCredentials } from '../errors/UserWrongCredentials'
-import { RefreshTokenInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokenInMemoryRepository'
+import { RefreshTokensInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokensInMemoryRepository'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
 import { LoginUserService } from './LoginUser.service'
+import { EnvService } from '@infra/env/Env.service'
 
 let usersInMemoryRepository: UsersInMemoryRepository
 let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
 let fakeEnv: FakeEnv
 let fakeDateProvider: DayJs
-let refreshTokenInMemoryRepository: RefreshTokenInMemoryRepository
+let refreshTokensInMemoryRepository: RefreshTokensInMemoryRepository
 
 let sut: LoginUserService
 
@@ -25,7 +25,7 @@ describe('Login User', () => {
     fakeEncrypter = new FakeEncrypter()
     fakeEnv = new FakeEnv()
     fakeDateProvider = new DayJs()
-    refreshTokenInMemoryRepository = new RefreshTokenInMemoryRepository()
+    refreshTokensInMemoryRepository = new RefreshTokensInMemoryRepository()
 
     sut = new LoginUserService(
       usersInMemoryRepository,
@@ -33,7 +33,7 @@ describe('Login User', () => {
       fakeEncrypter,
       fakeEnv as EnvService,
       fakeDateProvider,
-      refreshTokenInMemoryRepository,
+      refreshTokensInMemoryRepository,
     )
   })
 

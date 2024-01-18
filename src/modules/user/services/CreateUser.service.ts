@@ -27,9 +27,9 @@ export class CreateUserService {
   ) {}
 
   async execute({ email, name, password, image }: Request): Promise<Response> {
-    const ownerExists = await this.usersRepository.findByEmail(email)
+    const userExists = await this.usersRepository.findByEmail(email)
 
-    if (ownerExists) {
+    if (userExists) {
       return left(new UserAlreadyExistsWithSameEmail())
     }
 
