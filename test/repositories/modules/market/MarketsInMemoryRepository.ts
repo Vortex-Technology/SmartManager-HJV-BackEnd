@@ -2,15 +2,17 @@ import { Market } from '@modules/market/entities/Market'
 import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
 import { CollaboratorsInMemoryRepository } from '../collaborator/CollaboratorsInMemoryRepository'
 import { Collaborator } from '@modules/collaborator/entities/Collaborator'
+import { InventoriesInMemoryRepository } from '../inventory/InventoriesInMemoryRepository'
 
 export class MarketsInMemoryRepository implements MarketsRepository {
   constructor(
     private readonly collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository,
+    private readonly inventoriesInMemoryRepository: InventoriesInMemoryRepository,
   ) {}
 
   markets: Market[] = []
 
-  async createMarket(markets: Market[]): Promise<void> {
+  async createMany(markets: Market[]): Promise<void> {
     this.markets.push(...markets)
 
     const newCollaborators: Collaborator[] = []
@@ -20,6 +22,10 @@ export class MarketsInMemoryRepository implements MarketsRepository {
 
       if (newCollaboratorsInCurrentMarket) {
         newCollaborators.push(...newCollaboratorsInCurrentMarket)
+      }
+
+      if (market.inventory) {
+        await this.inventoriesInMemoryRepository.create(market.inventory)
       }
     }
 
@@ -51,6 +57,10 @@ export class MarketsInMemoryRepository implements MarketsRepository {
 
     if (collaborators) {
       await this.collaboratorsInMemoryRepository.createMany(collaborators)
+    }
+
+    if (market.inventory) {
+      await this.inventoriesInMemoryRepository.create(market.inventory)
     }
   }
 }
