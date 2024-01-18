@@ -76,6 +76,7 @@ enum CompanyDocumentationType {
 model Company {
   id                     String                    @id @unique @default(uuid())
   email                  String?                   @unique
+  status                 CompanyStatus             @default(INACTIVE)
   companyNane            String                    @unique @map("company_name")
   documentation          String?                   @unique
   documentationType      CompanyDocumentationType? @map("documentation_type")
@@ -93,8 +94,21 @@ model Company {
   ownerId String @map("owner_id")
 
   markets Market[]
+  apiKeys ApiKey[]
 
   @@map("companies")
+}
+
+model ApiKey {
+  id        String    @id @unique @default(uuid())
+  key       String    @unique
+  secret    String    @unique
+  revokedAt DateTime? @map("revoked_at")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
+  @@map("api_keys")
 }
 
 model Market {
@@ -109,6 +123,9 @@ model Market {
 
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   companyId String  @map("company_id")
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  inventoryId String    @unique @map("inventory_id")
 
   collaborators Collaborator[]
 
@@ -223,6 +240,8 @@ model Inventory {
 
   address   Address? @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   addressId Int?     @unique @map("address_id")
+
+  market Market?
 
   @@map("inventories")
 }
