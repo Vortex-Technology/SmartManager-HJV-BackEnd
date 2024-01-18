@@ -2,10 +2,12 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 import { MarketCollaboratorsList } from './MarketCollaboratorsList'
+import { Inventory } from '@modules/inventory/entities/Inventory'
 
 export interface MarketProps {
   tradeName: string
   companyId: UniqueEntityId
+  inventoryId: UniqueEntityId
   street: string
   number: string
   neighborhood: string
@@ -18,6 +20,8 @@ export interface MarketProps {
   createdAt: Date
   updatedAt: Date | null
   deletedAt: Date | null
+
+  inventory: Inventory | null
 }
 
 export class Market extends AggregateRoot<MarketProps> {
@@ -30,6 +34,7 @@ export class Market extends AggregateRoot<MarketProps> {
       | 'createdAt'
       | 'updatedAt'
       | 'deletedAt'
+      | 'inventory'
     >,
     id?: UniqueEntityId,
   ) {
@@ -41,6 +46,7 @@ export class Market extends AggregateRoot<MarketProps> {
       createdAt: props.createdAt ?? new Date(),
       updatedAt: props.updatedAt ?? null,
       deletedAt: props.deletedAt ?? null,
+      inventory: props.inventory ?? null,
     }
 
     const market = new Market(marketProps, id)
@@ -54,6 +60,10 @@ export class Market extends AggregateRoot<MarketProps> {
 
   get companyId() {
     return this.props.companyId
+  }
+
+  get inventoryId() {
+    return this.props.inventoryId
   }
 
   get street() {
@@ -95,6 +105,10 @@ export class Market extends AggregateRoot<MarketProps> {
   set collaborators(collaborators: MarketCollaboratorsList | null) {
     this.props.collaborators = collaborators
     this.touch()
+  }
+
+  get inventory() {
+    return this.props.inventory
   }
 
   touch() {
