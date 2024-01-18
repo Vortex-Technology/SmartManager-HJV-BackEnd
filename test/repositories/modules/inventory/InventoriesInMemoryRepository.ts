@@ -1,10 +1,10 @@
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
-import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
+import { ProductVariantInventoriesInMemoryRepository } from './ProductVariantInventoriesInMemoryRepository'
 
-export class InventoryInMemoryRepository implements InventoriesRepository {
+export class InventoriesInMemoryRepository implements InventoriesRepository {
   constructor(
-    private readonly productVariantInventoryInMemoryRepository: ProductVariantInventoriesRepository,
+    private readonly productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository,
   ) {}
 
   inventories: Inventory[] = []
@@ -16,7 +16,7 @@ export class InventoryInMemoryRepository implements InventoriesRepository {
       inventory.productVariantInventories?.getNewItems()
 
     if (productVariantInventories) {
-      await this.productVariantInventoryInMemoryRepository.createMany(
+      await this.productVariantInventoriesInMemoryRepository.createMany(
         productVariantInventories,
       )
     }
@@ -45,7 +45,7 @@ export class InventoryInMemoryRepository implements InventoriesRepository {
       inventory.productVariantInventories?.getNewItems()
 
     if (productVariantInventories) {
-      await this.productVariantInventoryInMemoryRepository.createMany(
+      await this.productVariantInventoriesInMemoryRepository.createMany(
         productVariantInventories,
       )
     }
