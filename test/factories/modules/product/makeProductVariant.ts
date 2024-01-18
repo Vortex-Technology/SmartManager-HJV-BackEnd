@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductVariantPrismaMapper } from '@infra/database/prisma/product/ProductVariantPrismaMapper'
+import { ProductVariantsPrismaMapper } from '@infra/database/prisma/product/ProductVariantsPrismaMapper'
 import { ProductUnitType } from '@modules/product/entities/Product'
 import {
   ProductVariant,
@@ -39,7 +39,7 @@ export class MakeProductVariant {
     const productVariant = makeProductVariant(override, id)
 
     await this.prisma.productVariant.create({
-      data: ProductVariantPrismaMapper.toPrisma(productVariant),
+      data: ProductVariantsPrismaMapper.toPrisma(productVariant),
     })
 
     return productVariant

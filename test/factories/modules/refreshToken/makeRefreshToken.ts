@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { RefreshTokenPrismaMapper } from '@infra/database/prisma/refreshToken/RefreshTokenPrismaMapper'
+import { RefreshTokensPrismaMapper } from '@infra/database/prisma/refreshToken/RefreshTokensPrismaMapper'
 import {
   RefreshToken,
   RefreshTokenProps,
@@ -33,7 +33,7 @@ export class MakeRefreshToken {
     const refreshToken = makeRefreshToken(override, id)
 
     await this.prisma.refreshToken.create({
-      data: RefreshTokenPrismaMapper.toPrisma(refreshToken),
+      data: RefreshTokensPrismaMapper.toPrisma(refreshToken),
     })
 
     return refreshToken

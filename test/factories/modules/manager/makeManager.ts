@@ -3,16 +3,16 @@ import {
   CollaboratorCreatePropsOptional,
   CollaboratorRole,
 } from '@modules/collaborator/entities/Collaborator'
-import { Seller } from '@modules/seller/entities/Seller'
+import { Manager } from '@modules/manager/entities/Manager'
 import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
 
-export function makeSeller(
+export function makeManager(
   override: Partial<
-    CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+    CollaboratorCreatePropsOptional<CollaboratorRole.MANAGER>
   > = {},
   id?: UniqueEntityId,
-): Seller {
-  const seller = Seller.create(
+): Manager {
+  const manager = Manager.create(
     {
       email: fakerPT_BR.internet.email(),
       actualRemuneration: fakerPT_BR.number.int(),
@@ -24,25 +24,25 @@ export function makeSeller(
     id,
   )
 
-  return seller
+  return manager
 }
 
 // @Injectable()
-// export class MakeSeller {
+// export class MakeManager {
 //   constructor(private readonly prisma: PrismaService) {}
 
 //   async create(
 //     override: Partial<
-//       CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+//       CollaboratorCreatePropsOptional<CollaboratorRole.MANAGER>
 //     > = {},
 //     id?: UniqueEntityId,
 //   ) {
-//     const seller = makeSeller(override, id)
+//     const manager = makeManager(override, id)
 
 //     await this.prisma.collaborator.create({
-//       data: SellersPrismaMapper.toPrisma(seller),
+//       data: ManagersPrismaMapper.toPrisma(manager),
 //     })
 
-//     return seller
+//     return manager
 //   }
 // }

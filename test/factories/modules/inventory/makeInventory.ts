@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { InventoryPrismaMapper } from '@infra/database/prisma/inventory/InventoryPrismaMapper'
+import { InventoriesPrismaMapper } from '@infra/database/prisma/inventory/InventoriesPrismaMapper'
 import {
   Inventory,
   InventoryProps,
@@ -31,7 +31,7 @@ export class MakeInventory {
     const inventory = makeInventory(override, id)
 
     await this.prisma.inventory.create({
-      data: InventoryPrismaMapper.toPrisma(inventory),
+      data: InventoriesPrismaMapper.toPrisma(inventory),
     })
 
     return inventory
