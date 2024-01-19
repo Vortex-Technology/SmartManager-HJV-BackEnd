@@ -9,4 +9,6 @@ const createUserBodySchema = z.object({
 })
 
 export type CreateUserBody = z.infer<typeof createUserBodySchema>
-export const bodyValidationPipe = new ZodValidationPipe(createUserBodySchema)
+export const createUserBodyValidationPipe = new ZodValidationPipe(
+  createUserBodySchema,
+)

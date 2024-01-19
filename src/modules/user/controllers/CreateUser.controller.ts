@@ -15,7 +15,7 @@ import { Response } from 'express'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import {
   CreateUserBody,
-  bodyValidationPipe,
+  createUserBodyValidationPipe,
 } from '../gateways/CreateUser.gateway'
 
 @Controller('/users')
@@ -26,7 +26,7 @@ export class CreateUserController {
   @Public()
   @HttpCode(statusCode.Created)
   async handle(
-    @Body(bodyValidationPipe) body: CreateUserBody,
+    @Body(createUserBodyValidationPipe) body: CreateUserBody,
     @Res() res: Response,
   ) {
     const { email, name, password, image } = body
