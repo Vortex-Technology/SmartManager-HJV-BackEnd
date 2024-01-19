@@ -104,20 +104,4 @@ describe('Create company (E2E)', () => {
       }),
     )
   })
-
-  // test('[GET] /users [409]', async () => {
-  //   const invalidToken = await encrypter.encrypt({
-  //     // A random inexistent uuid
-  //     sub: new UniqueEntityId().toString(),
-  //   })
-
-  //   const response = await request(app.getHttpServer())
-  //     .get('/users')
-  //     .set({
-  //       Authorization: `Bearer ${invalidToken}`,
-  //     })
-  //     .timeout({ deadline: 10000, response: 10000 })
-
-  //   expect(response.statusCode).toEqual(statusCode.Conflict)
-  // })
 })
