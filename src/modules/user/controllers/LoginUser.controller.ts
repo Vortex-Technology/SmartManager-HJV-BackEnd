@@ -12,7 +12,7 @@ import { statusCode } from 'src/config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import {
   LoginUserBody,
-  bodyValidationPipe,
+  loginUserBodyValidationPipe,
 } from '../gateways/LoginUser.gateway'
 
 @Controller('/users/login')
@@ -22,7 +22,7 @@ export class LoginUserController {
   @Post()
   @Public()
   @HttpCode(statusCode.Created)
-  async handle(@Body(bodyValidationPipe) body: LoginUserBody) {
+  async handle(@Body(loginUserBodyValidationPipe) body: LoginUserBody) {
     const { email, password } = body
 
     const response = await this.loginUserService.execute({

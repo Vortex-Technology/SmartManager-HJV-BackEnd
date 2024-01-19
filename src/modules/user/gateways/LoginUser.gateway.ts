@@ -7,4 +7,6 @@ const loginUserBodySchema = z.object({
 })
 
 export type LoginUserBody = z.infer<typeof loginUserBodySchema>
-export const bodyValidationPipe = new ZodValidationPipe(loginUserBodySchema)
+export const loginUserBodyValidationPipe = new ZodValidationPipe(
+  loginUserBodySchema,
+)
