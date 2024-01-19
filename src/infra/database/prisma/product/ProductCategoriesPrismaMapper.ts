@@ -3,7 +3,7 @@ import {
   Prisma,
   ProductCategory as ProductCategoryPrisma,
 } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class ProductCategoriesPrismaMapper {
   static toEntity(raw: ProductCategoryPrisma): ProductCategory {

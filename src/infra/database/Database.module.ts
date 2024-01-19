@@ -18,18 +18,31 @@ import { ProductsPrismaRepository } from './prisma/product/ProductsPrismaReposit
 import { ProductVariantInventoriesPrismaRepository } from './prisma/inventory/ProductVariantInventoriesPrismaRepository'
 import { InventoriesPrismaRepository } from './prisma/inventory/InventoriesPrismaRepository'
 import { ProductVariantsPrismaRepository } from './prisma/product/ProductVariantsPrismaRepository'
+import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
+import { CompaniesPrismaRepository } from './prisma/company/CompaniesPrismaRepository'
+import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
+import { MarketsPrismaRepository } from './prisma/market/MarketsPrismaRepository'
 
 @Module({
   providers: [
     PrismaService,
     {
-      provide: SellersRepository,
-      useClass: SellersPrismaRepository,
-    },
-    {
       provide: RefreshTokensRepository,
       useClass: RefreshTokensPrismaRepository,
     },
+    {
+      provide: CompaniesRepository,
+      useClass: CompaniesPrismaRepository,
+    },
+    {
+      provide: MarketsRepository,
+      useClass: MarketsPrismaRepository,
+    },
+    {
+      provide: SellersRepository,
+      useClass: SellersPrismaRepository,
+    },
+
     {
       provide: ProductCategoriesRepository,
       useClass: ProductCategoriesPrismaRepository,
@@ -61,6 +74,7 @@ import { ProductVariantsPrismaRepository } from './prisma/product/ProductVariant
   ],
   exports: [
     PrismaService,
+    RefreshTokensRepository,
     ProductCategoriesRepository,
     ProductVariantsRepository,
     ProductsRepository,
@@ -68,6 +82,8 @@ import { ProductVariantsPrismaRepository } from './prisma/product/ProductVariant
     InventoriesRepository,
     CollaboratorsRepository,
     UsersRepository,
+    MarketsRepository,
+    CompaniesRepository,
   ],
 })
 export class DatabaseModule {}

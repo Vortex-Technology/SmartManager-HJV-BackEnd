@@ -1,6 +1,6 @@
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { Prisma, Inventory as InventoryPrisma } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class InventoriesPrismaMapper {
   static toEntity(raw: InventoryPrisma): Inventory {

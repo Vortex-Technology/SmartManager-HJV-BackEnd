@@ -5,7 +5,7 @@ import {
   ProductVariant as ProductVariantPrisma,
   UnitType,
 } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class ProductVariantsPrismaMapper {
   static toEntity(raw: ProductVariantPrisma): ProductVariant {

@@ -5,7 +5,7 @@ import {
   RoleCollaborator,
   Collaborator as SellerPrisma,
 } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class SellersPrismaMapper {
   static toEntity(raw: SellerPrisma): Seller {

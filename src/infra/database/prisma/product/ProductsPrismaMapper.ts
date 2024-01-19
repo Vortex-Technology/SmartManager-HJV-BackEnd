@@ -1,6 +1,6 @@
 import { Product } from '@modules/product/entities/Product'
 import { Prisma, Product as ProductPrisma } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class ProductsPrismaMapper {
   static toEntity(raw: ProductPrisma): Product {

@@ -7,7 +7,7 @@ import {
   Prisma,
   RoleCollaborator,
 } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class CollaboratorsPrismaMapper {
   static toEntity(raw: CollaboratorPrisma): Collaborator {
@@ -18,7 +18,10 @@ export class CollaboratorsPrismaMapper {
         createdAt: raw.createdAt,
         deletedAt: raw.deletedAt,
         actualRemuneration: raw.actualRemuneration,
-        marketId: new UniqueEntityId(raw.marketId),
+        marketId: raw.marketId ? new UniqueEntityId(raw.marketId) : undefined,
+        companyId: raw.companyId
+          ? new UniqueEntityId(raw.companyId)
+          : undefined,
         userId: new UniqueEntityId(raw.userId),
         inactivatedAt: raw.inactivatedAt,
         updatedAt: raw.updatedAt,
@@ -38,7 +41,8 @@ export class CollaboratorsPrismaMapper {
       createdAt: collaborator.createdAt,
       deletedAt: collaborator.deletedAt,
       actualRemuneration: collaborator.actualRemuneration,
-      marketId: collaborator.marketId.toString(),
+      marketId: collaborator.marketId?.toString(),
+      companyId: collaborator.companyId?.toString(),
       userId: collaborator.userId.toString(),
       inactivatedAt: collaborator.inactivatedAt,
       updatedAt: collaborator.updatedAt,
