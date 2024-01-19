@@ -134,7 +134,7 @@ model Market {
 }
 
 enum RoleCollaborator {
-  OWNRE
+  OWNER
   MANAGER
   STOCKIST
   SELLER
