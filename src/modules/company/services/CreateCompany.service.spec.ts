@@ -41,6 +41,7 @@ describe('Create company', () => {
     )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
+      ownersInMemoryRepository,
     )
 
     sut = new CreateCompanyService(

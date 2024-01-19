@@ -4,7 +4,9 @@ import { PrismaService } from '../index.service'
 import { MarketsPrismaMapper } from './MarketsPrismaMapper'
 import { AddressesPrismaMapper } from '../address/AddressesPrismaMapper'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
+import { Injectable } from '@nestjs/common'
 
+@Injectable()
 export class MarketsPrismaRepository implements MarketsRepository {
   constructor(
     private readonly prisma: PrismaService,

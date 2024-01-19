@@ -51,6 +51,10 @@ export class CompaniesPrismaMapper {
       throw new Error('Owner not set in creation of company')
     }
 
+    const { companyId: _, ...owner } = CollaboratorsPrismaMapper.toPrisma(
+      company.owner,
+    )
+
     return {
       companyNane: company.companyName,
       founder: {
@@ -62,7 +66,7 @@ export class CompaniesPrismaMapper {
         create: AddressesPrismaMapper.toPrisma(company.address),
       },
       owner: {
-        create: CollaboratorsPrismaMapper.toPrisma(company.owner),
+        create: owner,
       },
       sector: company.sector,
       createdAt: company.createdAt,

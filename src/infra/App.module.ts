@@ -5,6 +5,7 @@ import { EnvModule } from './env/Env.module'
 import { SocketModule } from '@providers/socket/Socket.module'
 import { AuthProvider } from '@providers/auth/Auth.module'
 import { UserModule } from '@modules/user/User.module'
+import { CompanyModule } from '@modules/company/Company.module'
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { UserModule } from '@modules/user/User.module'
     // ProductModule,
     // SellerModule,
     UserModule,
+    CompanyModule,
     SocketModule,
     AuthProvider,
     EnvModule,
