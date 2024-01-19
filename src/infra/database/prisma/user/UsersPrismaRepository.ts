@@ -25,4 +25,16 @@ export class UsersPrismaRepository implements UsersRepository {
       data: UsersPrismaMapper.toPrisma(user),
     })
   }
+
+  async findById(id: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    if (!user) return null
+
+    return UsersPrismaMapper.toEntity(user)
+  }
 }

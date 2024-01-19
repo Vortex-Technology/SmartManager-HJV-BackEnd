@@ -1,5 +1,5 @@
 import { makeUser } from '@test/factories/modules/user/makeUser'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { User } from '../entities/User'
 import { UserNotFount } from '../errors/UserNotFound'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'

@@ -1,6 +1,6 @@
 import { User } from '@modules/user/entities/User'
 import { Prisma, User as UserPrisma } from '@prisma/client'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class UsersPrismaMapper {
   static toEntity(raw: UserPrisma): User {

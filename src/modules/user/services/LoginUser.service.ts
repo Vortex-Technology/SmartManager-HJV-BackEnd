@@ -52,28 +52,26 @@ export class LoginUserService {
     const accessToken = await this.encrypter.encrypt(
       {
         sub: user.id.toString(),
-        type: 'USER',
       },
       {
-        expiresIn: this.env.get('JWT_ADM_ACCESS_EXPIRES_IN'),
+        expiresIn: this.env.get('JWT_USER_ACCESS_EXPIRES_IN'),
       },
     )
 
     const _refreshToken = await this.encrypter.encrypt(
       {
         sub: user.id.toString(),
-        type: 'USER',
       },
       {
-        expiresIn: this.env.get('JWT_ADM_REFRESH_EXPIRES_IN'),
+        expiresIn: this.env.get('JWT_USER_REFRESH_EXPIRES_IN'),
       },
     )
 
     const refreshToken = RefreshToken.create({
-      collaboratorId: user.id,
+      userId: user.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
-        this.env.get('ADM_REFRESH_EXPIRES_IN'),
+        this.env.get('USER_REFRESH_EXPIRES_IN'),
       ),
     })
 
