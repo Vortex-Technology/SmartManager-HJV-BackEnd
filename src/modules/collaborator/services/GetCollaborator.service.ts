@@ -1,8 +1,8 @@
-import { CollaboratorNotFound } from '@modules/refreshToken/errors/CollaboratorNotFound'
 import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
 import { Collaborator } from '../entities/Collaborator'
 import { CollaboratorsRepository } from '../repositories/CollaboratorsRepository'
+import { CollaboratorNotFound } from '../errors/CollaboratorNotFound'
 
 interface Request {
   id: string

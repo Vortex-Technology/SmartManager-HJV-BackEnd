@@ -1,8 +1,9 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 
 export enum CollaboratorRole {
+  'OWNER' = 'OWNER',
   'MANAGER' = 'MANAGER',
   'STOCKIST' = 'STOCKIST',
   'SELLER' = 'SELLER',
@@ -20,21 +21,52 @@ export interface CollaboratorProps<
   updatedAt: Date | null
   deletedAt: Date | null
   inactivatedAt: Date | null
-  marketId: UniqueEntityId
+  marketId: UniqueEntityId | null
+  companyId: UniqueEntityId | null
   userId: UniqueEntityId
 }
+
+export type CollaboratorCreateUntypedPropsOptional<
+  TRole extends CollaboratorRole,
+> = Optional<
+  CollaboratorProps<TRole>,
+  | 'createdAt'
+  | 'deletedAt'
+  | 'updatedAt'
+  | 'inactivatedAt'
+  | 'role'
+  | 'companyId'
+  | 'marketId'
+>
+
+export type CollaboratorCreateOwnerPropsOptional<
+  TRole extends CollaboratorRole,
+> = Optional<
+  CollaboratorProps<TRole>,
+  | 'createdAt'
+  | 'deletedAt'
+  | 'updatedAt'
+  | 'inactivatedAt'
+  | 'role'
+  | 'marketId'
+>
 
 export type CollaboratorCreatePropsOptional<TRole extends CollaboratorRole> =
   Optional<
     CollaboratorProps<TRole>,
-    'createdAt' | 'deletedAt' | 'updatedAt' | 'inactivatedAt' | 'role'
+    | 'createdAt'
+    | 'deletedAt'
+    | 'updatedAt'
+    | 'inactivatedAt'
+    | 'role'
+    | 'companyId'
   >
 
 export class Collaborator<
   T extends CollaboratorRole = CollaboratorRole,
 > extends AggregateRoot<CollaboratorProps<T>> {
   static createUntyped<TRole extends CollaboratorRole = CollaboratorRole>(
-    props: CollaboratorCreatePropsOptional<TRole>,
+    props: CollaboratorCreateUntypedPropsOptional<TRole>,
     id?: UniqueEntityId,
   ) {
     const collaboratorProps = Collaborator.setupProps<TRole>(props)
@@ -43,7 +75,7 @@ export class Collaborator<
   }
 
   static setupProps<TRole extends CollaboratorRole>(
-    props: CollaboratorCreatePropsOptional<TRole>,
+    props: CollaboratorCreateUntypedPropsOptional<TRole>,
   ) {
     const collaboratorProps: CollaboratorProps<TRole> = {
       ...props,
@@ -52,6 +84,8 @@ export class Collaborator<
       updatedAt: props.updatedAt ?? null,
       deletedAt: props.deletedAt ?? null,
       inactivatedAt: props.inactivatedAt ?? null,
+      marketId: props.marketId ?? null,
+      companyId: props.companyId ?? null,
     }
 
     return collaboratorProps
@@ -101,6 +135,10 @@ export class Collaborator<
 
   get marketId() {
     return this.props.marketId
+  }
+
+  get companyId() {
+    return this.props.companyId
   }
 
   get userId() {

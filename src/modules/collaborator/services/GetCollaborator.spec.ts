@@ -1,9 +1,9 @@
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { GetCollaboratorService } from './GetCollaborator.service'
 import { Collaborator, CollaboratorRole } from '../entities/Collaborator'
-import { CollaboratorNotFound } from '@modules/refreshToken/errors/CollaboratorNotFound'
+import { CollaboratorNotFound } from '../errors/CollaboratorNotFound'
 
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 

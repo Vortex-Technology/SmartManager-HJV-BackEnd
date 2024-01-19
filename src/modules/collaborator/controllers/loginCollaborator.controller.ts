@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common'
 import { ZodValidationPipe } from '@shared/pipes/zodValidation'
 import { statusCode } from 'src/config/statusCode'
-import { LoginCollaboratorService } from '../services/loginCollaborator.service'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
 import { z } from 'zod'
+import { LoginCollaboratorService } from '../services/LoginCollaborator.service'
 
 const loginCollaboratorBodySchema = z.object({
   login: z.string().min(4).max(30),

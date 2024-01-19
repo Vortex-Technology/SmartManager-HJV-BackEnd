@@ -12,7 +12,7 @@ import { InventoriesInMemoryRepository } from '@test/repositories/modules/invent
 import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { makeCompany } from '@test/factories/modules/company/makeCompany'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { makeMarket } from '@test/factories/modules/market/makeMarket'
 import { CompanyStatus } from '@modules/company/entities/Company'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
