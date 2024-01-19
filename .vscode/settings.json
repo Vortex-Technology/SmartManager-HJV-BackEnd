@@ -14,7 +14,8 @@
     "presenters": "typescript",
     "repositories": "database",
     "implementations": "controller",
-    "entities": "class"
+    "entities": "class",
+    "gateways": "typescript",
   },
   "cSpell.words": [
     "alvaro",
