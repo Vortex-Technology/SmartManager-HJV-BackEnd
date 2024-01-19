@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export interface DomainEvent {
   ocurredAt: Date

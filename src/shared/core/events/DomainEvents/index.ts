@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { DomainEvent } from '../DomainEvent'
 
 type DomainEventCallback = (event: unknown) => void

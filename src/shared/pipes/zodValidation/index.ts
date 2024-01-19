@@ -19,7 +19,5 @@ export class ZodValidationPipe implements PipeTransform {
 
       throw new BadRequestException('Cant be validate received data')
     }
-
-    return value
   }
 }
