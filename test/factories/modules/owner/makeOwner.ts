@@ -1,48 +1,50 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import {
-  CollaboratorCreatePropsOptional,
+  CollaboratorCreateOwnerPropsOptional,
   CollaboratorRole,
 } from '@modules/collaborator/entities/Collaborator'
-import { Seller } from '@modules/seller/entities/Seller'
+import { Owner } from '@modules/owner/entities/Owner'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
-export function makeSeller(
+export function makeOwner(
   override: Partial<
-    CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+    CollaboratorCreateOwnerPropsOptional<CollaboratorRole.OWNER>
   > = {},
   id?: UniqueEntityId,
-): Seller {
-  const seller = Seller.create(
+): Owner {
+  const owner = Owner.create(
     {
       email: fakerPT_BR.internet.email(),
       actualRemuneration: fakerPT_BR.number.int(),
       marketId: new UniqueEntityId(),
       userId: new UniqueEntityId(),
       password: fakerPT_BR.internet.password(),
+      companyId: new UniqueEntityId(),
+      role: CollaboratorRole.OWNER,
       ...override,
     },
     id,
   )
 
-  return seller
+  return owner
 }
 
 // @Injectable()
-// export class MakeSeller {
+// export class MakeOwner {
 //   constructor(private readonly prisma: PrismaService) {}
 
 //   async create(
 //     override: Partial<
-//       CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+//       CollaboratorCreatePropsOptional<CollaboratorRole.OWNER>
 //     > = {},
 //     id?: UniqueEntityId,
 //   ) {
-//     const seller = makeSeller(override, id)
+//     const owner = makeOwner(override, id)
 
 //     await this.prisma.collaborator.create({
-//       data: SellersPrismaMapper.toPrisma(seller),
+//       data: OwnersPrismaMapper.toPrisma(owner),
 //     })
 
-//     return seller
+//     return owner
 //   }
 // }

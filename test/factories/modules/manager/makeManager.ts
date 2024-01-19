@@ -4,7 +4,7 @@ import {
   CollaboratorRole,
 } from '@modules/collaborator/entities/Collaborator'
 import { Manager } from '@modules/manager/entities/Manager'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeManager(
   override: Partial<

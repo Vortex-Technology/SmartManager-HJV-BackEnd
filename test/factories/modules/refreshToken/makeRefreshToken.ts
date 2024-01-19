@@ -6,7 +6,7 @@ import {
   RefreshTokenProps,
 } from '@modules/refreshToken/entities/RefreshToken'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeRefreshToken(
   override: Partial<RefreshTokenProps> = {},

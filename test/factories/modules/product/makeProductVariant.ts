@@ -7,7 +7,7 @@ import {
   ProductVariantProps,
 } from '@modules/product/entities/ProductVariant'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeProductVariant(
   override: Partial<ProductVariantProps>,

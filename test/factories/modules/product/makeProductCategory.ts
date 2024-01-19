@@ -7,7 +7,7 @@ import {
 } from '@modules/product/entities/ProductCategory'
 
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeProductCategory(
   override: Partial<ProductCategoryProps>,

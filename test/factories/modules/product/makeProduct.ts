@@ -4,7 +4,7 @@ import { ProductVariantPrismaMapper } from '@infra/database/prisma/product/Produ
 import { ProductsPrismaMapper } from '@infra/database/prisma/product/ProductsPrismaMapper'
 import { Product, ProductProps } from '@modules/product/entities/Product'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeProduct(
   override: Partial<ProductProps>,

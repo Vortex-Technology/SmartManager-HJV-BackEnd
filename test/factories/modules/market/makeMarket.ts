@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { Market, MarketProps } from '@modules/market/entities/Market'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeMarket(
   override: Partial<MarketProps> = {},

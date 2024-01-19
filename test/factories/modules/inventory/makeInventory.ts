@@ -6,7 +6,7 @@ import {
   InventoryProps,
 } from '@modules/inventory/entities/Inventory'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeInventory(
   override: Partial<InventoryProps> = {},

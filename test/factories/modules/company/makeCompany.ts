@@ -4,7 +4,7 @@ import {
   CompanyProps,
   CompanyStatus,
 } from '@modules/company/entities/Company'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeCompany(
   override: Partial<CompanyProps> = {},

@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { ApiKey, ApiKeyProps } from '@modules/company/entities/ApiKey'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeApiKey(
   override: Partial<ApiKeyProps> = {},

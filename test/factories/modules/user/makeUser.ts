@@ -3,7 +3,7 @@ import { PrismaService } from '@infra/database/prisma/index.service'
 import { UsersPrismaMapper } from '@infra/database/prisma/user/UsersPrismaMapper'
 import { User, UserProps } from '@modules/user/entities/User'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeUser(
   override: Partial<UserProps> = {},
