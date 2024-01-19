@@ -1,16 +1,22 @@
 import { Company } from '@modules/company/entities/Company'
 import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
 import { MarketsInMemoryRepository } from '../market/MarketsInMemoryRepository'
+import { OwnersInMemoryRepository } from '../owner/OwnersInMemoryRepository'
 
 export class CompaniesInMemoryRepository implements CompaniesRepository {
   constructor(
     private readonly marketsInMemoryRepository: MarketsInMemoryRepository,
+    private readonly ownersInMemoryRepository: OwnersInMemoryRepository,
   ) {}
 
   companies: Company[] = []
 
   async create(company: Company): Promise<void> {
     this.companies.push(company)
+
+    if (company.owner) {
+      await this.ownersInMemoryRepository.create(company.owner)
+    }
 
     const markets = company.markets?.getNewItems()
 
