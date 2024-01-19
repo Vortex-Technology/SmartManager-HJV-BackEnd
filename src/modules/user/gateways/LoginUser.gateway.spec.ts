@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { bodyValidationPipe } from './LoginUser.gateway'
+import { loginUserBodyValidationPipe } from './LoginUser.gateway'
 
 describe('Login user gateway', () => {
   it('should be able to validate body of login user', () => {
@@ -7,14 +7,14 @@ describe('Login user gateway', () => {
       email: 'test@example.com',
       password: 'test-password',
     }
-    const result = bodyValidationPipe.transform(body)
+    const result = loginUserBodyValidationPipe.transform(body)
 
     expect(result).toEqual(body)
   })
 
   it('not should be able to pass in validation body of login user with a invalid data', () => {
     expect(async () => {
-      bodyValidationPipe.transform({
+      loginUserBodyValidationPipe.transform({
         email: 'wrong-test',
         password: 'wrong',
       })
