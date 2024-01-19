@@ -14,11 +14,7 @@ import { MarketNotFound } from '../errors/MarketNorFound'
 import { User } from '@modules/user/entities/User'
 import { MarketCollaboratorsList } from '../entities/MarketCollaboratorsList'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
-import { MissingInformations } from '@shared/errors/MissingInformations'
-import { CollaboratorNotFound } from '@modules/refreshToken/errors/CollaboratorNotFound'
-import { Company } from '@modules/company/entities/Company'
-import { Market } from '../entities/Market'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 
 interface Request {
   name: string
@@ -30,80 +26,14 @@ interface Request {
   companyId: string
   marketId: string
   creatorId: string
-  creatorType: 'OWNER' | 'COLLABORATOR'
 }
 
 type Response = Either<
-  | UserNotFount
-  | PermissionDenied
-  | CompanyNotFound
-  | MarketNotFound
-  | MissingInformations
-  | CollaboratorNotFound,
+  PermissionDenied | CompanyNotFound | MarketNotFound | CollaboratorNotFound,
   {
     collaborator: Collaborator
   }
 >
-
-function verifyForOwner(
-  owner: User | null,
-  company: Company | null,
-  market: Market | null,
-): Either<
-  UserNotFount | CompanyNotFound | PermissionDenied | MarketNotFound,
-  true
-> {
-  if (!owner) {
-    return left(new UserNotFount())
-  }
-
-  if (!company) {
-    return left(new CompanyNotFound())
-  }
-
-  if (!company.ownerId.equals(owner.id)) {
-    return left(new PermissionDenied())
-  }
-
-  if (!market) return left(new MarketNotFound())
-
-  return right(true)
-}
-
-function verifyForCollaborator(
-  collaborator: Collaborator | null,
-  company: Company | null,
-  market: Market | null,
-): Either<CollaboratorNotFound | MarketNotFound | PermissionDenied, true> {
-  const acceptCreationForRoles = [CollaboratorRole.MANAGER]
-
-  if (!collaborator) {
-    return left(new CollaboratorNotFound(CollaboratorRole.MANAGER))
-  }
-
-  if (!company) {
-    return left(new CompanyNotFound())
-  }
-
-  if (!market) {
-    return left(new MarketNotFound())
-  }
-
-  if (!collaborator.marketId.equals(market.id)) {
-    return left(new PermissionDenied())
-  }
-
-  if (!acceptCreationForRoles.includes(collaborator.role)) {
-    return left(new PermissionDenied())
-  }
-
-  return right(true)
-}
-
-const verificationMapper = {
-  OWNER: verifyForOwner,
-  COLLABORATOR: verifyForCollaborator,
-}
 
 @Injectable()
 export class AddCollaboratorService {
@@ -125,27 +55,43 @@ export class AddCollaboratorService {
     collaboratorRole,
     actualRemuneration,
     creatorId,
-    creatorType,
   }: Request): Promise<Response> {
-    const isOwner = creatorType === 'OWNER'
+    const acceptCreationForRoles = [
+      CollaboratorRole.MANAGER,
+      CollaboratorRole.OWNER,
+    ]
 
-    const creator = isOwner
-      ? await this.usersRepository.findById(creatorId)
-      : await this.collaboratorsRepository.findById(creatorId)
+    const creator = await this.collaboratorsRepository.findById(creatorId)
+    if (!creator) {
+      return left(new CollaboratorNotFound())
+    }
 
     const company = await this.companiesRepository.findById(companyId)
+    if (!company) {
+      return left(new CompanyNotFound())
+    }
+
     const market = await this.marketsRepository.findById(marketId)
-
-    const verification = verificationMapper[creatorType](
-      creator as (User & Collaborator) | null,
-      company,
-      market,
-    )
-
-    if (verification.isLeft()) return left(verification.value)
-
     if (!market) {
       return left(new MarketNotFound())
+    }
+
+    if (
+      !creator.marketId?.equals(market.id) &&
+      !creator.companyId?.equals(company.id)
+    ) {
+      return left(new PermissionDenied())
+    }
+
+    if (!acceptCreationForRoles.includes(creator.role)) {
+      return left(new PermissionDenied())
+    }
+
+    if (
+      collaboratorRole === CollaboratorRole.OWNER ||
+      collaboratorRole === CollaboratorRole.NOT_DEFINED
+    ) {
+      return left(new PermissionDenied())
     }
 
     const collaboratorExistAsUser =

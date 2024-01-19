@@ -1,8 +1,5 @@
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
-import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
-import { makeUser } from '@test/factories/modules/user/makeUser'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
 import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
@@ -16,8 +13,10 @@ import { CompanyNotFound } from '../errors/CompanyNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { makeApiKey } from '@test/factories/modules/company/makeApiKey'
 import { LotsOfExistingKeys } from '../errors/LotsOfExistingKeys'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { makeOwner } from '@test/factories/modules/owner/makeOwner'
 
-let usersInMemoryRepository: UsersInMemoryRepository
+let ownersInMemoryRepository: OwnersInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
@@ -30,8 +29,10 @@ let sut: GenerateApiKeyService
 
 describe('Generate api key', () => {
   beforeEach(() => {
-    usersInMemoryRepository = new UsersInMemoryRepository()
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
@@ -48,7 +49,7 @@ describe('Generate api key', () => {
     fakeHasher = new FakeHasher()
 
     sut = new GenerateApiKeyService(
-      usersInMemoryRepository,
+      ownersInMemoryRepository,
       companiesInMemoryRepository,
       apiKeysInMemoryRepository,
       fakeHasher,
@@ -57,12 +58,17 @@ describe('Generate api key', () => {
   })
 
   it('should be able to generate a api key for company', async () => {
-    const user = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(user)
+    const owner = makeOwner(
+      {
+        companyId: new UniqueEntityId('company-1'),
+      },
+      new UniqueEntityId('owner-1'),
+    )
+    await ownersInMemoryRepository.create(owner)
 
     const company = makeCompany(
       {
-        ownerId: user.id,
+        ownerId: owner.id,
       },
       new UniqueEntityId('company-1'),
     )
@@ -70,7 +76,7 @@ describe('Generate api key', () => {
 
     const response = await sut.execute({
       companyId: 'company-1',
-      userId: 'user-1',
+      requesterId: 'owner-1',
     })
 
     expect(response.isRight()).toBe(true)
@@ -80,26 +86,26 @@ describe('Generate api key', () => {
     }
   })
 
-  it('not should be able to generate a api key for company if user not exists', async () => {
+  it('not should be able to generate a api key for company if owner not exists', async () => {
     const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
 
     const response = await sut.execute({
       companyId: 'company-1',
-      userId: 'inexistent-user-id',
+      requesterId: 'inexistent-user-id',
     })
 
     expect(response.isLeft()).toBe(true)
-    expect(response.value).toBeInstanceOf(UserNotFount)
+    expect(response.value).toBeInstanceOf(PermissionDenied)
   })
 
   it('not should be able to generate a api key for company if company not exists', async () => {
-    const user = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(user)
+    const user = makeOwner({}, new UniqueEntityId('owner-1'))
+    await ownersInMemoryRepository.create(user)
 
     const response = await sut.execute({
       companyId: 'inexistent-company-id',
-      userId: 'user-1',
+      requesterId: 'owner-1',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -107,12 +113,12 @@ describe('Generate api key', () => {
   })
 
   it('not should be able to generate a api key for company if requester is not owner of company', async () => {
-    const user = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(user)
+    const user = makeOwner({}, new UniqueEntityId('owner-1'))
+    await ownersInMemoryRepository.create(user)
 
     const company = makeCompany(
       {
-        ownerId: new UniqueEntityId('other-user-id'),
+        ownerId: new UniqueEntityId('other-owner-id'),
       },
       new UniqueEntityId('company-1'),
     )
@@ -120,7 +126,7 @@ describe('Generate api key', () => {
 
     const response = await sut.execute({
       companyId: 'company-1',
-      userId: 'user-1',
+      requesterId: 'owner-1',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -128,12 +134,17 @@ describe('Generate api key', () => {
   })
 
   it('not should be able to generate a api key for company if user already has an api key active', async () => {
-    const user = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(user)
+    const owner = makeOwner(
+      {
+        companyId: new UniqueEntityId('company-1'),
+      },
+      new UniqueEntityId('owner-1'),
+    )
+    await ownersInMemoryRepository.create(owner)
 
     const company = makeCompany(
       {
-        ownerId: user.id,
+        ownerId: owner.id,
       },
       new UniqueEntityId('company-1'),
     )
@@ -147,7 +158,7 @@ describe('Generate api key', () => {
 
     const response = await sut.execute({
       companyId: 'company-1',
-      userId: 'user-1',
+      requesterId: 'owner-1',
     })
 
     expect(response.isLeft()).toBe(true)

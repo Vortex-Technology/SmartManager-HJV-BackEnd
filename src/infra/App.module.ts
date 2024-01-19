@@ -1,13 +1,10 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { envSchema } from './env'
-import { AuthProvider } from '@providers/auth/auth.module'
 import { EnvModule } from './env/Env.module'
-import { SocketModule } from '@providers/socket/socket.module'
-import { CollaboratorModule } from '@modules/collaborator/Collaborator.module'
-import { RefreshTokenModule } from '@modules/refreshToken/RefreshToken.module'
-import { ProductModule } from '@modules/product/Product.module'
-import { SellerModule } from '@modules/seller/Seller.module'
+import { SocketModule } from '@providers/socket/Socket.module'
+import { AuthProvider } from '@providers/auth/Auth.module'
+import { UserModule } from '@modules/user/User.module'
 
 @Module({
   imports: [
@@ -15,11 +12,12 @@ import { SellerModule } from '@modules/seller/Seller.module'
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
-    CollaboratorModule,
-    RefreshTokenModule,
-    ProductModule,
+    // CollaboratorModule,
+    // RefreshTokenModule,
+    // ProductModule,
+    // SellerModule,
+    UserModule,
     SocketModule,
-    SellerModule,
     AuthProvider,
     EnvModule,
   ],

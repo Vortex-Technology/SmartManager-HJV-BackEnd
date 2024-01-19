@@ -7,12 +7,15 @@ import {
 } from '@modules/collaborator/entities/Collaborator'
 import { MarketNotFound } from '../errors/MarketNorFound'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
-import { CollaboratorNotFound } from '@modules/refreshToken/errors/CollaboratorNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
+import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 
 interface Request {
   marketId: string
   collaboratorId: string
+  companyId: string
   page: number
   limit: number
 }
@@ -30,16 +33,21 @@ type Response = Either<
 export class ListMarketCollaboratorsService {
   constructor(
     private readonly marketsRepository: MarketsRepository,
+    private readonly companiesRepository: CompaniesRepository,
     private readonly collaboratorsRepository: CollaboratorsRepository,
   ) {}
 
   async execute({
     marketId,
     collaboratorId,
+    companyId,
     page,
     limit,
   }: Request): Promise<Response> {
-    const acceptListForRoles = [CollaboratorRole.MANAGER]
+    const acceptListForRoles = [
+      CollaboratorRole.MANAGER,
+      CollaboratorRole.OWNER,
+    ]
 
     const collaborator =
       await this.collaboratorsRepository.findById(collaboratorId)
@@ -52,13 +60,21 @@ export class ListMarketCollaboratorsService {
       return left(new PermissionDenied())
     }
 
+    const company = await this.companiesRepository.findById(companyId)
+    if (!company) {
+      return left(new CompanyNotFound())
+    }
+
     const market = await this.marketsRepository.findById(marketId)
 
     if (!market) {
       return left(new MarketNotFound())
     }
 
-    if (!collaborator.marketId.equals(market.id)) {
+    if (
+      !collaborator.marketId?.equals(market.id) &&
+      !collaborator.companyId?.equals(company.id)
+    ) {
       return left(new PermissionDenied())
     }
 

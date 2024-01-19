@@ -9,6 +9,9 @@ import { CompanyMarketsList } from '../entities/CompanyMarketsList'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import { Market } from '@modules/market/entities/Market'
 import { Inventory } from '@modules/inventory/entities/Inventory'
+import { Owner } from '@modules/owner/entities/Owner'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
+import { Address } from '@shared/core/valueObjects/Address'
 
 interface Request {
   startedIssueInvoicesNow: boolean
@@ -19,6 +22,14 @@ interface Request {
   stateRegistration?: string
   sector: string
   userId: string
+  street: string
+  number: string
+  neighborhood: string
+  city: string
+  state: string
+  postalCode: string
+  country?: string
+  complement?: string
   markets: Array<{
     tradeName: string
     street: string
@@ -53,6 +64,14 @@ export class CreateCompanyService {
     documentationType,
     startedIssueInvoicesNow,
     stateRegistration,
+    city,
+    neighborhood,
+    number,
+    postalCode,
+    state,
+    street,
+    complement,
+    country,
     markets,
   }: Request): Promise<Response> {
     const user = await this.usersRepository.findById(userId)
@@ -72,28 +91,71 @@ export class CreateCompanyService {
       return left(new InsufficientMarkets())
     }
 
-    const company = Company.create({
-      companyName,
-      ownerId: user.id,
-      sector,
-      documentation,
-      documentationType,
-      startedIssueInvoicesAt: startedIssueInvoicesNow ? new Date() : null,
-      stateRegistration,
-      email,
-      markets: new CompanyMarketsList(),
+    const ownerId = new UniqueEntityId()
+    const companyId = new UniqueEntityId()
+
+    const owner = Owner.create(
+      {
+        actualRemuneration: 0,
+        email: user.email,
+        password: user.password,
+        userId: user.id,
+        companyId,
+      },
+      ownerId,
+    )
+
+    const address = Address.create({
+      city,
+      neighborhood,
+      number,
+      postalCode,
+      state,
+      street,
+      complement,
+      country,
     })
+
+    const company = Company.create(
+      {
+        companyName,
+        founderId: user.id,
+        sector,
+        documentation,
+        documentationType,
+        startedIssueInvoicesAt: startedIssueInvoicesNow ? new Date() : null,
+        stateRegistration,
+        email,
+        markets: new CompanyMarketsList(),
+        ownerId,
+        owner,
+        address,
+      },
+      companyId,
+    )
 
     for (const m of markets) {
       const inventory = Inventory.create({
         name: m.tradeName,
       })
 
+      const marketAddress = Address.create({
+        city: m.city,
+        neighborhood: m.neighborhood,
+        number: m.number,
+        postalCode: m.postalCode,
+        state: m.state,
+        street: m.street,
+        complement: m.complement,
+        country: m.country,
+      })
+
       const market = Market.create({
-        ...m,
+        tradeName: m.tradeName,
         companyId: company.id,
         inventoryId: inventory.id,
         inventory,
+        address: marketAddress,
       })
 
       company.markets?.add(market)

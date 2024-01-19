@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { CreateCompanyService } from './CreateCompany.service'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
 import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
@@ -11,6 +11,7 @@ import { MarketsInMemoryRepository } from '@test/repositories/modules/market/Mar
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
 import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
 import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
 
 let usersInMemoryRepository: UsersInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
@@ -18,6 +19,7 @@ let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
+let ownersInMemoryRepository: OwnersInMemoryRepository
 
 let sut: CreateCompanyService
 
@@ -25,6 +27,9 @@ describe('Create company', () => {
   beforeEach(() => {
     usersInMemoryRepository = new UsersInMemoryRepository()
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
@@ -54,6 +59,12 @@ describe('Create company', () => {
       sector: 'Tech',
       userId: 'user-1',
       startedIssueInvoicesNow: false,
+      city: 'São Paulo',
+      neighborhood: 'Vila Madalena',
+      number: '123',
+      postalCode: '12345678',
+      state: 'SP',
+      street: 'Avenida Brigadeiro Faria Lima',
       markets: [
         {
           city: 'São Paulo',
@@ -74,6 +85,7 @@ describe('Create company', () => {
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(1)
       expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
+      expect(ownersInMemoryRepository.owners).toHaveLength(1)
     }
   })
 
@@ -87,6 +99,12 @@ describe('Create company', () => {
       sector: 'Tech',
       userId: 'user-1',
       startedIssueInvoicesNow: false,
+      city: 'São Paulo',
+      neighborhood: 'Vila Madalena',
+      number: '123',
+      postalCode: '12345678',
+      state: 'SP',
+      street: 'Avenida Brigadeiro Faria Lima',
       markets: [
         {
           city: 'São Paulo',
@@ -125,6 +143,7 @@ describe('Create company', () => {
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(3)
       expect(inventoriesInMemoryRepository.inventories).toHaveLength(3)
+      expect(ownersInMemoryRepository.owners).toHaveLength(1)
     }
   })
 
@@ -135,6 +154,12 @@ describe('Create company', () => {
       sector: 'Tech',
       userId: 'inexistent-user-id',
       startedIssueInvoicesNow: false,
+      city: 'São Paulo',
+      neighborhood: 'Vila Madalena',
+      number: '123',
+      postalCode: '12345678',
+      state: 'SP',
+      street: 'Avenida Brigadeiro Faria Lima',
       markets: [
         {
           city: 'São Paulo',
@@ -164,6 +189,12 @@ describe('Create company', () => {
       sector: 'Tech',
       userId: 'user-1',
       startedIssueInvoicesNow: true,
+      city: 'São Paulo',
+      neighborhood: 'Vila Madalena',
+      number: '123',
+      postalCode: '12345678',
+      state: 'SP',
+      street: 'Avenida Brigadeiro Faria Lima',
       markets: [
         {
           city: 'São Paulo',
@@ -193,6 +224,12 @@ describe('Create company', () => {
       sector: 'Tech',
       userId: 'user-1',
       startedIssueInvoicesNow: false,
+      city: 'São Paulo',
+      neighborhood: 'Vila Madalena',
+      number: '123',
+      postalCode: '12345678',
+      state: 'SP',
+      street: 'Avenida Brigadeiro Faria Lima',
       markets: [],
     })
 

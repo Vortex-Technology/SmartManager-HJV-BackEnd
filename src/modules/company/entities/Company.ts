@@ -1,7 +1,9 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 import { CompanyMarketsList } from './CompanyMarketsList'
+import { Owner } from '@modules/owner/entities/Owner'
+import { Address } from '@shared/core/valueObjects/Address'
 
 export enum CompanyDocumentationType {
   IE = 'IE', // individual person
@@ -26,7 +28,10 @@ export interface CompanyProps {
   deletedAt: Date | null
   startedIssueInvoicesAt: Date | null
   markets: CompanyMarketsList | null
+  founderId: UniqueEntityId
   ownerId: UniqueEntityId
+  owner: Owner | null
+  address: Address
 }
 
 export class Company extends AggregateRoot<CompanyProps> {
@@ -43,6 +48,7 @@ export class Company extends AggregateRoot<CompanyProps> {
       | 'startedIssueInvoicesAt'
       | 'markets'
       | 'status'
+      | 'owner'
     >,
     id?: UniqueEntityId,
   ) {
@@ -58,6 +64,7 @@ export class Company extends AggregateRoot<CompanyProps> {
       stateRegistration: props.stateRegistration ?? null,
       markets: props.markets ?? null,
       status: props.status ?? CompanyStatus.INACTIVE,
+      owner: props.owner ?? null,
     }
 
     const company = new Company(companyProps, id)
@@ -109,6 +116,10 @@ export class Company extends AggregateRoot<CompanyProps> {
     return this.props.startedIssueInvoicesAt
   }
 
+  get founderId() {
+    return this.props.founderId
+  }
+
   get ownerId() {
     return this.props.ownerId
   }
@@ -120,6 +131,14 @@ export class Company extends AggregateRoot<CompanyProps> {
   set markets(markets: CompanyMarketsList | null) {
     this.props.markets = markets
     this.touch()
+  }
+
+  get owner() {
+    return this.props.owner
+  }
+
+  get address() {
+    return this.props.address
   }
 
   touch() {

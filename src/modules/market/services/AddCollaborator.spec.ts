@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
 import { makeUser } from '@test/factories/modules/user/makeUser'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
@@ -17,11 +17,15 @@ import {
 import { MarketNotFound } from '../errors/MarketNorFound'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { makeSeller } from '@test/factories/modules/seller/makeSeller'
-import { CollaboratorNotFound } from '@modules/refreshToken/errors/CollaboratorNotFound'
 import { AddCollaboratorService } from './AddCollaborator.service'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
+import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
+import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { makeOwner } from '@test/factories/modules/owner/makeOwner'
 
 let usersInMemoryRepository: UsersInMemoryRepository
+let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
+let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
@@ -33,8 +37,14 @@ describe('Add collaborator', () => {
   beforeEach(() => {
     usersInMemoryRepository = new UsersInMemoryRepository()
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    productVariantInventoriesInMemoryRepository =
+      new ProductVariantInventoriesInMemoryRepository()
+    inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
+      productVariantInventoriesInMemoryRepository,
+    )
     marketsInMemoryRepository = new MarketsInMemoryRepository(
       collaboratorsInMemoryRepository,
+      inventoriesInMemoryRepository,
     )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
@@ -81,7 +91,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'manager-1',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isRight()).toBe(true)
@@ -95,11 +104,16 @@ describe('Add collaborator', () => {
   })
 
   it('should be able to add a collaborator per owner on market', async () => {
-    const creator = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(creator)
+    const owner = makeOwner(
+      {
+        companyId: new UniqueEntityId('company-1'),
+      },
+      new UniqueEntityId('owner-1'),
+    )
+    await collaboratorsInMemoryRepository.create(owner)
 
     const company = makeCompany(
-      { ownerId: creator.id },
+      { ownerId: owner.id },
       new UniqueEntityId('company-1'),
     )
 
@@ -122,9 +136,8 @@ describe('Add collaborator', () => {
       email: 'jonas@jonas.com',
       marketId: 'market-1',
       name: 'Jonas',
-      creatorId: 'user-1',
+      creatorId: 'owner-1',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isRight()).toBe(true)
@@ -133,8 +146,8 @@ describe('Add collaborator', () => {
       expect(response.value.collaborator).toBeInstanceOf(Collaborator)
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(1)
-      expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(1)
-      expect(usersInMemoryRepository.users).toHaveLength(2)
+      expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(2)
+      expect(usersInMemoryRepository.users).toHaveLength(1)
     }
   })
 
@@ -162,7 +175,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'inexistent-collaborator-id',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -194,11 +206,10 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'inexistent-owner-id',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isLeft()).toBe(true)
-    expect(response.value).toBeInstanceOf(UserNotFount)
+    expect(response.value).toBeInstanceOf(CollaboratorNotFound)
     expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(0)
     expect(usersInMemoryRepository.users).toHaveLength(0)
   })
@@ -224,7 +235,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'manager-1',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -233,8 +243,8 @@ describe('Add collaborator', () => {
   })
 
   it('not should be able to add a collaborator per owner on market if company not exists', async () => {
-    const creator = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(creator)
+    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
+    await collaboratorsInMemoryRepository.create(owner)
 
     const market = makeMarket({}, new UniqueEntityId('market-1'))
     marketsInMemoryRepository.markets.push(market)
@@ -246,15 +256,14 @@ describe('Add collaborator', () => {
       email: 'jonas@jonas.com',
       marketId: 'market-1',
       name: 'Jonas',
-      creatorId: 'user-1',
+      creatorId: 'owner-1',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(CompanyNotFound)
-    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(0)
-    expect(usersInMemoryRepository.users).toHaveLength(1)
+    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(1)
+    expect(usersInMemoryRepository.users).toHaveLength(0)
   })
 
   it('not should be able to add a collaborator per collaborator on market if market not exists', async () => {
@@ -273,7 +282,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'manager-1',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -282,11 +290,16 @@ describe('Add collaborator', () => {
   })
 
   it('not should be able to add a collaborator per owner on market if market not exists', async () => {
-    const creator = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(creator)
+    const owner = makeOwner(
+      {
+        companyId: new UniqueEntityId('company-1'),
+      },
+      new UniqueEntityId('owner-1'),
+    )
+    await collaboratorsInMemoryRepository.create(owner)
 
     const company = makeCompany(
-      { ownerId: creator.id },
+      { ownerId: owner.id },
       new UniqueEntityId('company-1'),
     )
     await companiesInMemoryRepository.create(company)
@@ -298,15 +311,14 @@ describe('Add collaborator', () => {
       email: 'jonas@jonas.com',
       marketId: 'inexistent-market-id',
       name: 'Jonas',
-      creatorId: 'user-1',
+      creatorId: 'owner-1',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(MarketNotFound)
-    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(0)
-    expect(usersInMemoryRepository.users).toHaveLength(1)
+    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(1)
+    expect(usersInMemoryRepository.users).toHaveLength(0)
   })
 
   it('not should be able to add a collaborator per collaborator on market if creator not is collaborator manager of the market', async () => {
@@ -341,7 +353,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'seller-1',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -351,11 +362,11 @@ describe('Add collaborator', () => {
   })
 
   it('not should be able to add a collaborator per owner on market if creator not is owner of the company', async () => {
-    const creator = makeUser({}, new UniqueEntityId('user-1'))
-    await usersInMemoryRepository.create(creator)
+    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
+    await collaboratorsInMemoryRepository.create(owner)
 
     const company = makeCompany(
-      { ownerId: new UniqueEntityId('other-user-id') },
+      { ownerId: new UniqueEntityId('other-owner-id') },
       new UniqueEntityId('company-1'),
     )
 
@@ -378,18 +389,17 @@ describe('Add collaborator', () => {
       email: 'jonas@jonas.com',
       marketId: 'market-1',
       name: 'Jonas',
-      creatorId: 'user-1',
+      creatorId: 'owner-1',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(PermissionDenied)
-    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(0)
-    expect(usersInMemoryRepository.users).toHaveLength(1)
+    expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(1)
+    expect(usersInMemoryRepository.users).toHaveLength(0)
   })
 
-  it('should be able to add a collaborator per collaborator on market', async () => {
+  it('should be able to add a collaborator per collaborator on market if user already exists', async () => {
     const user = makeUser({
       email: 'jonas@jonas.com',
     })
@@ -426,7 +436,6 @@ describe('Add collaborator', () => {
       name: 'Jonas',
       creatorId: 'manager-1',
       password: '123456',
-      creatorType: 'COLLABORATOR',
     })
 
     expect(response.isRight()).toBe(true)
@@ -440,16 +449,22 @@ describe('Add collaborator', () => {
     }
   })
 
-  it('should be able to add a collaborator per owner on market', async () => {
-    const creator = makeUser({}, new UniqueEntityId('user-1'))
+  it('should be able to add a collaborator per owner on market if user already exists', async () => {
+    const owner = makeOwner(
+      {
+        companyId: new UniqueEntityId('company-1'),
+      },
+      new UniqueEntityId('owner-1'),
+    )
+    await collaboratorsInMemoryRepository.create(owner)
+
     const user = makeUser({
       email: 'jonas@jonas.com',
     })
-    await usersInMemoryRepository.create(creator)
     await usersInMemoryRepository.create(user)
 
     const company = makeCompany(
-      { ownerId: creator.id },
+      { ownerId: owner.id },
       new UniqueEntityId('company-1'),
     )
 
@@ -472,9 +487,8 @@ describe('Add collaborator', () => {
       email: 'jonas@jonas.com',
       marketId: 'market-1',
       name: 'Jonas',
-      creatorId: 'user-1',
+      creatorId: 'owner-1',
       password: '123456',
-      creatorType: 'OWNER',
     })
 
     expect(response.isRight()).toBe(true)
@@ -483,8 +497,8 @@ describe('Add collaborator', () => {
       expect(response.value.collaborator).toBeInstanceOf(Collaborator)
       expect(companiesInMemoryRepository.companies).toHaveLength(1)
       expect(marketsInMemoryRepository.markets).toHaveLength(1)
-      expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(1)
-      expect(usersInMemoryRepository.users).toHaveLength(2)
+      expect(collaboratorsInMemoryRepository.collaborators).toHaveLength(2)
+      expect(usersInMemoryRepository.users).toHaveLength(1)
     }
   })
 })

@@ -1,4 +1,4 @@
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { CreateMarketService } from './CreateMarket.service'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
 import { makeUser } from '@test/factories/modules/user/makeUser'
