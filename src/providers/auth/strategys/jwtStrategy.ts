@@ -6,8 +6,10 @@ import { z } from 'zod'
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
+  marketId: z.string().uuid().optional().nullable(),
+  companyId: z.string().uuid().optional().nullable(),
   role: z
-    .enum(['MASTER', 'OWNER', 'MANAGER', 'STOCKIST', 'SELLER'])
+    .enum(['OWNER', 'MANAGER', 'STOCKIST', 'SELLER'])
     .nullable()
     .optional(),
 })

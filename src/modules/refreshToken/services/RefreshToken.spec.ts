@@ -13,7 +13,7 @@
 // import { makeSeller } from '@test/factories/modules/seller/makeSeller'
 // import { fakerPT_BR } from '@faker-js/faker'
 // import { SessionExpired } from '../errors/SessionExpired'
-// import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+// import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 // import { CollaboratorNotFound } from '../errors/CollaboratorNotFound'
 
 // let fakeEncrypter: FakeEncrypter

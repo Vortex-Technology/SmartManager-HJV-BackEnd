@@ -2,7 +2,7 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { ProductVariantsList } from './ProductVariantsList'
 import { ProductCategoriesList } from './ProductCategoriesList'
 import { Optional } from '@shared/core/types/Optional'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export enum ProductUnitType {
   KILOS = 'KG',

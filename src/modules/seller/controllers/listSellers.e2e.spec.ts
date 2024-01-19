@@ -6,7 +6,7 @@ import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdm
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import request from 'supertest'
 import {
   Administrator,

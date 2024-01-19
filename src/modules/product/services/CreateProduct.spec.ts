@@ -1,6 +1,6 @@
 import { AdministratorInMemoryRepository } from '@test/repositories/modules/administrator/AdministratorInMemoryRepository'
 import { makeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { makeProductCategory } from '@test/factories/modules/product/makeProductCategory'
 import { ProductCategoryInMemoryRepository } from '@test/repositories/modules/product/ProductCategoryInMemoryRepository'

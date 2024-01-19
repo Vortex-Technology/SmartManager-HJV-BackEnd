@@ -8,7 +8,7 @@ import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import request from 'supertest'
 
 describe('Get seller (E2E)', () => {

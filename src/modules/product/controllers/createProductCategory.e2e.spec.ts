@@ -6,7 +6,7 @@ import { statusCode } from 'src/config/statusCode'
 import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DatabaseModule } from '@infra/database/database.module'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
 import request from 'supertest'
 import {

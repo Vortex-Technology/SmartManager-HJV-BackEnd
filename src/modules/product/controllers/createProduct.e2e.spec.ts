@@ -14,7 +14,7 @@ import {
 } from '@modules/administrator/entities/Administrator'
 import { MakeProductCategory } from '@test/factories/modules/product/makeProductCategory'
 import { ProductCategory } from '../entities/ProductCategory'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 describe('Create product (E2E)', () => {
   let app: INestApplication

@@ -2,7 +2,7 @@ import { AdministratorInMemoryRepository } from '@test/repositories/modules/admi
 import { makeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
 import { CreateProductCategoryService } from './createProductCategory.service'
 import { AdministratorRole } from '@modules/administrator/entities/Administrator'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'

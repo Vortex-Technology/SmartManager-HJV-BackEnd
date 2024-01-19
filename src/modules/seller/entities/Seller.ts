@@ -3,7 +3,7 @@ import {
   CollaboratorCreatePropsOptional,
   CollaboratorRole,
 } from '@modules/collaborator/entities/Collaborator'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class Seller extends Collaborator<CollaboratorRole.SELLER> {
   static create<TRole extends CollaboratorRole = CollaboratorRole.SELLER>(
@@ -13,7 +13,7 @@ export class Seller extends Collaborator<CollaboratorRole.SELLER> {
     const sellerProps = Seller.setupProps<TRole>(props)
 
     const seller = new Seller(
-      { ...sellerProps, role: CollaboratorRole.SELLER },
+      { ...sellerProps, role: CollaboratorRole.SELLER, companyId: null },
       id,
     )
 

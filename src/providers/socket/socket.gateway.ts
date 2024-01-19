@@ -1,4 +1,4 @@
-import { EnvService } from '@infra/env/env.service'
+import { EnvService } from '@infra/env/Env.service'
 import { Injectable } from '@nestjs/common'
 import {
   OnGatewayConnection,

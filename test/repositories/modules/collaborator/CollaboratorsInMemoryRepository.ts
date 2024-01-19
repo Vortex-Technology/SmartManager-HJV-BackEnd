@@ -50,7 +50,7 @@ export class CollaboratorsInMemoryRepository
     limit,
   }: FindManyByMarketIdProps): Promise<Collaborator<CollaboratorRole>[]> {
     const collaboratorsOfMarket = this.collaborators.filter(
-      (collaborator) => collaborator.marketId.toString() === marketId,
+      (collaborator) => collaborator.marketId?.toString() === marketId,
     )
 
     const collaboratorsInOrd = collaboratorsOfMarket.sort(
@@ -62,7 +62,7 @@ export class CollaboratorsInMemoryRepository
 
   async countByMarketId(marketId: string): Promise<number> {
     const collaboratorsOfMarket = this.collaborators.filter(
-      (collaborator) => collaborator.marketId.toString() === marketId,
+      (collaborator) => collaborator.marketId?.toString() === marketId,
     )
 
     return collaboratorsOfMarket.length
