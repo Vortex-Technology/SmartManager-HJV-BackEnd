@@ -18,7 +18,7 @@ import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import {
   CreateCompanyBody,
-  bodyValidationPipe,
+  createCompanyBodyValidationPipe,
 } from '../gateways/CreateCompany.gateway'
 
 @Controller('/companies')
@@ -28,7 +28,7 @@ export class CreateCompanyController {
   @Post()
   @HttpCode(statusCode.Created)
   async handle(
-    @Body(bodyValidationPipe) body: CreateCompanyBody,
+    @Body(createCompanyBodyValidationPipe) body: CreateCompanyBody,
     @CurrentLoggedUserDecorator() user: TokenPayloadSchema,
     @Res() res: Response,
   ) {
