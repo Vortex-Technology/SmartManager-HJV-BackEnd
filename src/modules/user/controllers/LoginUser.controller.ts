@@ -7,19 +7,13 @@ import {
   Post,
 } from '@nestjs/common'
 import { UserWrongCredentials } from '../errors/UserWrongCredentials'
-import { ZodValidationPipe } from '@shared/pipes/zodValidation'
 import { LoginUserService } from '../services/LoginUser.service'
 import { statusCode } from 'src/config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
-import { z } from 'zod'
-
-const loginUserBodySchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-})
-
-type LoginUserBody = z.infer<typeof loginUserBodySchema>
-const bodyValidationPipe = new ZodValidationPipe(loginUserBodySchema)
+import {
+  LoginUserBody,
+  loginUserBodyValidationPipe,
+} from '../gateways/LoginUser.gateway'
 
 @Controller('/users/login')
 export class LoginUserController {
@@ -28,7 +22,7 @@ export class LoginUserController {
   @Post()
   @Public()
   @HttpCode(statusCode.Created)
-  async handle(@Body(bodyValidationPipe) body: LoginUserBody) {
+  async handle(@Body(loginUserBodyValidationPipe) body: LoginUserBody) {
     const { email, password } = body
 
     const response = await this.loginUserService.execute({
