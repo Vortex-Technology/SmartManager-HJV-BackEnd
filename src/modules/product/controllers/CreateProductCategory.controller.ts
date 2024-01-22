@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { ZodValidationPipe } from '@shared/pipes/zodValidation'
+import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
 import { statusCode } from 'src/config/statusCode'
 import { z } from 'zod'
 import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
