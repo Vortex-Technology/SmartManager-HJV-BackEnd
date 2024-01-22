@@ -17,6 +17,9 @@ import { InventoryNotFount } from '@modules/inventory/errors/InventoryNotFound'
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { ProductVariantInventoriesList } from '@modules/inventory/entities/ProductVariantInventoriesList'
 import { ProductVariantInventory } from '@modules/inventory/entities/ProductVariantInventory'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
+import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 
 interface Request {
   creatorId: string
@@ -38,10 +41,10 @@ interface Request {
 
 type Response = Either<
   | PermissionDenied
-  | AdministratorNotFount
   | AllProductVariantAlreadyExists
   | ProvideAtLeastOneProductVariant
-  | InventoryNotFount,
+  | InventoryNotFount
+  | CollaboratorNotFound,
   {
     product: Product
     errors: ProductVariantAlreadyExistsWithSame[]
@@ -51,10 +54,10 @@ type Response = Either<
 @Injectable()
 export class CreateProductService {
   constructor(
-    private readonly administratorRepository: AdministratorRepository,
+    private readonly collaboratorsRepository: CollaboratorsRepository,
     private readonly productCategoriesRepository: ProductCategoriesRepository,
-    private readonly productRepository: ProductsRepository,
-    private readonly productsVariantsRepository: ProductVariantsRepository,
+    private readonly productsRepository: ProductsRepository,
+    private readonly productVariantsRepository: ProductVariantsRepository,
     private readonly inventoriesRepository: InventoriesRepository,
   ) {}
 
@@ -66,19 +69,18 @@ export class CreateProductService {
     creatorId,
   }: Request): Promise<Response> {
     const acceptCreateProductForRoles = [
-      AdministratorRole.MASTER,
-      AdministratorRole.FULL_ACCESS,
-      AdministratorRole.EDITOR,
+      CollaboratorRole.OWNER,
+      CollaboratorRole.MANAGER,
+      CollaboratorRole.STOCKIST,
     ]
 
     if (variants.length < 1) {
       return left(new ProvideAtLeastOneProductVariant())
     }
 
-    const creator = await this.administratorRepository.findById(creatorId)
-
+    const creator = await this.collaboratorsRepository.findById(creatorId)
     if (!creator) {
-      return left(new AdministratorNotFount())
+      return left(new CollaboratorNotFound())
     }
 
     if (!acceptCreateProductForRoles.includes(creator.role)) {
@@ -127,7 +129,7 @@ export class CreateProductService {
 
     const variantsBarCodes = variants.map((variant) => variant.barCode)
     const variantsExistentsWithNullResults =
-      await this.productsVariantsRepository.findByBarCodes(variantsBarCodes)
+      await this.productVariantsRepository.findByBarCodes(variantsBarCodes)
 
     const variantsExistents = variantsExistentsWithNullResults.filter(
       (variant) => variant !== null,
@@ -191,7 +193,7 @@ export class CreateProductService {
       inventory?.productVariantInventories?.add(newProductVariantInventory)
     })
 
-    await this.productRepository.create(product)
+    await this.productsRepository.create(product)
 
     if (inventoryId) {
       await this.inventoriesRepository.save(inventory)
