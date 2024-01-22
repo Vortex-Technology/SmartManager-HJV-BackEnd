@@ -96,7 +96,7 @@ export class LoginCollaboratorService {
       return left(new CollaboratorWrongCredentials())
     }
 
-    if (!collaborator.marketId.equals(market.id)) {
+    if (!collaborator.marketId?.equals(market.id)) {
       return left(new PermissionDenied())
     }
 
@@ -132,7 +132,7 @@ export class LoginCollaboratorService {
     )
 
     const refreshToken = RefreshToken.create({
-      collaboratorId: collaborator.id,
+      userId: collaborator.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
         this.env.get('USER_REFRESH_EXPIRES_IN'),

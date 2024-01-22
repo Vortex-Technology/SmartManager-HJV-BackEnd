@@ -10,17 +10,15 @@ export class RefreshTokensInMemoryRepository
     this.refreshTokens.push(refreshToken)
   }
 
-  async findByCollaboratorIdAndRefreshToken({
-    collaboratorId,
+  async findByUserIdAndRefreshToken({
+    userId,
     refreshToken,
   }: {
-    collaboratorId: string
+    userId: string
     refreshToken: string
   }): Promise<RefreshToken | null> {
     const RT = this.refreshTokens.find(
-      (RT) =>
-        RT.collaboratorId.toString() === collaboratorId &&
-        RT.token === refreshToken,
+      (RT) => RT.userId.toString() === userId && RT.token === refreshToken,
     )
 
     if (!RT) return null
@@ -28,11 +26,9 @@ export class RefreshTokensInMemoryRepository
     return RT
   }
 
-  async permanentlyDeleteByCollaboratorId(
-    collaboratorId: string,
-  ): Promise<void> {
+  async permanentlyDeleteByUserId(userId: string): Promise<void> {
     this.refreshTokens = this.refreshTokens.filter(
-      (RT) => RT.collaboratorId.toString() !== collaboratorId,
+      (RT) => RT.userId.toString() !== userId,
     )
   }
 }
