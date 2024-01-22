@@ -18,10 +18,10 @@ import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { Roles } from '@providers/auth/decorators/roles.decorator'
 import { Response } from 'express'
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
-import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
-import { CreateProductCategoryService } from '../services/createProductCategory.service'
 import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
+import { CreateProductCategoryService } from '../services/CreateProductCategory.service'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 
 const createProductCategoryBodySchema = z.object({
   name: z.string().min(3).max(60),
@@ -43,9 +43,9 @@ export class CreateProductCategoryController {
   @HttpCode(statusCode.Created)
   @UseGuards(JwtRoleGuard)
   @Roles([
-    AdministratorRole.MASTER,
-    AdministratorRole.FULL_ACCESS,
-    AdministratorRole.EDITOR,
+    CollaboratorRole.OWNER,
+    CollaboratorRole.MANAGER,
+    CollaboratorRole.STOCKIST,
   ])
   async handle(
     @Body(bodyValidationPipe) body: CreateProductCategoryBody,
@@ -66,7 +66,7 @@ export class CreateProductCategoryController {
 
       switch (error.constructor) {
         case ProductCategoryAlreadyExists:
-        case AdministratorNotFount: {
+        case CollaboratorNotFound: {
           throw new ConflictException(error.message)
         }
 

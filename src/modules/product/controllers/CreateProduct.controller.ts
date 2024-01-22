@@ -16,18 +16,18 @@ import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { Roles } from '@providers/auth/decorators/roles.decorator'
 import { Response } from 'express'
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
-import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
-import { CreateProductService } from '../services/createProduct.service'
 import { AllProductVariantAlreadyExists } from '../errors/AllProductVariantAlreadyExists'
 import { ProvideAtLeastOneProductVariant } from '../errors/ProvideAlmostOneProductVariant'
 import { ProductErrosPresenter } from '../presenters/ProductErrosPresenter'
 import {
   CreateProductBody,
   createProductBodyValidationPipe,
-} from '../gateways/createProduct.gateway'
+} from '../gateways/CreateProduct.gateway'
+import { CreateProductService } from '../services/CreateProduct.service'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 
-@Controller('/products')
+@Controller('/companies/:companyId/products')
 export class CreateProductController {
   constructor(private readonly createProductService: CreateProductService) {}
 
@@ -35,9 +35,9 @@ export class CreateProductController {
   @HttpCode(statusCode.Created)
   @UseGuards(JwtRoleGuard)
   @Roles([
-    AdministratorRole.MASTER,
-    AdministratorRole.FULL_ACCESS,
-    AdministratorRole.EDITOR,
+    CollaboratorRole.OWNER,
+    CollaboratorRole.MANAGER,
+    CollaboratorRole.STOCKIST,
   ])
   async handle(
     @Body(createProductBodyValidationPipe) body: CreateProductBody,
@@ -60,7 +60,7 @@ export class CreateProductController {
       switch (error.constructor) {
         case AllProductVariantAlreadyExists:
         case ProvideAtLeastOneProductVariant:
-        case AdministratorNotFount: {
+        case CollaboratorNotFound: {
           throw new ConflictException(error.message)
         }
 
