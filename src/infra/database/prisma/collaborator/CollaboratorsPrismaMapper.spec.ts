@@ -28,6 +28,9 @@ describe('Collaborators prisma mapper', () => {
     }
 
     const collaboratorId = new UniqueEntityId('collaborator-1')
+    const marketId = new UniqueEntityId('market-1')
+    const userId = new UniqueEntityId('user-1')
+    const companyId = new UniqueEntityId('company-1')
 
     const result = CollaboratorsPrismaMapper.toEntity(collaborator)
 
@@ -35,6 +38,10 @@ describe('Collaborators prisma mapper', () => {
     expect(result.id.equals(collaboratorId)).toBe(true)
     expect(result.email).toBe('jonas@jonas.com')
     expect(result.password).toBe('123456')
+    expect(result.marketId?.equals(marketId)).toBe(true)
+    expect(result.userId.equals(userId)).toBe(true)
+    expect(result.actualRemuneration).toBe(1000)
+    expect(result.companyId?.equals(companyId)).toBe(true)
     expect(result.role).toEqual(CollaboratorRole.MANAGER)
   })
 
@@ -72,5 +79,53 @@ describe('Collaborators prisma mapper', () => {
     expect(result.updatedAt).toEqual(null)
     expect(result.createdAt).toBeInstanceOf(Date)
     expect(createdAtIsActualDate).toEqual(true)
+  })
+
+  it('should be able to map collaborator to entity without marketId', () => {
+    const collaborator: CollaboratorPrisma = {
+      actualRemuneration: 1000,
+      companyId: 'company-1',
+      createdAt: new Date(),
+      deletedAt: null,
+      email: 'jonas@jonas.com',
+      id: 'collaborator-1',
+      inactivatedAt: null,
+      marketId: null,
+      password: '123456',
+      role: 'MANAGER',
+      updatedAt: new Date(),
+      userId: 'user-1',
+    }
+
+    const companyId = new UniqueEntityId('company-1')
+
+    const result = CollaboratorsPrismaMapper.toEntity(collaborator)
+
+    expect(result.companyId?.equals(companyId)).toBe(true)
+    expect(result.marketId).toEqual(null)
+  })
+
+  it('should be able to map collaborator to entity without companyId', () => {
+    const collaborator: CollaboratorPrisma = {
+      actualRemuneration: 1000,
+      companyId: null,
+      createdAt: new Date(),
+      deletedAt: null,
+      email: 'jonas@jonas.com',
+      id: 'collaborator-1',
+      inactivatedAt: null,
+      marketId: 'market-1',
+      password: '123456',
+      role: 'MANAGER',
+      updatedAt: new Date(),
+      userId: 'user-1',
+    }
+
+    const marketId = new UniqueEntityId('market-1')
+
+    const result = CollaboratorsPrismaMapper.toEntity(collaborator)
+
+    expect(result.marketId?.equals(marketId)).toBe(true)
+    expect(result.companyId).toEqual(null)
   })
 })
