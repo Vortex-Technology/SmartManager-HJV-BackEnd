@@ -4,6 +4,7 @@ import {
   Controller,
   ForbiddenException,
   HttpCode,
+  Param,
   Post,
 } from '@nestjs/common'
 import { statusCode } from 'src/config/statusCode'
@@ -12,10 +13,13 @@ import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredent
 import { LoginCollaboratorService } from '../services/LoginCollaborator.service'
 import {
   LoginCollaboratorBody,
+  LoginCollaboratorParams,
   loginCollaboratorBodyValidationPipe,
-} from '../gateways/loginCollaborator.gateway'
+  loginCollaboratorParamsValidationPipe,
+} from '../gateways/LoginCollaborator.gateway'
+import { CompanyApiKey } from '@providers/auth/decorators/companyApiKey.decorator'
 
-@Controller('/collaborators/login')
+@Controller('/companies/:companyId/markets/:marketId/collaborators/login')
 export class LoginCollaboratorController {
   constructor(
     private readonly loginCollaboratorService: LoginCollaboratorService,
@@ -26,13 +30,19 @@ export class LoginCollaboratorController {
   @Public()
   async handle(
     @Body(loginCollaboratorBodyValidationPipe) body: LoginCollaboratorBody,
+    @Param(loginCollaboratorParamsValidationPipe)
+    params: LoginCollaboratorParams,
+    @CompanyApiKey() apiKey: string,
   ) {
-    const { login, password } = body
+    const { email, password } = body
+    const { companyId, marketId } = params
 
     const response = await this.loginCollaboratorService.execute({
-      
-      login,
+      companyId,
+      marketId,
+      email,
       password,
+      apiKey,
     })
 
     if (response.isLeft()) {

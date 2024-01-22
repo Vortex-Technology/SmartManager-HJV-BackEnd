@@ -1,10 +1,10 @@
 import { BadRequestException } from '@nestjs/common'
-import { loginCollaboratorBodyValidationPipe } from './loginCollaborator.gateway'
+import { loginCollaboratorBodyValidationPipe } from './LoginCollaborator.gateway'
 
 describe('login collaborator gateway', () => {
   it('should be able to validate body login collaborator', () => {
     const body = {
-      login: 'user',
+      email: 'jonas@jonas.com',
       password: 'password',
     }
 
@@ -16,7 +16,7 @@ describe('login collaborator gateway', () => {
   it('not should be able to validate body a login collaborator', async () => {
     expect(async () => {
       loginCollaboratorBodyValidationPipe.transform({
-        login: 'wrong-user',
+        email: 'jonas-jonas.com',
       })
     }).rejects.toBeInstanceOf(BadRequestException)
   })

@@ -113,6 +113,8 @@ export class LoginCollaboratorService {
       {
         sub: collaborator.id.toString(),
         role: collaborator.role,
+        companyId: company.id.toString(),
+        marketId: market.id.toString(),
       },
       {
         secret: apiKey.secret,
@@ -124,6 +126,8 @@ export class LoginCollaboratorService {
       {
         sub: collaborator.id.toString(),
         role: collaborator.role,
+        companyId: company.id.toString(),
+        marketId: market.id.toString(),
       },
       {
         secret: apiKey.secret,
