@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
 import { Company, CompanyDocumentationType } from '../entities/Company'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
 import { UsersRepository } from '@modules/user/repositories/UsersRepository'
 import { CompaniesRepository } from '../repositories/CompaniesRepository'
 import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
@@ -12,6 +11,7 @@ import { Inventory } from '@modules/inventory/entities/Inventory'
 import { Owner } from '@modules/owner/entities/Owner'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Address } from '@shared/core/valueObjects/Address'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 
 interface Request {
   startedIssueInvoicesNow: boolean
@@ -44,7 +44,7 @@ interface Request {
 }
 
 type Response = Either<
-  UserNotFount | DocumentationsIsMissing | InsufficientMarkets,
+  UserNotFound | DocumentationsIsMissing | InsufficientMarkets,
   { company: Company }
 >
 
@@ -77,7 +77,7 @@ export class CreateCompanyService {
     const user = await this.usersRepository.findById(userId)
 
     if (!user) {
-      return left(new UserNotFount())
+      return left(new UserNotFound())
     }
 
     const hasAllTheDocuments =

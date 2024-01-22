@@ -4,7 +4,6 @@ import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersIn
 import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
 import { makeUser } from '@test/factories/modules/user/makeUser'
 import { Company } from '../entities/Company'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
 import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
@@ -12,6 +11,7 @@ import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/coll
 import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
 import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 
 let usersInMemoryRepository: UsersInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
@@ -175,7 +175,7 @@ describe('Create company', () => {
     })
 
     expect(response.isLeft()).toBe(true)
-    expect(response.value).toBeInstanceOf(UserNotFount)
+    expect(response.value).toBeInstanceOf(UserNotFound)
     expect(companiesInMemoryRepository.companies).toHaveLength(0)
     expect(marketsInMemoryRepository.markets).toHaveLength(0)
   })

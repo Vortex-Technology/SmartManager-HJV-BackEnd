@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
-import { UserNotFount } from '../errors/UserNotFound'
+import { UserNotFound } from '../errors/UserNotFound'
 import { User } from '../entities/User'
 import { UsersRepository } from '../repositories/UsersRepository'
 
@@ -9,7 +9,7 @@ interface Request {
 }
 
 type Response = Either<
-  UserNotFount,
+  UserNotFound,
   {
     user: User
   }
@@ -23,7 +23,7 @@ export class GetUserService {
     const user = await this.usersRepository.findById(userId)
 
     if (!user) {
-      return left(new UserNotFount())
+      return left(new UserNotFound())
     }
 
     return right({
