@@ -1,4 +1,4 @@
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { SetMetadata } from '@nestjs/common'
 
-export const Roles = (roles: AdministratorRole[]) => SetMetadata('roles', roles)
+export const Roles = (roles: CollaboratorRole[]) => SetMetadata('roles', roles)

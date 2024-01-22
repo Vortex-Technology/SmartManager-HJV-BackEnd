@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import { Env, envSchema } from '@infra/env'
 import { EnvServiceContract } from '@infra/env/contracts/envServiceContract'
 

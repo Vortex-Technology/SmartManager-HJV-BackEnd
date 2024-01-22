@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 
 export interface RefreshTokenProps {
@@ -7,7 +7,7 @@ export interface RefreshTokenProps {
   expiresIn: Date
   expiredAt: Date | null
   createdAt: Date
-  collaboratorId: UniqueEntityId
+  userId: UniqueEntityId
 }
 
 export class RefreshToken extends AggregateRoot<RefreshTokenProps> {
@@ -42,7 +42,7 @@ export class RefreshToken extends AggregateRoot<RefreshTokenProps> {
     return this.props.createdAt
   }
 
-  get collaboratorId() {
-    return this.props.collaboratorId
+  get userId() {
+    return this.props.userId
   }
 }

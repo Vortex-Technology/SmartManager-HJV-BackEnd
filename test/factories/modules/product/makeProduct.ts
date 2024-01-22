@@ -1,10 +1,10 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductPrismaMapper } from '@infra/database/prisma/repositories/product/ProductPrismaMapper'
-import { ProductVariantPrismaMapper } from '@infra/database/prisma/repositories/product/ProductVariantPrismaMapper'
+import { ProductVariantPrismaMapper } from '@infra/database/prisma/product/ProductVariantPrismaMapper'
+import { ProductsPrismaMapper } from '@infra/database/prisma/product/ProductsPrismaMapper'
 import { Product, ProductProps } from '@modules/product/entities/Product'
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeProduct(
   override: Partial<ProductProps>,
@@ -29,7 +29,7 @@ export class MakeProduct {
     const productVariants = product.productVariants?.getNewItems() ?? []
 
     await this.prisma.product.create({
-      data: ProductPrismaMapper.toPrisma(product),
+      data: ProductsPrismaMapper.toPrisma(product),
     })
 
     if (productVariants.length >= 1) {

@@ -10,6 +10,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id              String    @id @unique @default(uuid())
+  name            String
+  image           String?
+  email           String    @unique
+  emailVerifiedAt DateTime? @map("email_verified_at")
+  password        String
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime? @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+
+  address   Address? @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  addressId Int?     @unique @map("address_id")
+
+  refreshTokens  RefreshToken[]
+  companies      Company[]
+  collaborations Collaborator[]
+
+  @@map("users")
+}
+
 model RefreshToken {
   id        String    @id @unique @default(uuid())
   token     String
@@ -17,40 +38,143 @@ model RefreshToken {
   expiredAt DateTime? @map("expired_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
-  collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
-  collaboratorId String?       @map("collaborator_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
 
   @@map("refresh_tokens")
 }
 
-enum RoleCollaborator {
-  MASTER
-  FULL_ACCESS
-  EDITOR
-  VIEWER
+model Address {
+  id           Int     @id @default(autoincrement())
+  street       String
+  number       String
+  complement   String?
+  neighborhood String
+  city         String
+  state        String
+  postalCode   String
+  country      String
+
+  user      User?
+  company   Company?
+  market    Market?
+  inventory Inventory?
+
+  @@map("addresses")
 }
 
-enum CollaboratorType {
-  ADMINISTRATOR
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CompanyDocumentationType {
+  IE
+  LE
+}
+
+model Company {
+  id                     String                    @id @unique @default(uuid())
+  email                  String?                   @unique
+  status                 CompanyStatus             @default(INACTIVE)
+  companyNane            String                    @unique @map("company_name")
+  documentation          String?                   @unique
+  documentationType      CompanyDocumentationType? @map("documentation_type")
+  stateRegistration      String?                   @map("state_registration")
+  sector                 String
+  createdAt              DateTime                  @default(now()) @map("created_at")
+  updatedAt              DateTime?                 @updatedAt @map("updated_at")
+  deletedAt              DateTime?                 @map("deleted_at")
+  startedIssueInvoicesAt DateTime?                 @map("started_issue_invoices_at")
+
+  address   Address @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  addressId Int     @unique @map("address_id")
+
+  founder   User   @relation(fields: [founderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  founderId String @map("founder_id")
+
+  markets Market[]
+  apiKeys ApiKey[]
+  owner   Collaborator?
+
+  @@map("companies")
+}
+
+model ApiKey {
+  id        String    @id @unique @default(uuid())
+  key       String    @unique
+  secret    String    @unique
+  revokedAt DateTime? @map("revoked_at")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
+  @@map("api_keys")
+}
+
+model Market {
+  id        String    @id @unique @default(uuid())
+  tradeName String    @map("trade_name")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  address   Address @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  addressId Int     @unique @map("address_id")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  inventoryId String    @unique @map("inventory_id")
+
+  collaborators Collaborator[]
+
+  @@map("markets")
+}
+
+enum RoleCollaborator {
+  OWNER
+  MANAGER
+  STOCKIST
   SELLER
-  ATTENDANT
 }
 
 model Collaborator {
-  id        String           @id @unique @default(uuid())
-  name      String
-  image     String?
-  login     String           @unique
-  password  String
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime?        @updatedAt @map("udpated_at")
-  deletedAt DateTime?        @map("deleted_at")
-  type      CollaboratorType @default(ATTENDANT)
-  role      RoleCollaborator @default(EDITOR)
+  id                 String           @id @unique @default(uuid())
+  password           String
+  email              String           @unique
+  actualRemuneration Int              @map("actual_remuneration")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime?        @updatedAt @map("updated_at")
+  deletedAt          DateTime?        @map("deleted_at")
+  inactivatedAt      DateTime?        @map("inactivated_at")
+  role               RoleCollaborator @default(SELLER)
 
-  refreshTokens RefreshToken[]
+  market   Market? @relation(fields: [marketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketId String? @map("market_id")
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String?  @unique @map("company_id")
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId String @map("user_id")
+
+  remunerations Remuneration[]
 
   @@map("collaborators")
+}
+
+model Remuneration {
+  id        String    @id @unique @default(uuid())
+  value     Int
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  collaboratorId String       @map("collaborator_id")
+
+  @@map("remunerations")
 }
 
 model ProductCategory {
@@ -119,6 +243,11 @@ model Inventory {
 
   productVariantInventories ProductVariantInventory[]
 
+  address   Address? @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  addressId Int?     @unique @map("address_id")
+
+  market Market?
+
   @@map("inventories")
 }
 
@@ -135,5 +264,5 @@ model ProductVariantInventory {
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inventoryId String    @map("inventory_id")
 
-  @@map("products_variatns_inventories")
+  @@map("products_variants_inventories")
 }

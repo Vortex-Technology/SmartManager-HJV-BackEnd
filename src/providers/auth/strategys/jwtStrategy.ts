@@ -1,4 +1,4 @@
-import { EnvService } from '@infra/env/env.service'
+import { EnvService } from '@infra/env/Env.service'
 import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { ExtractJwt, Strategy } from 'passport-jwt'
@@ -6,11 +6,12 @@ import { z } from 'zod'
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
+  marketId: z.string().uuid().optional().nullable(),
+  companyId: z.string().uuid().optional().nullable(),
   role: z
-    .enum(['MASTER', 'FULL_ACCESS', 'EDITOR', 'VIEWER'])
+    .enum(['OWNER', 'MANAGER', 'STOCKIST', 'SELLER'])
     .nullable()
     .optional(),
-  type: z.enum(['ADMINISTRATOR', 'ATTENDANT', 'SELLER']),
 })
 
 export type TokenPayloadSchema = z.infer<typeof tokenPayloadSchema>

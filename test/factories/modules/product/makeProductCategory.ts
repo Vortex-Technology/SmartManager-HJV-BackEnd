@@ -1,13 +1,13 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductCategoryPrismaMapper } from '@infra/database/prisma/repositories/product/ProductCategoryPrismaMapper'
+import { ProductCategoriesPrismaMapper } from '@infra/database/prisma/product/ProductCategoriesPrismaMapper'
 import {
   ProductCategory,
   ProductCategoryProps,
 } from '@modules/product/entities/ProductCategory'
 
 import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeProductCategory(
   override: Partial<ProductCategoryProps>,
@@ -34,7 +34,7 @@ export class MakeProductCategory {
     const productCategory = makeProductCategory(override, id)
 
     await this.prisma.productCategory.create({
-      data: ProductCategoryPrismaMapper.toPrisma(productCategory),
+      data: ProductCategoriesPrismaMapper.toPrisma(productCategory),
     })
 
     return productCategory

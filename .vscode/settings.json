@@ -14,14 +14,17 @@
     "presenters": "typescript",
     "repositories": "database",
     "implementations": "controller",
-    "entities": "class"
+    "entities": "class",
+    "gateways": "typescript",
   },
   "cSpell.words": [
     "alvaro",
     "encrypter",
     "Encrypter",
+    "fkey",
     "hasher",
     "KG",
+    "pkey",
     "strategys",
     "unexistendt",
     "websockets"

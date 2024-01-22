@@ -1,18 +1,23 @@
 import { fakerPT_BR } from '@faker-js/faker'
-import { PrismaService } from '@infra/database/prisma/index.service'
-import { SellerPrismaMapper } from '@infra/database/prisma/repositories/seller/SellerPrismaMapper'
-import { Seller, SellerProps } from '@modules/seller/entities/Seller'
-import { Injectable } from '@nestjs/common'
-import { UniqueEntityId } from '@shared/core/entities/valueObjects/UniqueEntityId'
+import {
+  CollaboratorCreatePropsOptional,
+  CollaboratorRole,
+} from '@modules/collaborator/entities/Collaborator'
+import { Seller } from '@modules/seller/entities/Seller'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export function makeSeller(
-  override: Partial<SellerProps> = {},
+  override: Partial<
+    CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+  > = {},
   id?: UniqueEntityId,
 ): Seller {
   const seller = Seller.create(
     {
-      login: fakerPT_BR.person.firstName(),
-      name: fakerPT_BR.person.fullName(),
+      email: fakerPT_BR.internet.email(),
+      actualRemuneration: fakerPT_BR.number.int(),
+      marketId: new UniqueEntityId(),
+      userId: new UniqueEntityId(),
       password: fakerPT_BR.internet.password(),
       ...override,
     },
@@ -22,17 +27,22 @@ export function makeSeller(
   return seller
 }
 
-@Injectable()
-export class MakeSeller {
-  constructor(private readonly prisma: PrismaService) {}
+// @Injectable()
+// export class MakeSeller {
+//   constructor(private readonly prisma: PrismaService) {}
 
-  async create(override: Partial<SellerProps> = {}, id?: UniqueEntityId) {
-    const seller = makeSeller(override, id)
+//   async create(
+//     override: Partial<
+//       CollaboratorCreatePropsOptional<CollaboratorRole.SELLER>
+//     > = {},
+//     id?: UniqueEntityId,
+//   ) {
+//     const seller = makeSeller(override, id)
 
-    await this.prisma.collaborator.create({
-      data: SellerPrismaMapper.toPrisma(seller),
-    })
+//     await this.prisma.collaborator.create({
+//       data: SellersPrismaMapper.toPrisma(seller),
+//     })
 
-    return seller
-  }
-}
+//     return seller
+//   }
+// }
