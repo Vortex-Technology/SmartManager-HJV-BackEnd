@@ -1,4 +1,4 @@
-import { ZodValidationPipe } from '@shared/pipes/zodValidation'
+import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
 import { z } from 'zod'
 
 const generateApiKeyParamsSchema = z.object({

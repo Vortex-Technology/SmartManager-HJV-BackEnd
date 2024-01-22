@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ZodValidationPipe } from '@shared/pipes/zodValidation'
+import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
 
 const createUserBodySchema = z.object({
   email: z.string().email(),
