@@ -1,60 +1,54 @@
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
-import { AppModule } from '@infra/app.module'
 import { statusCode } from 'src/config/statusCode'
-import { MakeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
-import { CryptographyModule } from '@providers/cryptography/cryptography.module'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
-import { DatabaseModule } from '@infra/database/database.module'
 import request from 'supertest'
-import {
-  Administrator,
-  AdministratorRole,
-} from '@modules/administrator/entities/Administrator'
 import { MakeRefreshToken } from '@test/factories/modules/refreshToken/makeRefreshToken'
+import { MakeUser } from '@test/factories/modules/user/makeUser'
+import { User } from '@modules/user/entities/User'
+import { AppModule } from '@infra/App.module'
+import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
+import { DatabaseModule } from '@infra/database/Database.module'
 
 describe('Refresh token (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
-  let makeAdministrator: MakeAdministrator
+  let makeUser: MakeUser
   let makeRefreshToken: MakeRefreshToken
   let hasherGenerator: HashGenerator
   let encrypter: Encrypter
-  let master: Administrator
+  let user: User
   let token: string
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, CryptographyModule, DatabaseModule],
-      providers: [MakeAdministrator, MakeRefreshToken],
+      providers: [MakeUser, MakeRefreshToken],
     }).compile()
 
     app = moduleRef.createNestApplication()
     prisma = moduleRef.get(PrismaService)
-    makeAdministrator = moduleRef.get(MakeAdministrator)
+    makeUser = moduleRef.get(MakeUser)
     makeRefreshToken = moduleRef.get(MakeRefreshToken)
     hasherGenerator = moduleRef.get(HashGenerator)
     encrypter = moduleRef.get(Encrypter)
 
     const hashedPassword = await hasherGenerator.hash('12345678')
 
-    master = await makeAdministrator.create({
-      name: 'master',
-      login: 'master',
-      role: AdministratorRole.MASTER,
+    user = await makeUser.create({
+      name: 'user',
+      email: 'jonas@joans.com',
       password: hashedPassword,
     })
 
     token = await encrypter.encrypt({
-      sub: master.id.toString(),
-      role: master.role,
-      type: 'ADMINISTRATOR',
+      sub: user.id.toString(),
     })
 
     await makeRefreshToken.create({
-      collaboratorId: master.id,
+      userId: user.id,
       token,
     })
 
@@ -79,7 +73,7 @@ describe('Refresh token (E2E)', () => {
 
     const refreshTokensOnDatabase = await prisma.refreshToken.count({
       where: {
-        collaboratorId: master.id.toString(),
+        userId: user.id.toString(),
       },
     })
 
