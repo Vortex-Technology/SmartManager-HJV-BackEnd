@@ -4,7 +4,7 @@ import { MarketsInMemoryRepository } from '@test/repositories/modules/market/Mar
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
 import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
 import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
-import { GenerateApiKeyService } from './GenerateApiKey.service'
+import { GenerateApiKeyCompanyService } from './GenerateApiKeyCompany.service'
 import { ApiKeysInMemoryRepository } from '@test/repositories/modules/company/ApiKeysInMemoryRepository'
 import { FakeHasher } from '@test/repositories/providers/cryptography/fakeHasher'
 import { makeCompany } from '@test/factories/modules/company/makeCompany'
@@ -25,7 +25,7 @@ let companiesInMemoryRepository: CompaniesInMemoryRepository
 let apiKeysInMemoryRepository: ApiKeysInMemoryRepository
 let fakeHasher: FakeHasher
 
-let sut: GenerateApiKeyService
+let sut: GenerateApiKeyCompanyService
 
 describe('Generate api key', () => {
   beforeEach(() => {
@@ -48,7 +48,7 @@ describe('Generate api key', () => {
     apiKeysInMemoryRepository = new ApiKeysInMemoryRepository()
     fakeHasher = new FakeHasher()
 
-    sut = new GenerateApiKeyService(
+    sut = new GenerateApiKeyCompanyService(
       ownersInMemoryRepository,
       companiesInMemoryRepository,
       apiKeysInMemoryRepository,

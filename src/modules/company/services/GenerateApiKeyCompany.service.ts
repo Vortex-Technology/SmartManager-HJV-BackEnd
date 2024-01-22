@@ -21,7 +21,7 @@ type Response = Either<
 >
 
 @Injectable()
-export class GenerateApiKeyService {
+export class GenerateApiKeyCompanyService {
   constructor(
     private readonly ownersRepository: OwnersRepository,
     private readonly companiesRepository: CompaniesRepository,
