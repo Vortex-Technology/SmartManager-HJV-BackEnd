@@ -1,6 +1,21 @@
 version: "3.8"
 
+networks:
+  local:
+    driver: bridge
+
 services:
+  redis:
+    container_name: smart-manager-redis
+    image: redis/redis-stack:latest
+    ports:
+      - 6379:6379
+      - 8001:8001
+    volumes:
+      - ./data/redis:/data
+    networks:
+      - local
+
   postgres:
     container_name: smart-manager-db
     # For prodution is recomendly use bitnami images
@@ -14,3 +29,5 @@ services:
       PGDATA: /data/postgres
     volumes:
       - ./data/pg:/data/postgres
+    networks:
+      - local

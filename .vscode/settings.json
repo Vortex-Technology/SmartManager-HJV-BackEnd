@@ -1,4 +1,9 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
   "material-icon-theme.activeIconPack": "nest",
   "material-icon-theme.folders.associations": {
     "strategy": "utils",
@@ -9,14 +14,19 @@
     "presenters": "typescript",
     "repositories": "database",
     "implementations": "controller",
-    "entities": "class"
+    "entities": "class",
+    "gateways": "typescript",
   },
   "cSpell.words": [
     "alvaro",
     "encrypter",
     "Encrypter",
+    "fkey",
     "hasher",
+    "KG",
+    "pkey",
     "strategys",
+    "unexistendt",
     "websockets"
   ]
 }
