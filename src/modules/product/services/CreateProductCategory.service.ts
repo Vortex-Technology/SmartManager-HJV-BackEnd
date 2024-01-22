@@ -1,12 +1,12 @@
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
-import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
-import { AdministratorRepository } from '@modules/administrator/repositories/AdministratorRepository'
 import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { ProductCategory } from '../entities/ProductCategory'
 import { ProductCategoriesRepository } from '../repositories/ProductCategoriesRepository'
 import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
+import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 
 interface Request {
   name: string
@@ -15,7 +15,7 @@ interface Request {
 }
 
 type Response = Either<
-  AdministratorNotFount | ProductCategoryAlreadyExists,
+  CollaboratorNotFound | ProductCategoryAlreadyExists,
   {
     productCategory: ProductCategory
   }
@@ -24,21 +24,21 @@ type Response = Either<
 @Injectable()
 export class CreateProductCategoryService {
   constructor(
-    private readonly administratorRepository: AdministratorRepository,
-    private readonly productCategoryRepository: ProductCategoriesRepository,
+    private readonly collaboratorsRepository: CollaboratorsRepository,
+    private readonly productCategoriesRepository: ProductCategoriesRepository,
   ) {}
 
   async execute({ creatorId, name, description }: Request): Promise<Response> {
     const acceptCreateProductCategoryForRoles = [
-      AdministratorRole.MASTER,
-      AdministratorRole.FULL_ACCESS,
-      AdministratorRole.EDITOR,
+      CollaboratorRole.OWNER,
+      CollaboratorRole.MANAGER,
+      CollaboratorRole.STOCKIST,
     ]
 
-    const creator = await this.administratorRepository.findById(creatorId)
+    const creator = await this.collaboratorsRepository.findById(creatorId)
 
     if (!creator) {
-      return left(new AdministratorNotFount())
+      return left(new CollaboratorNotFound())
     }
 
     if (!acceptCreateProductCategoryForRoles.includes(creator.role)) {
@@ -51,13 +51,13 @@ export class CreateProductCategoryService {
     })
 
     const productCategoryExists =
-      await this.productCategoryRepository.findByName(productCategory.name)
+      await this.productCategoriesRepository.findByName(productCategory.name)
 
     if (productCategoryExists) {
       return left(new ProductCategoryAlreadyExists())
     }
 
-    await this.productCategoryRepository.create(productCategory)
+    await this.productCategoriesRepository.create(productCategory)
 
     return right({
       productCategory,

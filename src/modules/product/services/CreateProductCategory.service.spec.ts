@@ -1,42 +1,38 @@
-import { AdministratorInMemoryRepository } from '@test/repositories/modules/administrator/AdministratorInMemoryRepository'
-import { makeAdministrator } from '@test/factories/modules/administrator/makeAdministrator'
-import { CreateProductCategoryService } from './createProductCategory.service'
-import { AdministratorRole } from '@modules/administrator/entities/Administrator'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
-import { AdministratorNotFount } from '@modules/administrator/errors/AdministratorNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'
 import { makeProductCategory } from '@test/factories/modules/product/makeProductCategory'
-import { ProductCategoryInMemoryRepository } from '@test/repositories/modules/product/ProductCategoryInMemoryRepository'
+import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
+import { ProductCategoriesInMemoryRepository } from '@test/repositories/modules/product/ProductCategoriesInMemoryRepository'
+import { CreateProductCategoryService } from './CreateProductCategory.service'
+import { makeManager } from '@test/factories/modules/manager/makeManager'
+import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { makeSeller } from '@test/factories/modules/seller/makeSeller'
 
-let administratorInMemoryRepository: AdministratorInMemoryRepository
-let productCategoryInMemoryRepository: ProductCategoryInMemoryRepository
+let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
+let productCategoriesInMemoryRepository: ProductCategoriesInMemoryRepository
 
 let sut: CreateProductCategoryService
 
 describe('Create product category', () => {
   beforeEach(() => {
-    administratorInMemoryRepository = new AdministratorInMemoryRepository()
-    productCategoryInMemoryRepository = new ProductCategoryInMemoryRepository()
+    collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+    productCategoriesInMemoryRepository =
+      new ProductCategoriesInMemoryRepository()
 
     sut = new CreateProductCategoryService(
-      administratorInMemoryRepository,
-      productCategoryInMemoryRepository,
+      collaboratorsInMemoryRepository,
+      productCategoriesInMemoryRepository,
     )
   })
 
   it('should be able to create a new product category', async () => {
-    const administrator = makeAdministrator(
-      {
-        role: AdministratorRole.FULL_ACCESS,
-      },
-      new UniqueEntityId('1'),
-    )
+    const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
 
-    await administratorInMemoryRepository.create(administrator)
+    await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
-      creatorId: '1',
+      creatorId: 'manager-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
@@ -44,19 +40,19 @@ describe('Create product category', () => {
     expect(response.isRight()).toBe(true)
 
     if (response.isRight()) {
-      expect(productCategoryInMemoryRepository.productCategories).toHaveLength(
-        1,
-      )
       expect(
-        productCategoryInMemoryRepository.productCategories[0].name,
+        productCategoriesInMemoryRepository.productCategories,
+      ).toHaveLength(1)
+      expect(
+        productCategoriesInMemoryRepository.productCategories[0].name,
       ).toEqual('product-category')
       expect(
-        productCategoryInMemoryRepository.productCategories[0].description,
+        productCategoriesInMemoryRepository.productCategories[0].description,
       ).toEqual('A new product category to test the creation')
     }
   })
 
-  it("not should be able to create a new product category if administrator doesn't exist", async () => {
+  it("not should be able to create a new product category if collaborator doesn't exist", async () => {
     const response = await sut.execute({
       creatorId: 'inexistent-creator-id',
       name: 'Product category',
@@ -64,21 +60,16 @@ describe('Create product category', () => {
     })
 
     expect(response.isLeft()).toBe(true)
-    expect(response.value).toBeInstanceOf(AdministratorNotFount)
+    expect(response.value).toBeInstanceOf(CollaboratorNotFound)
   })
 
-  it("not should be able to create a new product category if administrator doesn't have necessary role", async () => {
-    const administrator = makeAdministrator(
-      {
-        role: AdministratorRole.VIEWER,
-      },
-      new UniqueEntityId('1'),
-    )
+  it("not should be able to create a new product category if collaborator doesn't have necessary role", async () => {
+    const collaborator = makeSeller({}, new UniqueEntityId('seller-1'))
 
-    await administratorInMemoryRepository.create(administrator)
+    await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
-      creatorId: '1',
+      creatorId: 'seller-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
@@ -88,21 +79,16 @@ describe('Create product category', () => {
   })
 
   it('not should be able to create a new product category if already exist one with same name', async () => {
-    const administrator = makeAdministrator(
-      {
-        role: AdministratorRole.EDITOR,
-      },
-      new UniqueEntityId('1'),
-    )
+    const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
     const productCategory = makeProductCategory({
       name: 'product-category',
     })
 
-    await administratorInMemoryRepository.create(administrator)
-    await productCategoryInMemoryRepository.create(productCategory)
+    await collaboratorsInMemoryRepository.create(collaborator)
+    await productCategoriesInMemoryRepository.create(productCategory)
 
     const response = await sut.execute({
-      creatorId: '1',
+      creatorId: 'manager-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
