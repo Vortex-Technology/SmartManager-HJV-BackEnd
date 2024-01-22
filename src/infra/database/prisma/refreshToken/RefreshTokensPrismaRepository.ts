@@ -14,30 +14,26 @@ export class RefreshTokensPrismaRepository implements RefreshTokensRepository {
     })
   }
 
-  async findByCollaboratorIdAndRefreshToken(props: {
-    collaboratorId: string
+  async findByUserIdAndRefreshToken(props: {
+    userId: string
     refreshToken: string
   }): Promise<RefreshToken | null> {
     const refreshToken = await this.prisma.refreshToken.findFirst({
       where: {
-        userId: props.collaboratorId,
+        userId: props.userId,
         token: props.refreshToken,
       },
     })
 
-    if (!refreshToken) {
-      return null
-    }
+    if (!refreshToken) return null
 
     return RefreshTokensPrismaMapper.toEntity(refreshToken)
   }
 
-  async permanentlyDeleteByCollaboratorId(
-    collaboratorId: string,
-  ): Promise<void> {
+  async permanentlyDeleteByUserId(userId: string): Promise<void> {
     await this.prisma.refreshToken.deleteMany({
       where: {
-        userId: collaboratorId,
+        userId,
       },
     })
   }

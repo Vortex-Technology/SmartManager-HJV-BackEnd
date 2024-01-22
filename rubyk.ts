@@ -294,7 +294,7 @@ export const config: Config = {
             },
           ],
           returns: {
-            type: ['Prisma.-{^module}-CreateUncheckedInput'],
+            type: ['Prisma.-{^module}-UncheckedCreateInput'],
           },
         },
       ],

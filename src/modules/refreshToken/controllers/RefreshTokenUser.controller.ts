@@ -15,10 +15,10 @@ import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorN
 import {
   RefreshTokenBody,
   refreshTokenBodyValidationPipe,
-} from '../gateways/RefreshToken.gateway'
+} from '../gateways/RefreshTokenUser.gateway'
 
 @Controller('/refreshTokens')
-export class RefreshTokenController {
+export class RefreshTokenUserController {
   constructor(private readonly refreshTokenService: RefreshTokenUserService) {}
 
   @Post()

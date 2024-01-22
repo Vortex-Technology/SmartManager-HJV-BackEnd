@@ -9,6 +9,10 @@ import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 
 export class SellersPrismaMapper {
   static toEntity(raw: SellerPrisma): Seller {
+    if (!raw.marketId) {
+      throw new Error('Market not exist in seller')
+    }
+
     return Seller.create(
       {
         actualRemuneration: raw.actualRemuneration,
@@ -27,6 +31,10 @@ export class SellersPrismaMapper {
   }
 
   static toPrisma(seller: Seller): Prisma.CollaboratorUncheckedCreateInput {
+    if (!seller.marketId) {
+      throw new Error('Market not exist in seller')
+    }
+
     return {
       actualRemuneration: seller.actualRemuneration,
       email: seller.email,

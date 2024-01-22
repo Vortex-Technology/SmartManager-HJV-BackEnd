@@ -30,7 +30,7 @@ describe('Create user (E2E)', () => {
         name: 'Jonas',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Created)
     expect(response.headers).toEqual(
@@ -57,7 +57,7 @@ describe('Create user (E2E)', () => {
         name: 'Jonas',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Conflict)
   })

@@ -22,6 +22,10 @@ import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepo
 import { CompaniesPrismaRepository } from './prisma/company/CompaniesPrismaRepository'
 import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
 import { MarketsPrismaRepository } from './prisma/market/MarketsPrismaRepository'
+import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
+import { OwnersPrismaRepository } from './prisma/owner/OwnersPrismaRepository'
+import { ApiKeysRepository } from '@modules/company/repositories/ApiKeysRepository'
+import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepository'
 
 @Module({
   providers: [
@@ -71,6 +75,14 @@ import { MarketsPrismaRepository } from './prisma/market/MarketsPrismaRepository
       provide: UsersRepository,
       useClass: UsersPrismaRepository,
     },
+    {
+      provide: OwnersRepository,
+      useClass: OwnersPrismaRepository,
+    },
+    {
+      provide: ApiKeysRepository,
+      useClass: ApiKeysPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -84,6 +96,8 @@ import { MarketsPrismaRepository } from './prisma/market/MarketsPrismaRepository
     UsersRepository,
     MarketsRepository,
     CompaniesRepository,
+    OwnersRepository,
+    ApiKeysRepository,
   ],
 })
 export class DatabaseModule {}

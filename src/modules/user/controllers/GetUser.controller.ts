@@ -10,7 +10,7 @@ import { statusCode } from 'src/config/statusCode'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { UserPresenter } from '../presenters/UserPresenter'
-import { UserNotFount } from '../errors/UserNotFound'
+import { UserNotFound } from '../errors/UserNotFound'
 
 @Controller('/users')
 export class GetUserController {
@@ -29,7 +29,7 @@ export class GetUserController {
       const error = response.value
 
       switch (error.constructor) {
-        case UserNotFount: {
+        case UserNotFound: {
           throw new ConflictException(error.message)
         }
 

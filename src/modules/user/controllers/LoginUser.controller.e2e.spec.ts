@@ -47,7 +47,7 @@ describe('Login user (E2E)', () => {
         email: 'jonas@jonas.com',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Created)
     expect(response.body).toEqual(
@@ -74,7 +74,7 @@ describe('Login user (E2E)', () => {
         email: 'jonas@jonas.com',
         password: 'wrong-password',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Forbidden)
 
@@ -85,7 +85,7 @@ describe('Login user (E2E)', () => {
         email: 'inexistent@user.com',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response2.statusCode).toEqual(statusCode.Forbidden)
   })

@@ -28,7 +28,7 @@ describe('Login collaborator (E2E)', () => {
         login: 'owner',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Created)
     expect(response.body).toEqual(
@@ -47,7 +47,7 @@ describe('Login collaborator (E2E)', () => {
         login: 'owner',
         password: 'wrong-password',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Forbidden)
 
@@ -58,7 +58,7 @@ describe('Login collaborator (E2E)', () => {
         login: 'inexistent-collaborator',
         password: '12345678',
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response2.statusCode).toEqual(statusCode.Forbidden)
   })

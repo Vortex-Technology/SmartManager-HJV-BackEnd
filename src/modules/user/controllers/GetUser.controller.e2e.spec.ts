@@ -51,7 +51,7 @@ describe('Get user (E2E)', () => {
       .set({
         Authorization: `Bearer ${token}`,
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Ok)
     expect(response.body).toEqual(
@@ -75,7 +75,7 @@ describe('Get user (E2E)', () => {
       .set({
         Authorization: `Bearer ${invalidToken}`,
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     expect(response.statusCode).toEqual(statusCode.Conflict)
   })

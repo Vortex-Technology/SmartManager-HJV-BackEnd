@@ -1,5 +1,5 @@
 import { BadRequestException } from '@nestjs/common'
-import { createProductBodyValidationPipe } from './createProduct.gateway'
+import { createProductBodyValidationPipe } from './CreateProduct.gateway'
 
 describe('should create product', () => {
   it('should be able  to validate body a new product', () => {

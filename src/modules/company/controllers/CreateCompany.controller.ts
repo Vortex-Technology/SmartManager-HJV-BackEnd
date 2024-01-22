@@ -13,7 +13,7 @@ import { CreateCompanyService } from '../services/CreateCompany.service'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { CompanyDocumentationType } from '../entities/Company'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
 import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import {
@@ -44,7 +44,7 @@ export class CreateCompanyController {
       const error = response.value
 
       switch (error.constructor) {
-        case UserNotFount:
+        case UserNotFound:
         case DocumentationsIsMissing:
         case InsufficientMarkets: {
           throw new ConflictException(error.message)

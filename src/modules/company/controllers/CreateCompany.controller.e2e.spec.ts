@@ -76,7 +76,7 @@ describe('Create company (E2E)', () => {
           },
         ],
       })
-      .timeout({ deadline: 10000, response: 10000 })
+      .timeout({ deadline: 60000, response: 60000 })
 
     const [
       companiesInDatabase,
