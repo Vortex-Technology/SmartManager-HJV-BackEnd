@@ -3,7 +3,7 @@ import { CreateMarketService } from './CreateMarket.service'
 import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
 import { makeUser } from '@test/factories/modules/user/makeUser'
 import { Market } from '../entities/Market'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
 import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
 import { makeCompany } from '@test/factories/modules/company/makeCompany'
@@ -116,7 +116,7 @@ describe('Create market', () => {
     })
 
     expect(response.isLeft()).toBe(true)
-    expect(response.value).toBeInstanceOf(UserNotFount)
+    expect(response.value).toBeInstanceOf(UserNotFound)
     expect(companiesInMemoryRepository.companies).toHaveLength(1)
     expect(marketsInMemoryRepository.markets).toHaveLength(0)
   })

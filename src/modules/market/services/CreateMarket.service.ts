@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { Either, left, right } from '@shared/core/error/Either'
-import { UserNotFount } from '@modules/user/errors/UserNotFound'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 import { UsersRepository } from '@modules/user/repositories/UsersRepository'
 import { Market } from '@modules/market/entities/Market'
 import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
@@ -8,6 +8,7 @@ import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { CompanyMarketsList } from '@modules/company/entities/CompanyMarketsList'
 import { Inventory } from '@modules/inventory/entities/Inventory'
+import { Address } from '@shared/core/valueObjects/Address'
 
 interface Request {
   tradeName: string
@@ -23,7 +24,7 @@ interface Request {
   ownerId: string
 }
 
-type Response = Either<UserNotFount | CompanyNotFound, { market: Market }>
+type Response = Either<UserNotFound | CompanyNotFound, { market: Market }>
 
 @Injectable()
 export class CreateMarketService {
@@ -54,7 +55,7 @@ export class CreateMarketService {
     const owner = await this.usersRepository.findById(ownerId)
 
     if (!owner) {
-      return left(new UserNotFount())
+      return left(new UserNotFound())
     }
 
     if (!company.ownerId.equals(owner.id)) {
@@ -65,19 +66,23 @@ export class CreateMarketService {
       name: `${tradeName} - Estoque`,
     })
 
-    const market = Market.create({
+    const address = Address.create({
       city,
-      companyId: company.id,
       neighborhood,
       number,
       postalCode,
       state,
       street,
-      tradeName,
       complement,
       country,
+    })
+
+    const market = Market.create({
+      companyId: company.id,
+      tradeName,
       inventoryId: inventory.id,
       inventory,
+      address,
     })
 
     company.markets = new CompanyMarketsList()
