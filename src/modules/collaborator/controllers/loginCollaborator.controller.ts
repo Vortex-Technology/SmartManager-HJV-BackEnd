@@ -6,20 +6,14 @@ import {
   HttpCode,
   Post,
 } from '@nestjs/common'
-import { ZodValidationPipe } from '@shared/pipes/zodValidation'
 import { statusCode } from 'src/config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
-import { z } from 'zod'
 import { LoginCollaboratorService } from '../services/LoginCollaborator.service'
-
-const loginCollaboratorBodySchema = z.object({
-  login: z.string().min(4).max(30),
-  password: z.string().min(8),
-})
-
-type LoginCollaboratorBody = z.infer<typeof loginCollaboratorBodySchema>
-const bodyValidationPipe = new ZodValidationPipe(loginCollaboratorBodySchema)
+import {
+  LoginCollaboratorBody,
+  loginCollaboratorBodyValidationPipe,
+} from '../gateways/loginCollaborator.gateway'
 
 @Controller('/collaborators/login')
 export class LoginCollaboratorController {
@@ -30,10 +24,13 @@ export class LoginCollaboratorController {
   @Post()
   @HttpCode(statusCode.Created)
   @Public()
-  async handle(@Body(bodyValidationPipe) body: LoginCollaboratorBody) {
+  async handle(
+    @Body(loginCollaboratorBodyValidationPipe) body: LoginCollaboratorBody,
+  ) {
     const { login, password } = body
 
     const response = await this.loginCollaboratorService.execute({
+      
       login,
       password,
     })
