@@ -36,7 +36,7 @@ describe('Address Prisma Mapper', () => {
       number: '1',
       postalCode: '123',
       state: 'San Francisco',
-      street: 'San vile',
+      street: 'San ville',
     })
 
     const result = AddressesPrismaMapper.toPrisma(address)
@@ -48,6 +48,6 @@ describe('Address Prisma Mapper', () => {
     expect(result.number).toBe('1')
     expect(result.postalCode).toBe('123')
     expect(result.state).toBe('San Francisco')
-    expect(result.street).toBe('San vile')
+    expect(result.street).toBe('San ville')
   })
 })
