@@ -58,4 +58,20 @@ export class CompaniesPrismaRepository implements CompaniesRepository {
       await this.marketsRepository.createMany(markets)
     }
   }
+
+  async findByIdWithOwner(companyId: string): Promise<Company | null> {
+    const company = await this.prisma.company.findUnique({
+      where: {
+        id: companyId,
+      },
+      include: {
+        address: true,
+        owner: true,
+      },
+    })
+
+    if (!company) return null
+
+    return CompaniesPrismaMapper.toEntity(company)
+  }
 }
