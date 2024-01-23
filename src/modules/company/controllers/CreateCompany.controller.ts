@@ -7,7 +7,7 @@ import {
   Post,
   Res,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { Response } from 'express'
 import { CreateCompanyService } from '../services/CreateCompany.service'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'

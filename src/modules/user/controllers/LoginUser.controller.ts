@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common'
 import { UserWrongCredentials } from '../errors/UserWrongCredentials'
 import { LoginUserService } from '../services/LoginUser.service'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import {
   LoginUserBody,

@@ -7,7 +7,7 @@ import {
   Param,
   Post,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
 import { LoginCollaboratorService } from '../services/LoginCollaborator.service'

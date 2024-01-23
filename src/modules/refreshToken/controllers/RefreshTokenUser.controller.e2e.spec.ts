@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import request from 'supertest'

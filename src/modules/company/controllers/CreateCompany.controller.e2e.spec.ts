@@ -1,6 +1,6 @@
 import { Test } from '@nestjs/testing'
 import { INestApplication } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { MakeUser } from '@test/factories/modules/user/makeUser'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
