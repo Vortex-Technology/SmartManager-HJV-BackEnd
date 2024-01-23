@@ -12,7 +12,7 @@ import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { AddressesPrismaMapper } from '../address/AddressesPrismaMapper'
 import { CollaboratorsPrismaMapper } from '../collaborator/CollaboratorsPrismaMapper'
 
-type CompanyWithAddressAndOwnerIdPrisma = CompanyPrisma & {
+export type CompanyWithAddressAndOwnerIdPrisma = CompanyPrisma & {
   address: AddressPrisma
   owner: {
     id: string
@@ -84,7 +84,7 @@ export class CompaniesPrismaMapper {
 
   static toUpdatePrisma(company: Company): Prisma.CompanyUpdateInput {
     if (!company.owner) {
-      throw new Error('Owner not set in creation of company')
+      throw new Error('Owner not set in process update of company')
     }
 
     return {
