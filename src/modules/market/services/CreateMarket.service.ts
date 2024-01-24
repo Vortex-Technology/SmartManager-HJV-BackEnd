@@ -60,7 +60,7 @@ export class CreateMarketService {
       return left(new CollaboratorNotFound())
     }
 
-    const company = await this.companiesRepository.findById(companyId)
+    const company = await this.companiesRepository.findByIdWithOwner(companyId)
     if (!company) {
       return left(new CompanyNotFound())
     }

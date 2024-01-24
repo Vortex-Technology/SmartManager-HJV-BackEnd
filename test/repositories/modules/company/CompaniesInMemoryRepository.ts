@@ -52,4 +52,24 @@ export class CompaniesInMemoryRepository implements CompaniesRepository {
       await this.marketsInMemoryRepository.createMany(markets)
     }
   }
+
+  async findByIdWithOwner(companyId: string): Promise<Company | null> {
+    const company = this.companies.find(
+      (company) => company.id.toString() === companyId,
+    )
+
+    if (!company) return null
+
+    const owner = await this.ownersInMemoryRepository.findById(
+      company.ownerId.toString(),
+    )
+
+    if (!owner) {
+      throw new Error('Owner not set in findByIdWithOwner')
+    }
+
+    company.owner = owner
+
+    return company
+  }
 }

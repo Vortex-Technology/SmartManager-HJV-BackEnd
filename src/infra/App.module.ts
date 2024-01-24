@@ -6,6 +6,7 @@ import { SocketModule } from '@providers/socket/Socket.module'
 import { AuthProvider } from '@providers/auth/Auth.module'
 import { UserModule } from '@modules/user/User.module'
 import { CompanyModule } from '@modules/company/Company.module'
+import { MarketModule } from '@modules/market/Market.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { CompanyModule } from '@modules/company/Company.module'
     // SellerModule,
     UserModule,
     CompanyModule,
+    MarketModule,
     SocketModule,
     AuthProvider,
     EnvModule,

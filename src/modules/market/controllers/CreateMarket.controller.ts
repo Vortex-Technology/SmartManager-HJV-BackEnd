@@ -29,16 +29,18 @@ import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { Roles } from '@providers/auth/decorators/roles.decorator'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
+import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
 
+@UseGuards(ApiKeyGuard)
 @Controller('/companies/:companyId/markets')
 export class CreateMarketController {
   constructor(private readonly createMarketService: CreateMarketService) {}
 
   @Post()
+  @AuthCollaborator()
   @HttpCode(statusCode.Created)
-  @UseGuards(ApiKeyGuard)
-  @UseGuards(JwtRoleGuard)
   @Roles([CollaboratorRole.MANAGER, CollaboratorRole.OWNER])
+  @UseGuards(JwtRoleGuard)
   async handle(
     @Body(createMarketBodyValidationPipe) body: CreateMarketBody,
     @Param(createMarketParamsValidationPipe) params: CreateMarketParams,

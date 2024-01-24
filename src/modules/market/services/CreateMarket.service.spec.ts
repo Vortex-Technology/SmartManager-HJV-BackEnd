@@ -12,30 +12,37 @@ import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
 
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
+let ownersInMemoryRepository: OwnersInMemoryRepository
 
 let sut: CreateMarketService
 
 describe('Create market', () => {
   beforeEach(() => {
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
+
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
       productVariantInventoriesInMemoryRepository,
     )
-    collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
     marketsInMemoryRepository = new MarketsInMemoryRepository(
       collaboratorsInMemoryRepository,
       inventoriesInMemoryRepository,
     )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
+      ownersInMemoryRepository,
     )
 
     sut = new CreateMarketService(
@@ -49,14 +56,14 @@ describe('Create market', () => {
       {
         companyId: new UniqueEntityId('company-1'),
       },
-      new UniqueEntityId('manager-1'),
+      new UniqueEntityId('owner-1'),
     )
-    await collaboratorsInMemoryRepository.create(creator)
 
     const company = makeCompany(
-      { ownerId: creator.id },
+      { ownerId: creator.id, owner: creator },
       new UniqueEntityId('company-1'),
     )
+
     await companiesInMemoryRepository.create(company)
 
     const response = await sut.execute({
@@ -67,7 +74,7 @@ describe('Create market', () => {
       state: 'SP',
       street: 'Avenida Brigadeiro Faria Lima',
       tradeName: 'Vortex',
-      creatorId: 'manager-1',
+      creatorId: 'owner-1',
       companyId: 'company-1',
     })
 
@@ -129,8 +136,10 @@ describe('Create market', () => {
     const creator = makeManager({}, new UniqueEntityId('manager-1'))
     await collaboratorsInMemoryRepository.create(creator)
 
+    const otherOwner = makeOwner()
+
     const company = makeCompany(
-      { ownerId: new UniqueEntityId('other-manager-id') },
+      { ownerId: otherOwner.id, owner: otherOwner },
       new UniqueEntityId('company-1'),
     )
     await companiesInMemoryRepository.create(company)
