@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
