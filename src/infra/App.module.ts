@@ -7,6 +7,7 @@ import { AuthProvider } from '@providers/auth/Auth.module'
 import { UserModule } from '@modules/user/User.module'
 import { CompanyModule } from '@modules/company/Company.module'
 import { MarketModule } from '@modules/market/Market.module'
+import { ProductModule } from '@modules/product/Product.module'
 
 @Module({
   imports: [
@@ -16,12 +17,12 @@ import { MarketModule } from '@modules/market/Market.module'
     }),
     // CollaboratorModule,
     // RefreshTokenModule,
-    // ProductModule,
     // SellerModule,
     UserModule,
     CompanyModule,
     MarketModule,
     SocketModule,
+    ProductModule,
     AuthProvider,
     EnvModule,
   ],

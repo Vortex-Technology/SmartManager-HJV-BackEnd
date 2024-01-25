@@ -6,9 +6,10 @@ import { CreateMarketController } from './controllers/CreateMarket.controller'
 import { ValidateApiKeyService } from '@modules/company/services/ValidateApiKey.service'
 import { AddCollaboratorMarketController } from './controllers/AddCollaboratorMarket.controller'
 import { AddCollaboratorMarketService } from './services/AddCollaboratorMarket.service'
+import { InterceptorsModule } from '@modules/interceptors/Interceptors.module'
 
 @Module({
-  imports: [DatabaseModule, CryptographyModule],
+  imports: [DatabaseModule, CryptographyModule, InterceptorsModule],
   providers: [
     CreateMarketService,
     ValidateApiKeyService,
