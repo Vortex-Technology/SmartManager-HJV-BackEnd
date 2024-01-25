@@ -1,13 +1,14 @@
 import { Market } from '@modules/market/entities/Market'
 import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
-import { PrismaService } from '../index.service'
+import { PrismaConfig, PrismaService } from '../index.service'
 import { MarketsPrismaMapper } from './MarketsPrismaMapper'
-import { AddressesPrismaMapper } from '../address/AddressesPrismaMapper'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
-export class MarketsPrismaRepository implements MarketsRepository {
+export class MarketsPrismaRepository
+  implements MarketsRepository<PrismaConfig>
+{
   constructor(
     private readonly prisma: PrismaService,
     private readonly collaboratorsRepository: CollaboratorsRepository,
@@ -15,26 +16,10 @@ export class MarketsPrismaRepository implements MarketsRepository {
 
   async createMany(markets: Market[]): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
-      const data = markets.map((market) => ({
-        market,
-        address: market.address,
-      }))
-
       return Promise.all(
-        data.map(async (d) => {
-          const address = await prisma.address.create({
-            data: AddressesPrismaMapper.toPrisma(d.address),
-          })
-
+        markets.map(async (market) => {
           await prisma.market.create({
-            data: {
-              ...MarketsPrismaMapper.toCreateWithoutAddressPrisma(d.market),
-              address: {
-                connect: {
-                  id: address.id,
-                },
-              },
-            },
+            data: MarketsPrismaMapper.toCreatePrisma(market),
           })
         }),
       )
@@ -56,8 +41,10 @@ export class MarketsPrismaRepository implements MarketsRepository {
     return MarketsPrismaMapper.toEntity(market)
   }
 
-  async save(market: Market): Promise<void> {
-    await this.prisma.market.update({
+  async save(market: Market, config?: PrismaConfig): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.market.update({
       where: {
         id: market.id.toString(),
       },
@@ -67,7 +54,7 @@ export class MarketsPrismaRepository implements MarketsRepository {
     const collaborators = market.collaborators?.getNewItems()
 
     if (collaborators) {
-      await this.collaboratorsRepository.createMany(collaborators)
+      await this.collaboratorsRepository.createMany(collaborators, config)
     }
   }
 }
