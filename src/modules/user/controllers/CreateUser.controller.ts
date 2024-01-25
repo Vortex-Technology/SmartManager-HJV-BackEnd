@@ -7,7 +7,7 @@ import {
   Post,
   Res,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { CreateUserService } from '../services/CreateUser.service'
 
 import { UserAlreadyExistsWithSameEmail } from '../errors/UserAlreadyExistsWithSameEmail'

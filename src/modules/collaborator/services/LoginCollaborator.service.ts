@@ -117,6 +117,7 @@ export class LoginCollaboratorService {
         marketId: market.id.toString(),
       },
       {
+        algorithm: 'HS256',
         secret: apiKey.secret,
         expiresIn: this.env.get('JWT_USER_ACCESS_EXPIRES_IN'),
       },
@@ -130,6 +131,7 @@ export class LoginCollaboratorService {
         marketId: market.id.toString(),
       },
       {
+        algorithm: 'HS256',
         secret: apiKey.secret,
         expiresIn: this.env.get('JWT_USER_REFRESH_EXPIRES_IN'),
       },

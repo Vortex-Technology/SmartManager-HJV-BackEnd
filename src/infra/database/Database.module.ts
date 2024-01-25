@@ -26,6 +26,8 @@ import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
 import { OwnersPrismaRepository } from './prisma/owner/OwnersPrismaRepository'
 import { ApiKeysRepository } from '@modules/company/repositories/ApiKeysRepository'
 import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepository'
+import { TransactorService } from './transactor/contracts/TransactorService'
+import { TransactorManager } from './transactor/implementations/TransactorManager'
 
 @Module({
   providers: [
@@ -83,6 +85,10 @@ import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepositor
       provide: ApiKeysRepository,
       useClass: ApiKeysPrismaRepository,
     },
+    {
+      provide: TransactorService,
+      useClass: TransactorManager,
+    },
   ],
   exports: [
     PrismaService,
@@ -98,6 +104,7 @@ import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepositor
     CompaniesRepository,
     OwnersRepository,
     ApiKeysRepository,
+    TransactorService,
   ],
 })
 export class DatabaseModule {}

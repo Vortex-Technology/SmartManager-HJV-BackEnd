@@ -7,7 +7,7 @@ import {
   HttpCode,
   Post,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import { SessionExpired } from '../errors/SessionExpired'
 import { RefreshTokenUserService } from '../services/RefreshTokenUser.service'

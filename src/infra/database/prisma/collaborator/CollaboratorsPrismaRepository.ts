@@ -3,7 +3,7 @@ import {
   FindManyByMarketIdProps,
 } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../index.service'
+import { PrismaConfig, PrismaService } from '../index.service'
 import {
   Collaborator,
   CollaboratorRole,
@@ -11,7 +11,9 @@ import {
 import { CollaboratorsPrismaMapper } from './CollaboratorsPrismaMapper'
 
 @Injectable()
-export class CollaboratorsPrismaRepository implements CollaboratorsRepository {
+export class CollaboratorsPrismaRepository
+  implements CollaboratorsRepository<PrismaConfig>
+{
   constructor(private readonly prisma: PrismaService) {}
 
   async findByEmail(
@@ -42,8 +44,11 @@ export class CollaboratorsPrismaRepository implements CollaboratorsRepository {
 
   async createMany(
     collaborator: Collaborator<CollaboratorRole>[],
+    config?: PrismaConfig,
   ): Promise<void> {
-    await this.prisma.collaborator.createMany({
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.collaborator.createMany({
       data: collaborator.map(CollaboratorsPrismaMapper.toPrisma),
     })
   }

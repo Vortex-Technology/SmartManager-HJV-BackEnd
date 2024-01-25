@@ -5,12 +5,16 @@ import { CompanyNotFound } from '../errors/CompanyNotFound'
 import { ApiKeysRepository } from '../repositories/ApiKeysRepository'
 import { ApiKeyIsRevoked } from '../errors/ApiKeyIsRevoked'
 import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
+import { ApiKey } from '../entities/ApiKey'
 
 interface Request {
   key: string
 }
 
-type Response = Either<ApiKeyIsRevoked | CompanyNotFound, { valid: boolean }>
+type Response = Either<
+  ApiKeyIsRevoked | CompanyNotFound,
+  { valid: boolean; apiKey?: ApiKey }
+>
 
 @Injectable()
 export class ValidateApiKeyService {
@@ -46,6 +50,6 @@ export class ValidateApiKeyService {
       key,
     )
 
-    return right({ valid })
+    return right({ valid, apiKey })
   }
 }

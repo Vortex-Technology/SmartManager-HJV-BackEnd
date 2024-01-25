@@ -137,6 +137,10 @@ export class Company extends AggregateRoot<CompanyProps> {
     return this.props.owner
   }
 
+  set owner(owner: Owner | null) {
+    this.props.owner = owner
+  }
+
   get address() {
     return this.props.address
   }

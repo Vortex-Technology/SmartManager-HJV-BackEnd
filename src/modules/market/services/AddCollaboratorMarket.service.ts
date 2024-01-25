@@ -15,6 +15,7 @@ import { User } from '@modules/user/entities/User'
 import { MarketCollaboratorsList } from '../entities/MarketCollaboratorsList'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { TransactorService } from '@infra/database/transactor/contracts/TransactorService'
 
 interface Request {
   name: string
@@ -36,13 +37,14 @@ type Response = Either<
 >
 
 @Injectable()
-export class AddCollaboratorService {
+export class AddCollaboratorMarketService {
   constructor(
     private readonly usersRepository: UsersRepository,
     private readonly companiesRepository: CompaniesRepository,
     private readonly marketsRepository: MarketsRepository,
     private readonly collaboratorsRepository: CollaboratorsRepository,
     private readonly hasherGenerator: HashGenerator,
+    private readonly transactorService: TransactorService,
   ) {}
 
   async execute({
@@ -100,15 +102,19 @@ export class AddCollaboratorService {
     let userOfCollaborator = collaboratorExistAsUser
     const passwordHash = await this.hasherGenerator.hash(password)
 
+    const transactor = this.transactorService.start()
+
     if (!userOfCollaborator) {
-      userOfCollaborator = User.create({
+      const newUser = User.create({
         email,
         name,
         password: passwordHash,
         image,
       })
 
-      await this.usersRepository.create(userOfCollaborator)
+      userOfCollaborator = newUser
+
+      transactor.add((ex) => this.usersRepository.create(newUser, ex))
     }
 
     const collaborator = Collaborator.createUntyped({
@@ -123,7 +129,9 @@ export class AddCollaboratorService {
     market.collaborators = new MarketCollaboratorsList()
     market.collaborators.add(collaborator)
 
-    await this.marketsRepository.save(market)
+    transactor.add((ex) => this.marketsRepository.save(market, ex))
+
+    await this.transactorService.execute(transactor)
 
     return right({
       collaborator,

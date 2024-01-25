@@ -1,7 +1,7 @@
 import { Test } from '@nestjs/testing'
 import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import request from 'supertest'
 import { AppModule } from '@infra/App.module'
 import { DatabaseModule } from '@infra/database/Database.module'

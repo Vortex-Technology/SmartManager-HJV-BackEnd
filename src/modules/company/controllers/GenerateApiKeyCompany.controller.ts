@@ -9,7 +9,7 @@ import {
   Post,
   Res,
 } from '@nestjs/common'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { Response } from 'express'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'

@@ -52,6 +52,31 @@ export class MarketsPrismaMapper {
     }
   }
 
+  static toCreatePrisma(market: Market): Prisma.MarketCreateInput {
+    if (!market.inventory) {
+      throw new Error('Market must have an inventory')
+    }
+
+    return {
+      address: {
+        create: AddressesPrismaMapper.toPrisma(market.address),
+      },
+      company: {
+        connect: {
+          id: market.companyId.toString(),
+        },
+      },
+      inventory: {
+        create: InventoriesPrismaMapper.toPrisma(market.inventory),
+      },
+      tradeName: market.tradeName,
+      id: market.id.toString(),
+      createdAt: market.createdAt,
+      deletedAt: market.deletedAt,
+      updatedAt: market.updatedAt,
+    }
+  }
+
   static toUpdatePrisma(market: Market): Prisma.MarketUpdateInput {
     return {
       address: {

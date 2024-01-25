@@ -17,9 +17,10 @@ export class JwtEncrypter implements Encrypter, Decoder {
 
   async decrypt(
     token: string,
+    options: JwtSignOptions = {},
   ): Promise<{ payload?: TokenPayloadSchema; isValid: boolean }> {
     try {
-      const payload = await this.jwtService.verifyAsync(token)
+      const payload = await this.jwtService.verifyAsync(token, options)
 
       return { payload, isValid: true }
     } catch (error) {

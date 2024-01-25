@@ -6,7 +6,7 @@ import {
   HttpCode,
 } from '@nestjs/common'
 import { GetUserService } from '../services/GetUser.service'
-import { statusCode } from 'src/config/statusCode'
+import { statusCode } from '@config/statusCode'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { UserPresenter } from '../presenters/UserPresenter'
