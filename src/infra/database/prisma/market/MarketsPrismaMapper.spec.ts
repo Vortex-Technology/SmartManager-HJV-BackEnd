@@ -106,4 +106,6 @@ describe('Markets prisma mapper', () => {
         throw err
       })
   })
+
+  it.skip('should be able to map a market to create prisma')
 })
