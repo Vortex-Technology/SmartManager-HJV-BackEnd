@@ -16,6 +16,7 @@ import { ProductVariantsInMemoryRepository } from '@test/repositories/modules/pr
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { makeSeller } from '@test/factories/modules/seller/makeSeller'
+import { FakeTransactor } from '@test/repositories/infra/transactor/fakeTransactor'
 
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let productCategoriesInMemoryRepository: ProductCategoriesInMemoryRepository
@@ -23,11 +24,14 @@ let productsInMemoryRepository: ProductsInMemoryRepository
 let productVariantsInMemoryRepository: ProductVariantsInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
+let fakeTransactor: FakeTransactor
 
 let sut: CreateProductService
 
 describe('Create product', () => {
   beforeEach(() => {
+    fakeTransactor = new FakeTransactor()
+
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
     productCategoriesInMemoryRepository =
       new ProductCategoriesInMemoryRepository()
@@ -47,18 +51,22 @@ describe('Create product', () => {
       productsInMemoryRepository,
       productVariantsInMemoryRepository,
       inventoriesInMemoryRepository,
+      fakeTransactor,
     )
   })
 
   it('should be able to create a new product', async () => {
     const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
-
     await collaboratorsInMemoryRepository.create(collaborator)
+
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
       categories: ['strong category'],
+      inventoryId: 'inventory-1',
       variants: [
         {
           barCode: '123',
@@ -91,8 +99,12 @@ describe('Create product', () => {
   })
 
   it("not should be able to create a new product if collaborator doesn't exist", async () => {
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
+
     const response = await sut.execute({
       creatorId: 'inexistent-manager-id',
+      inventoryId: 'inventory-1',
       name: 'Product category',
       categories: ['strong category'],
       variants: [
@@ -113,13 +125,16 @@ describe('Create product', () => {
 
   it("not should be able to create a new product if collaborator doesn't have necessary role", async () => {
     const collaborator = makeSeller({}, new UniqueEntityId('seller-1'))
-
     await collaboratorsInMemoryRepository.create(collaborator)
+
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'seller-1',
       name: 'Product category',
       categories: ['strong category'],
+      inventoryId: 'inventory-1',
       variants: [
         {
           barCode: '123',
@@ -138,12 +153,15 @@ describe('Create product', () => {
 
   it('should be able to create a new product with many categories and variants', async () => {
     const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
-
     await collaboratorsInMemoryRepository.create(collaborator)
+
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
+      inventoryId: 'inventory-1',
       categories: ['strong category', 'strong category 2'],
       variants: [
         {
@@ -183,16 +201,20 @@ describe('Create product', () => {
 
   it('should be able to create a new product with many existent and inexistent categories', async () => {
     const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
+    await collaboratorsInMemoryRepository.create(collaborator)
+
     const productCategory = makeProductCategory({
       name: 'strong category',
     })
-
-    await collaboratorsInMemoryRepository.create(collaborator)
     await productCategoriesInMemoryRepository.create(productCategory)
+
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
+      inventoryId: 'inventory-1',
       categories: ['strong category', 'strong category 2'],
       variants: [
         {
@@ -233,7 +255,9 @@ describe('Create product', () => {
     const productCategory3 = makeProductCategory({
       name: 'strong category 3',
     })
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
 
+    await inventoriesInMemoryRepository.create(inventory)
     await collaboratorsInMemoryRepository.create(collaborator)
     await productCategoriesInMemoryRepository.create(productCategory)
     await productCategoriesInMemoryRepository.create(productCategory2)
@@ -242,6 +266,7 @@ describe('Create product', () => {
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
+      inventoryId: 'inventory-1',
       categories: ['strong category', 'strong category 2', 'strong category 3'],
       variants: [
         {
@@ -273,17 +298,21 @@ describe('Create product', () => {
 
   it('should be able to create a new product if one of variants already exists but it return errors with response', async () => {
     const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
+    await collaboratorsInMemoryRepository.create(collaborator)
+
     const productVariant = makeProductVariant({
       name: 'pão',
       barCode: '123',
     })
-
-    await collaboratorsInMemoryRepository.create(collaborator)
     await productVariantsInMemoryRepository.create(productVariant)
+
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+    await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
+      inventoryId: 'inventory-1',
       categories: ['strong category'],
       variants: [
         {
@@ -337,6 +366,9 @@ describe('Create product', () => {
       barCode: '131315',
     })
 
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
+
+    await inventoriesInMemoryRepository.create(inventory)
     await collaboratorsInMemoryRepository.create(collaborator)
     await productVariantsInMemoryRepository.create(productVariant)
     await productVariantsInMemoryRepository.create(productVariant2)
@@ -345,6 +377,7 @@ describe('Create product', () => {
       creatorId: 'manager-1',
       name: 'Product category',
       categories: ['strong category'],
+      inventoryId: 'inventory-1',
       variants: [
         {
           barCode: '123',
@@ -367,48 +400,5 @@ describe('Create product', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(AllProductVariantAlreadyExists)
-  })
-
-  it('should be able to create a new product with an existent inventory', async () => {
-    const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
-    const inventory = makeInventory({}, new UniqueEntityId('inventory-id'))
-
-    await collaboratorsInMemoryRepository.create(collaborator)
-    await inventoriesInMemoryRepository.create(inventory)
-
-    const response = await sut.execute({
-      creatorId: 'manager-1',
-      name: 'Product category',
-      categories: ['strong category'],
-      inventoryId: 'inventory-id',
-      variants: [
-        {
-          barCode: '123',
-          brand: 'vanilla',
-          name: 'Product variant',
-          pricePerUnit: 1000,
-          unitType: ProductUnitType.UNIT,
-          quantity: 10,
-        },
-      ],
-    })
-
-    expect(response.isRight()).toBe(true)
-
-    if (response.isRight()) {
-      expect(response.value.product).toBeInstanceOf(Product)
-      expect(productsInMemoryRepository.products).toHaveLength(1)
-      expect(productVariantsInMemoryRepository.productVariants).toHaveLength(1)
-      expect(
-        productCategoriesInMemoryRepository.productCategories,
-      ).toHaveLength(1)
-      expect(inventoriesInMemoryRepository.inventories).toHaveLength(1)
-      expect(
-        productVariantInventoriesInMemoryRepository.productVariantInventories,
-      ).toHaveLength(1)
-      expect(
-        productVariantsInMemoryRepository.productVariants[0].barCode,
-      ).toEqual('123')
-    }
   })
 })
