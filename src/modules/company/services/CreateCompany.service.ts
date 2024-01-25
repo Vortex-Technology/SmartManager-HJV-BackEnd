@@ -136,6 +136,7 @@ export class CreateCompanyService {
 
     for (const m of markets) {
       const inventory = Inventory.create({
+        companyId: company.id,
         name: m.tradeName,
       })
 
