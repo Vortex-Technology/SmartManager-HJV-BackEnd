@@ -5,6 +5,7 @@ import { ProductVariantInventoriesList } from './ProductVariantInventoriesList'
 
 export interface InventoryProps {
   name: string
+  companyId: UniqueEntityId
   productVariantInventories: ProductVariantInventoriesList | null
   createdAt: Date
   updatedAt: Date | null
