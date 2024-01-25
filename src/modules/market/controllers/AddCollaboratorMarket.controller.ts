@@ -1,9 +1,7 @@
 import { statusCode } from '@config/statusCode'
 import {
   AddCollaboratorMarketBody,
-  AddCollaboratorMarketParams,
   addCollaboratorMarketBodyValidationPipe,
-  addCollaboratorMarketParamsValidationPipe,
 } from '../gateways/AddCollaboratorMarket.gateway'
 import { AddCollaboratorMarketService } from '../services/AddCollaboratorMarket.service'
 import {
@@ -12,7 +10,6 @@ import {
   Post,
   HttpCode,
   UseGuards,
-  Param,
   Res,
   NotFoundException,
   ConflictException,
@@ -33,7 +30,7 @@ import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorN
 import { Response } from 'express'
 
 @UseGuards(ApiKeyGuard)
-@Controller('/companies/:companyId/markets/:marketId/collaborators')
+@Controller('/markets/collaborators')
 export class AddCollaboratorMarketController {
   constructor(
     private readonly addCollaboratorMarketService: AddCollaboratorMarketService,
@@ -47,13 +44,16 @@ export class AddCollaboratorMarketController {
   async handle(
     @Body(addCollaboratorMarketBodyValidationPipe)
     body: AddCollaboratorMarketBody,
-    @Param(addCollaboratorMarketParamsValidationPipe)
-    params: AddCollaboratorMarketParams,
     @CurrentLoggedUserDecorator() user: TokenPayloadSchema,
     @Res() res: Response,
   ) {
-    const { sub: userId } = user
-    const { companyId, marketId } = params
+    const { sub: userId, companyId, marketId } = user
+
+    if (!companyId || !marketId) {
+      throw new ForbiddenException(
+        'Please verify if you are logged in with a company',
+      )
+    }
 
     const response = await this.addCollaboratorMarketService.execute({
       ...body,
@@ -86,10 +86,7 @@ export class AddCollaboratorMarketController {
     }
 
     const { collaborator } = response.value
-    res.header(
-      'X-Location',
-      `/companies/${companyId}/markets/${marketId}/collaborators/${collaborator.id}`,
-    )
+    res.header('X-Location', `/markets/collaborators/${collaborator.id}`)
     return res.status(statusCode.Created).end()
   }
 }

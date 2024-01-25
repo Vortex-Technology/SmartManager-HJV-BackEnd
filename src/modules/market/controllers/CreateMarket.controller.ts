@@ -1,9 +1,7 @@
 import { statusCode } from '@config/statusCode'
 import {
   CreateMarketBody,
-  CreateMarketParams,
   createMarketBodyValidationPipe,
-  createMarketParamsValidationPipe,
 } from '../gateways/CreateMarket.gateway'
 import { CreateMarketService } from '../services/CreateMarket.service'
 import {
@@ -14,7 +12,6 @@ import {
   BadRequestException,
   NotFoundException,
   UseGuards,
-  Param,
   ConflictException,
   Res,
   ForbiddenException,
@@ -32,7 +29,7 @@ import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
 import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
 
 @UseGuards(ApiKeyGuard)
-@Controller('/companies/:companyId/markets')
+@Controller('/markets')
 export class CreateMarketController {
   constructor(private readonly createMarketService: CreateMarketService) {}
 
@@ -43,12 +40,16 @@ export class CreateMarketController {
   @UseGuards(JwtRoleGuard)
   async handle(
     @Body(createMarketBodyValidationPipe) body: CreateMarketBody,
-    @Param(createMarketParamsValidationPipe) params: CreateMarketParams,
     @CurrentLoggedUserDecorator() user: TokenPayloadSchema,
     @Res() res: Response,
   ) {
-    const { sub: userId } = user
-    const { companyId } = params
+    const { sub: userId, companyId } = user
+
+    if (!companyId) {
+      throw new ForbiddenException(
+        'Please verify if you are logged in with a company',
+      )
+    }
 
     const response = await this.createMarketService.execute({
       ...body,
@@ -79,7 +80,7 @@ export class CreateMarketController {
     }
 
     const { market } = response.value
-    res.header('X-Location', `/companies/${companyId}/markets/${market.id}`)
+    res.header('X-Location', `/markets/${market.id}`)
     return res.status(statusCode.Created).end()
   }
 }

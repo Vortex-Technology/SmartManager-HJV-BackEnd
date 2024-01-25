@@ -4,40 +4,49 @@ import { INestApplication } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import request from 'supertest'
 import { AppModule } from '@infra/App.module'
-import { DatabaseModule } from '@infra/database/Database.module'
-import { MakeCompany } from '@test/factories/modules/company/makeCompany'
-import { Company } from '@modules/company/entities/Company'
-import { ApiKey } from '@modules/company/entities/ApiKey'
-import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
 import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
-import { Encrypter } from '@providers/cryptography/contracts/encrypter'
-import { Owner } from '@modules/owner/entities/Owner'
-import { makeOwner } from '@test/factories/modules/owner/makeOwner'
-import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
-import { User } from '@modules/user/entities/User'
+import { DatabaseModule } from '@infra/database/Database.module'
+import { MakeMarket } from '@test/factories/modules/market/makeMarket'
 import { MakeUser } from '@test/factories/modules/user/makeUser'
-import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
+import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
+import { MakeCompany } from '@test/factories/modules/company/makeCompany'
+import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { HandleHashGenerator } from '@providers/cryptography/contracts/handleHashGenerator'
+import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
+import { User } from '@modules/user/entities/User'
+import { Company } from '@modules/company/entities/Company'
+import { Market } from '@modules/market/entities/Market'
+import { ApiKey } from '@modules/company/entities/ApiKey'
+import { Owner } from '@modules/owner/entities/Owner'
+import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
+import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { makeInventory } from '@test/factories/modules/inventory/makeInventory'
 
-describe('Create market (E2E)', () => {
+describe('Create product (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
+
   let makeCompany: MakeCompany
   let makeApiKey: MakeApiKey
   let makeUser: MakeUser
+  let makeMarket: MakeMarket
+
+  let encrypter: Encrypter
+  let handleHashGenerator: HandleHashGenerator
+  let hashGenerator: HashGenerator
+
   let user: User
   let owner: Owner
   let company: Company
+  let market: Market
   let apiKey: ApiKey
-  let encrypter: Encrypter
+
   let collaboratorAccessToken: string
-  let hashGenerator: HashGenerator
-  let handleHashGenerator: HandleHashGenerator
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, CryptographyModule, DatabaseModule],
-      providers: [MakeCompany, MakeApiKey, MakeUser],
+      providers: [MakeCompany, MakeApiKey, MakeUser, MakeMarket],
     }).compile()
 
     app = moduleRef.createNestApplication()
@@ -45,6 +54,7 @@ describe('Create market (E2E)', () => {
     makeCompany = moduleRef.get(MakeCompany)
     makeApiKey = moduleRef.get(MakeApiKey)
     makeUser = moduleRef.get(MakeUser)
+    makeMarket = moduleRef.get(MakeMarket)
 
     encrypter = moduleRef.get(Encrypter)
     hashGenerator = moduleRef.get(HashGenerator)
@@ -65,6 +75,11 @@ describe('Create market (E2E)', () => {
       companyId,
     )
 
+    market = await makeMarket.create({
+      companyId,
+      inventory: makeInventory(),
+    })
+
     const secret = await handleHashGenerator.handleHash()
     const key = await hashGenerator.hash(company.companyName + secret)
 
@@ -78,6 +93,7 @@ describe('Create market (E2E)', () => {
       {
         sub: owner.id.toString(),
         companyId: companyId.toString(),
+        marketId: market.id.toString(),
         role: owner.role,
       },
       {
@@ -89,39 +105,48 @@ describe('Create market (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /markets [201]', async () => {
-    const response = await request(app.getHttpServer())
-      .post(`/markets`)
+  test('[POST] /products [201]', async () => {
+    const response1 = await request(app.getHttpServer())
+      .post('/products')
       .set({
         'x-api-key': apiKey.key,
         'x-collaborator-access-token': collaboratorAccessToken,
       })
       .send({
-        tradeName: 'Vortex',
-        street: 'Av. das Nações Unidas',
-        number: '1200',
-        neighborhood: 'Centro',
-        city: 'São Paulo',
-        state: 'SP',
-        postalCode: '01234000',
-        country: 'BR',
-        complement: 'apto 123',
+        name: 'product',
+        inventoryId: market.inventory?.id.toString(),
+        categories: ['product category', 'product category2'],
+        variants: [
+          {
+            name: 'variant',
+            pricePerUnit: 1000,
+            unitType: 'UN',
+            brand: 'vanilla',
+            barCode: '123456',
+            quantity: 10,
+          },
+        ],
       })
       .timeout({ deadline: 60000, response: 60000 })
 
-    expect(response.statusCode).toEqual(statusCode.Created)
-    expect(response.headers).toEqual(
-      expect.objectContaining({
-        'x-location': expect.any(String),
-      }),
-    )
+    expect(response1.statusCode).toEqual(statusCode.Created)
+    expect(response1.headers.location).toBeTruthy()
+    expect(response1.body.errors).not.toBeTruthy()
 
-    const marketOnDatabase = await prisma.market.findFirst({
+    const productOnDatabase = await prisma.product.findFirst({
       where: {
-        tradeName: 'Vortex',
+        name: 'product',
+      },
+      include: {
+        _count: {
+          select: {
+            productVariants: true,
+          },
+        },
       },
     })
 
-    expect(marketOnDatabase).toBeTruthy()
+    expect(productOnDatabase).toBeTruthy()
+    expect(productOnDatabase?._count.productVariants).toEqual(1)
   })
 })
