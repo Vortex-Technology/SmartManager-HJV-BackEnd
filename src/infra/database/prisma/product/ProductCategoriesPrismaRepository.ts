@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { ProductCategoriesRepository } from '@modules/product/repositories/ProductCategoriesRepository'
 import { ProductCategory } from '@modules/product/entities/ProductCategory'
-import { PrismaService } from '../index.service'
+import { PrismaConfig, PrismaService } from '../index.service'
 import { ProductCategoriesPrismaMapper } from './ProductCategoriesPrismaMapper'
 
 @Injectable()
 export class ProductCategoriesPrismaRepository
-  implements ProductCategoriesRepository
+  implements ProductCategoriesRepository<PrismaConfig>
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -28,8 +28,13 @@ export class ProductCategoriesPrismaRepository
     return ProductCategoriesPrismaMapper.toEntity(productCategory)
   }
 
-  async createMany(productCategories: ProductCategory[]): Promise<void> {
-    await this.prisma.productCategory.createMany({
+  async createMany(
+    productCategories: ProductCategory[],
+    config?: PrismaConfig,
+  ): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.productCategory.createMany({
       data: productCategories.map(ProductCategoriesPrismaMapper.toPrisma),
     })
   }
