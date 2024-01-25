@@ -26,12 +26,18 @@ import {
 import { CreateProductService } from '../services/CreateProduct.service'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { ApiKeyGuard } from '@providers/auth/guards/apiKey.guard'
+import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
+import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
+import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 
-@Controller('/companies/:companyId/products')
+@UseGuards(ApiKeyGuard)
+@Controller('/products')
 export class CreateProductController {
   constructor(private readonly createProductService: CreateProductService) {}
 
   @Post()
+  @AuthCollaborator()
   @HttpCode(statusCode.Created)
   @UseGuards(JwtRoleGuard)
   @Roles([
@@ -44,14 +50,19 @@ export class CreateProductController {
     @CurrentLoggedUserDecorator() user: TokenPayloadSchema,
     @Res() res: Response,
   ) {
-    const { name, variants, categories } = body
-    const { sub } = user
+    const { sub, companyId, marketId } = user
+
+    if (!companyId || !marketId) {
+      throw new ForbiddenException(
+        'Please verify if you are logged in with a company',
+      )
+    }
 
     const response = await this.createProductService.execute({
-      name,
+      ...body,
       creatorId: sub,
-      variants,
-      categories,
+      companyId,
+      marketId,
     })
 
     if (response.isLeft()) {
@@ -60,7 +71,9 @@ export class CreateProductController {
       switch (error.constructor) {
         case AllProductVariantAlreadyExists:
         case ProvideAtLeastOneProductVariant:
-        case CollaboratorNotFound: {
+        case CollaboratorNotFound:
+        case MarketNotFound:
+        case CompanyNotFound: {
           throw new ConflictException(error.message)
         }
 
