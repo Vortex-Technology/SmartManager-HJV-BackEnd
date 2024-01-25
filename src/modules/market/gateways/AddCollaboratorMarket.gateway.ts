@@ -21,15 +21,3 @@ export type AddCollaboratorMarketBody = z.infer<
 export const addCollaboratorMarketBodyValidationPipe = new ZodValidationPipe(
   addCollaboratorMarketBodySchema,
 )
-
-const addCollaboratorMarketParamsSchema = z.object({
-  companyId: z.string().uuid(),
-  marketId: z.string().uuid(),
-})
-
-export type AddCollaboratorMarketParams = z.infer<
-  typeof addCollaboratorMarketParamsSchema
->
-export const addCollaboratorMarketParamsValidationPipe = new ZodValidationPipe(
-  addCollaboratorMarketParamsSchema,
-)
