@@ -15,7 +15,13 @@ import { makeCompany } from '@test/factories/modules/company/makeCompany'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
 
+let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
+let verifyPermissionsOfCollaboratorInMarketService: VerifyPermissionsOfCollaboratorInMarketService
+let ownersInMemoryRepository: OwnersInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
@@ -27,23 +33,42 @@ let sut: ListMarketCollaboratorsService
 describe('List market collaborators', () => {
   beforeEach(() => {
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
       productVariantInventoriesInMemoryRepository,
     )
+
     marketsInMemoryRepository = new MarketsInMemoryRepository(
       collaboratorsInMemoryRepository,
       inventoriesInMemoryRepository,
     )
-    companiesInMemoryRepository = new CompaniesInMemoryRepository(
-      marketsInMemoryRepository,
+
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
     )
 
-    sut = new ListMarketCollaboratorsService(
+    companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
-      companiesInMemoryRepository,
+      ownersInMemoryRepository,
+    )
+
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
+    verifyPermissionsOfCollaboratorInMarketService =
+      new VerifyPermissionsOfCollaboratorInMarketService(
+        verifyPermissionsOfCollaboratorInCompanyService,
+        marketsInMemoryRepository,
+      )
+
+    sut = new ListMarketCollaboratorsService(
       collaboratorsInMemoryRepository,
+      verifyPermissionsOfCollaboratorInMarketService,
     )
   })
 
