@@ -73,7 +73,9 @@ describe('Create market (E2E)', () => {
 
     market = await makeMarket.create({
       companyId,
-      inventory: makeInventory(),
+      inventory: makeInventory({
+        companyId,
+      }),
     })
 
     const secret = await handleHashGenerator.handleHash()
