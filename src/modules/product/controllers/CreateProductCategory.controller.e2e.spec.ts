@@ -1,28 +1,28 @@
 import { Test } from '@nestjs/testing'
-import { PrismaService } from '@infra/database/prisma/index.service'
 import { INestApplication } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import request from 'supertest'
 import { AppModule } from '@infra/App.module'
 import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
 import { DatabaseModule } from '@infra/database/Database.module'
-import { MakeMarket } from '@test/factories/modules/market/makeMarket'
-import { MakeUser } from '@test/factories/modules/user/makeUser'
-import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
+import { PrismaService } from '@infra/database/prisma/index.service'
 import { MakeCompany } from '@test/factories/modules/company/makeCompany'
+import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
+import { MakeUser } from '@test/factories/modules/user/makeUser'
+import { MakeMarket } from '@test/factories/modules/market/makeMarket'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { HandleHashGenerator } from '@providers/cryptography/contracts/handleHashGenerator'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
+import { Owner } from '@modules/owner/entities/Owner'
 import { User } from '@modules/user/entities/User'
 import { Company } from '@modules/company/entities/Company'
 import { Market } from '@modules/market/entities/Market'
 import { ApiKey } from '@modules/company/entities/ApiKey'
-import { Owner } from '@modules/owner/entities/Owner'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
 import { makeInventory } from '@test/factories/modules/inventory/makeInventory'
 
-describe('Create product (E2E)', () => {
+describe('Create product category (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
 
@@ -107,48 +107,24 @@ describe('Create product (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /products [201]', async () => {
-    const response1 = await request(app.getHttpServer())
-      .post('/products')
+  test('[POST] /products/categories [201]', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/products/categories')
       .set({
         'x-api-key': apiKey.key,
         'x-collaborator-access-token': collaboratorAccessToken,
       })
       .send({
-        name: 'product',
-        inventoryId: market.inventory?.id.toString(),
-        categories: ['product category', 'product category2'],
-        variants: [
-          {
-            name: 'variant',
-            pricePerUnit: 1000,
-            unitType: 'UN',
-            brand: 'vanilla',
-            barCode: '123456',
-            quantity: 10,
-          },
-        ],
+        name: 'product category',
+        description: 'A new product category to test the creation',
       })
       .timeout({ deadline: 60000, response: 60000 })
 
-    expect(response1.statusCode).toEqual(statusCode.Created)
-    expect(response1.headers.location).toBeTruthy()
-    expect(response1.body.errors).not.toBeTruthy()
+    expect(response.statusCode).toEqual(statusCode.Created)
+    expect(response.headers['x-location']).toBeTruthy()
 
-    const productOnDatabase = await prisma.product.findFirst({
-      where: {
-        name: 'product',
-      },
-      include: {
-        _count: {
-          select: {
-            productVariants: true,
-          },
-        },
-      },
-    })
+    const productCategoryInDatabase = await prisma.productCategory.count()
 
-    expect(productOnDatabase).toBeTruthy()
-    expect(productOnDatabase?._count.productVariants).toEqual(1)
+    expect(productCategoryInDatabase).toEqual(1)
   })
 })

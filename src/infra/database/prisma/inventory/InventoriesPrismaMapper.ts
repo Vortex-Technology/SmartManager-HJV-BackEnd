@@ -10,6 +10,7 @@ export class InventoriesPrismaMapper {
         createdAt: raw.createdAt,
         deletedAt: raw.deletedAt,
         updatedAt: raw.updatedAt,
+        companyId: new UniqueEntityId(raw.companyId),
       },
       new UniqueEntityId(raw.id),
     )
@@ -22,6 +23,7 @@ export class InventoriesPrismaMapper {
       createdAt: inventory.createdAt,
       deletedAt: inventory.deletedAt,
       updatedAt: inventory.updatedAt,
+      companyId: inventory.companyId.toString(),
     }
   }
 }
