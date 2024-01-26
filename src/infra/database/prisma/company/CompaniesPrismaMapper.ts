@@ -99,10 +99,6 @@ export class CompaniesPrismaMapper {
   }
 
   static toUpdatePrisma(company: Company): Prisma.CompanyUpdateInput {
-    if (!company.owner) {
-      throw new Error('Owner not set in process update of company')
-    }
-
     return {
       companyNane: company.companyName,
       address: {
