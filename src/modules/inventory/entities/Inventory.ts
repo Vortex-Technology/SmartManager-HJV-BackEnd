@@ -47,6 +47,10 @@ export class Inventory extends AggregateRoot<InventoryProps> {
     this.props.productVariantInventories = productVariantInventories
   }
 
+  get companyId() {
+    return this.props.companyId
+  }
+
   get createdAt() {
     return this.props.createdAt
   }
