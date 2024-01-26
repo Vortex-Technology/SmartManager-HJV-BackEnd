@@ -27,7 +27,7 @@ export type CompanyWithAddressAndOwnerIdPrisma = CompanyPrisma & {
 
 export class CompaniesPrismaMapper {
   static toEntity(raw: CompanyWithAddressAndOwnerIdPrisma): Company {
-    if (!raw.owner?.id) {
+    if (!raw.owner) {
       throw new Error('Owner not exist in company')
     }
 
