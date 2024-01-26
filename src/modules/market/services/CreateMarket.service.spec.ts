@@ -13,7 +13,9 @@ import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
 import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
 
+let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
@@ -33,6 +35,7 @@ describe('Create market', () => {
 
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
+
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
       productVariantInventoriesInMemoryRepository,
     )
@@ -45,9 +48,15 @@ describe('Create market', () => {
       ownersInMemoryRepository,
     )
 
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
     sut = new CreateMarketService(
-      collaboratorsInMemoryRepository,
       companiesInMemoryRepository,
+      verifyPermissionsOfCollaboratorInCompanyService,
     )
   })
 
@@ -133,13 +142,14 @@ describe('Create market', () => {
   })
 
   it('not should be able create a new market if creator not is creator of the company', async () => {
-    const creator = makeManager({}, new UniqueEntityId('manager-1'))
-    await collaboratorsInMemoryRepository.create(creator)
+    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
+    await ownersInMemoryRepository.create(owner)
 
-    const otherOwner = makeOwner()
+    const owner2 = makeOwner({}, new UniqueEntityId('owner-2'))
+    await ownersInMemoryRepository.create(owner2)
 
     const company = makeCompany(
-      { ownerId: otherOwner.id, owner: otherOwner },
+      { ownerId: owner2.id },
       new UniqueEntityId('company-1'),
     )
     await companiesInMemoryRepository.create(company)
@@ -153,7 +163,7 @@ describe('Create market', () => {
       street: 'Avenida Brigadeiro Faria Lima',
       tradeName: 'Vortex',
       companyId: 'company-1',
-      creatorId: 'manager-1',
+      creatorId: 'owner-1',
     })
 
     expect(response.isLeft()).toBe(true)
