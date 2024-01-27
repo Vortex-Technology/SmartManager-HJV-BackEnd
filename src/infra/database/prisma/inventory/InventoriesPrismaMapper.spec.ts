@@ -7,6 +7,7 @@ describe('Inventory prisma mapper', () => {
     const inventory = {
       id: 'id-1',
       name: 'name-inventory',
+      companyId: 'company-1',
       createdAt: new Date(),
       updatedAt: new Date(),
       deletedAt: new Date(),
@@ -28,6 +29,7 @@ describe('Inventory prisma mapper', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         deletedAt: new Date(),
+        companyId: new UniqueEntityId('company-1'),
       },
       new UniqueEntityId('id-1'),
     )
@@ -38,6 +40,7 @@ describe('Inventory prisma mapper', () => {
 
     expect(result.id).toBe(id.toString())
     expect(result.name).toBe('name-inventory')
+    expect(result.companyId).toBe('company-1')
     expect(result.createdAt).toBeInstanceOf(Date)
     expect(result.updatedAt).toBeInstanceOf(Date)
     expect(result.deletedAt).toBeInstanceOf(Date)

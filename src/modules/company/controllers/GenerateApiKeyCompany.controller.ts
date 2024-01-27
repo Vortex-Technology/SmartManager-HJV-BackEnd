@@ -35,12 +35,12 @@ export class GenerateApiKeyCompanyController {
     @Param(generateApiKeyParamsValidationPipe) params: GenerateApiKeyParams,
     @Res() res: Response,
   ) {
-    const { sub: requesterId } = user
+    const { sub: userId } = user
     const { companyId } = params
 
     const response = await this.generateApiKeyCompanyService.execute({
       companyId,
-      requesterId,
+      userId,
     })
 
     if (response.isLeft()) {
