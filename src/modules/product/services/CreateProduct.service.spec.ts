@@ -19,16 +19,17 @@ import { makeSeller } from '@test/factories/modules/seller/makeSeller'
 import { FakeTransactor } from '@test/repositories/infra/transactor/fakeTransactor'
 import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
 import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
-import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
+
 import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
-import { makeCompany } from '@test/factories/modules/company/makeCompany'
-import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
 import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { makeCompany } from '@test/factories/modules/company/makeCompany'
 import { makeMarket } from '@test/factories/modules/market/makeMarket'
 
 let ownersInMemoryRepository: OwnersInMemoryRepository
-let companiesInMemoryRepository: CompaniesInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
+let companiesInMemoryRepository: CompaniesInMemoryRepository
+
 let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
 let verifyPermissionsOfCollaboratorInMarketService: VerifyPermissionsOfCollaboratorInMarketService
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
@@ -51,12 +52,9 @@ describe('Create product', () => {
       new ProductCategoriesInMemoryRepository()
 
     productVariantsInMemoryRepository = new ProductVariantsInMemoryRepository()
+
     productsInMemoryRepository = new ProductsInMemoryRepository(
       productVariantsInMemoryRepository,
-    )
-
-    ownersInMemoryRepository = new OwnersInMemoryRepository(
-      collaboratorsInMemoryRepository,
     )
 
     productVariantInventoriesInMemoryRepository =
@@ -87,6 +85,34 @@ describe('Create product', () => {
         marketsInMemoryRepository,
       )
 
+
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
+
+    marketsInMemoryRepository = new MarketsInMemoryRepository(
+      collaboratorsInMemoryRepository,
+      inventoriesInMemoryRepository,
+    )
+
+    companiesInMemoryRepository = new CompaniesInMemoryRepository(
+      marketsInMemoryRepository,
+      ownersInMemoryRepository,
+    )
+
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
+    verifyPermissionsOfCollaboratorInMarketService =
+      new VerifyPermissionsOfCollaboratorInMarketService(
+        verifyPermissionsOfCollaboratorInCompanyService,
+        marketsInMemoryRepository,
+      )
+
+
     sut = new CreateProductService(
       productCategoriesInMemoryRepository,
       productsInMemoryRepository,
@@ -98,14 +124,17 @@ describe('Create product', () => {
   })
 
   it('should be able to create a new product', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
+
 
     const market = makeMarket(
       { companyId: company.id },
@@ -113,16 +142,8 @@ describe('Create product', () => {
     )
     marketsInMemoryRepository.markets.push(market)
 
-    const collaborator = makeManager(
-      { marketId: market.id },
-      new UniqueEntityId('manager-1'),
-    )
-    await collaboratorsInMemoryRepository.create(collaborator)
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
 
-    const inventory = makeInventory(
-      { companyId: new UniqueEntityId('company-1') },
-      new UniqueEntityId('inventory-1'),
-    )
     await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
@@ -221,14 +242,16 @@ describe('Create product', () => {
   })
 
   it('should be able to create a new product with many categories and variants', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
+
 
     const market = makeMarket(
       { companyId: company.id },
@@ -236,28 +259,17 @@ describe('Create product', () => {
     )
     marketsInMemoryRepository.markets.push(market)
 
-    const collaborator = makeManager(
-      {
-        companyId: new UniqueEntityId('company-1'),
-        marketId: new UniqueEntityId('market-1'),
-      },
-      new UniqueEntityId('manager-1'),
-    )
-    await collaboratorsInMemoryRepository.create(collaborator)
+    const inventory = makeInventory({}, new UniqueEntityId('inventory-1'))
 
-    const inventory = makeInventory(
-      {
-        companyId: new UniqueEntityId('company-1'),
-      },
-      new UniqueEntityId('inventory-1'),
-    )
     await inventoriesInMemoryRepository.create(inventory)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
       name: 'Product category',
       inventoryId: 'inventory-1',
-      categories: ['category', 'category 2'],
+
+      categories: ['strong category', 'strong category 2'],
+
       companyId: 'company-1',
       marketId: 'market-1',
       variants: [
@@ -297,29 +309,22 @@ describe('Create product', () => {
   })
 
   it('should be able to create a new product with many existent and inexistent categories', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
 
     const market = makeMarket(
       { companyId: company.id },
       new UniqueEntityId('market-1'),
     )
     marketsInMemoryRepository.markets.push(market)
-
-    const collaborator = makeManager(
-      {
-        companyId: new UniqueEntityId('company-1'),
-        marketId: new UniqueEntityId('market-1'),
-      },
-      new UniqueEntityId('manager-1'),
-    )
-    await collaboratorsInMemoryRepository.create(collaborator)
 
     const productCategory = makeProductCategory({
       name: 'strong category',
@@ -365,14 +370,16 @@ describe('Create product', () => {
   })
 
   it('should be able to create a new product with many existent categories', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
+
 
     const market = makeMarket(
       { companyId: company.id },
@@ -380,13 +387,6 @@ describe('Create product', () => {
     )
     marketsInMemoryRepository.markets.push(market)
 
-    const collaborator = makeManager(
-      {
-        companyId: new UniqueEntityId('company-1'),
-        marketId: new UniqueEntityId('market-1'),
-      },
-      new UniqueEntityId('manager-1'),
-    )
     const productCategory = makeProductCategory({
       name: 'strong category',
     })
@@ -411,6 +411,8 @@ describe('Create product', () => {
       companyId: 'company-1',
       marketId: 'market-1',
       categories: ['strong category', 'strong category 2', 'strong category 3'],
+      companyId: 'company-1',
+      marketId: 'market-1',
       variants: [
         {
           barCode: '123',
@@ -440,29 +442,22 @@ describe('Create product', () => {
   })
 
   it('should be able to create a new product if one of variants already exists but it return errors with response', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
 
     const market = makeMarket(
       { companyId: company.id },
       new UniqueEntityId('market-1'),
     )
     marketsInMemoryRepository.markets.push(market)
-
-    const collaborator = makeManager(
-      {
-        companyId: new UniqueEntityId('company-1'),
-        marketId: new UniqueEntityId('market-1'),
-      },
-      new UniqueEntityId('manager-1'),
-    )
-    await collaboratorsInMemoryRepository.create(collaborator)
 
     const productVariant = makeProductVariant({
       name: 'pão',
@@ -521,14 +516,16 @@ describe('Create product', () => {
   })
 
   it('not should be able to create a new product if all variants already exists', async () => {
-    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(owner)
 
-    const company = makeCompany(
-      { ownerId: owner.id },
-      new UniqueEntityId('company-1'),
-    )
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
+
+    const collaborator = makeManager(
+      { marketId: new UniqueEntityId('market-1') },
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
+
 
     const market = makeMarket(
       { companyId: company.id },
@@ -536,14 +533,8 @@ describe('Create product', () => {
     )
     marketsInMemoryRepository.markets.push(market)
 
-    const collaborator = makeManager(
-      {
-        companyId: new UniqueEntityId('company-1'),
-        marketId: new UniqueEntityId('market-1'),
-      },
-      new UniqueEntityId('manager-1'),
-    )
-    await collaboratorsInMemoryRepository.create(collaborator)
+
+
     const productVariant = makeProductVariant({
       name: 'pão',
       barCode: '123',
