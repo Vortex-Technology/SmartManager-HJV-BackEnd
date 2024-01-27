@@ -132,7 +132,7 @@ describe('Create product (E2E)', () => {
       .timeout({ deadline: 60000, response: 60000 })
 
     expect(response1.statusCode).toEqual(statusCode.Created)
-    expect(response1.headers.location).toBeTruthy()
+    expect(response1.headers['x-location']).toBeTruthy()
     expect(response1.body.errors).not.toBeTruthy()
 
     const productOnDatabase = await prisma.product.findFirst({

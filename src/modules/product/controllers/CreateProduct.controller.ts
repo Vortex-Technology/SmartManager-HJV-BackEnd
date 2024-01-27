@@ -89,7 +89,7 @@ export class CreateProductController {
 
     const { product, errors } = response.value
 
-    res.header('Location', `/products/${product.id.toString()}`)
+    res.header('X-Location', `/products/${product.id.toString()}`)
     return res
       .status(statusCode.Created)
       .json(ProductErrosPresenter.toHTTP(errors))
