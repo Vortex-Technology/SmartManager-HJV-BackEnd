@@ -3,7 +3,8 @@ name: End to end tests
 on:
   push:
     branches: 
-      - '*'
+      - 'dev'
+      - 'main'
   pull_request:
     branches: 
       - main
