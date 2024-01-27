@@ -15,7 +15,10 @@ import { makeApiKey } from '@test/factories/modules/company/makeApiKey'
 import { LotsOfExistingKeys } from '../errors/LotsOfExistingKeys'
 import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { UsersInMemoryRepository } from '@test/repositories/modules/user/UsersInMemoryRepository'
+import { makeUser } from '@test/factories/modules/user/makeUser'
 
+let usersInMemoryRepository: UsersInMemoryRepository
 let ownersInMemoryRepository: OwnersInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
@@ -30,11 +33,14 @@ let sut: GenerateApiKeyCompanyService
 describe('Generate api key', () => {
   beforeEach(() => {
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
     ownersInMemoryRepository = new OwnersInMemoryRepository(
       collaboratorsInMemoryRepository,
     )
+
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
+
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
       productVariantInventoriesInMemoryRepository,
     )
@@ -44,12 +50,17 @@ describe('Generate api key', () => {
     )
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
+      ownersInMemoryRepository,
     )
+
+    usersInMemoryRepository = new UsersInMemoryRepository()
+
     apiKeysInMemoryRepository = new ApiKeysInMemoryRepository()
+
     fakeHasher = new FakeHasher()
 
     sut = new GenerateApiKeyCompanyService(
-      ownersInMemoryRepository,
+      usersInMemoryRepository,
       companiesInMemoryRepository,
       apiKeysInMemoryRepository,
       fakeHasher,
@@ -58,8 +69,12 @@ describe('Generate api key', () => {
   })
 
   it('should be able to generate a api key for company', async () => {
+    const user = makeUser({}, new UniqueEntityId('user-1'))
+    await usersInMemoryRepository.create(user)
+
     const owner = makeOwner(
       {
+        userId: user.id,
         companyId: new UniqueEntityId('company-1'),
       },
       new UniqueEntityId('owner-1'),
@@ -68,6 +83,7 @@ describe('Generate api key', () => {
 
     const company = makeCompany(
       {
+        founderId: owner.userId,
         ownerId: owner.id,
       },
       new UniqueEntityId('company-1'),
@@ -75,8 +91,8 @@ describe('Generate api key', () => {
     await companiesInMemoryRepository.create(company)
 
     const response = await sut.execute({
+      userId: 'user-1',
       companyId: 'company-1',
-      requesterId: 'owner-1',
     })
 
     expect(response.isRight()).toBe(true)
@@ -87,12 +103,15 @@ describe('Generate api key', () => {
   })
 
   it('not should be able to generate a api key for company if owner not exists', async () => {
+    const user = makeUser({}, new UniqueEntityId('user-1'))
+    await usersInMemoryRepository.create(user)
+
     const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
 
     const response = await sut.execute({
+      userId: 'user-1',
       companyId: 'company-1',
-      requesterId: 'inexistent-user-id',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -100,12 +119,12 @@ describe('Generate api key', () => {
   })
 
   it('not should be able to generate a api key for company if company not exists', async () => {
-    const user = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(user)
+    const user = makeUser({}, new UniqueEntityId('user-1'))
+    await usersInMemoryRepository.create(user)
 
     const response = await sut.execute({
+      userId: 'user-1',
       companyId: 'inexistent-company-id',
-      requesterId: 'owner-1',
     })
 
     expect(response.isLeft()).toBe(true)
@@ -113,29 +132,45 @@ describe('Generate api key', () => {
   })
 
   it('not should be able to generate a api key for company if requester is not owner of company', async () => {
-    const user = makeOwner({}, new UniqueEntityId('owner-1'))
-    await ownersInMemoryRepository.create(user)
+    const user = makeUser({}, new UniqueEntityId('user-1'))
+    await usersInMemoryRepository.create(user)
 
+    const owner = makeOwner({}, new UniqueEntityId('owner-1'))
+    await ownersInMemoryRepository.create(owner)
+
+    const owner1 = makeOwner({}, new UniqueEntityId('owner-2'))
+    await ownersInMemoryRepository.create(owner1)
+
+    // nao foi passado o founder para ele e mesmo assim deu o que era esperado no erro
     const company = makeCompany(
       {
-        ownerId: new UniqueEntityId('other-owner-id'),
+        ownerId: owner.id,
       },
       new UniqueEntityId('company-1'),
     )
     await companiesInMemoryRepository.create(company)
 
+    // VERIFICAR ESSE TEST !!
+    // VERIFICAR ESSE TEST !!
+    // VERIFICAR ESSE TEST !!
+
     const response = await sut.execute({
+      userId: 'user-1',
       companyId: 'company-1',
-      requesterId: 'owner-1',
     })
+    // console.log(response)
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(PermissionDenied)
   })
 
   it('not should be able to generate a api key for company if user already has an api key active', async () => {
+    const user = makeUser({}, new UniqueEntityId('user-1'))
+    await usersInMemoryRepository.create(user)
+
     const owner = makeOwner(
       {
+        userId: user.id,
         companyId: new UniqueEntityId('company-1'),
       },
       new UniqueEntityId('owner-1'),
@@ -144,6 +179,7 @@ describe('Generate api key', () => {
 
     const company = makeCompany(
       {
+        founderId: user.id,
         ownerId: owner.id,
       },
       new UniqueEntityId('company-1'),
@@ -157,9 +193,10 @@ describe('Generate api key', () => {
     await apiKeysInMemoryRepository.create(apiKey)
 
     const response = await sut.execute({
+      userId: 'user-1',
       companyId: 'company-1',
-      requesterId: 'owner-1',
     })
+    console.log(response)
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(LotsOfExistingKeys)
