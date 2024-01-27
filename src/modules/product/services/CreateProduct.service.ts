@@ -155,9 +155,7 @@ export class CreateProductService {
       ...inexistentCategories,
     ])
 
-    if (!inventory.productVariantInventories) {
-      inventory.productVariantInventories = new ProductVariantInventoriesList()
-    }
+    inventory.productVariantInventories = new ProductVariantInventoriesList()
 
     const product = Product.create({
       name,
@@ -189,12 +187,7 @@ export class CreateProductService {
     })
 
     transaction.add((ex) => this.productsRepository.create(product, ex))
-
-    if (inventoryId) {
-      transaction.add((ex) => this.inventoriesRepository.save(inventory, ex))
-    } else {
-      transaction.add((ex) => this.inventoriesRepository.create(inventory, ex))
-    }
+    transaction.add((ex) => this.inventoriesRepository.save(inventory, ex))
 
     await this.transactorService.execute(transaction)
 

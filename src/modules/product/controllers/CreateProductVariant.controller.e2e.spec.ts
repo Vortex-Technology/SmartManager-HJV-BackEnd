@@ -1,28 +1,31 @@
-import { Test } from '@nestjs/testing'
-import { PrismaService } from '@infra/database/prisma/index.service'
-import { INestApplication } from '@nestjs/common'
-import { statusCode } from '@config/statusCode'
-import request from 'supertest'
 import { AppModule } from '@infra/App.module'
-import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
 import { DatabaseModule } from '@infra/database/Database.module'
-import { MakeMarket } from '@test/factories/modules/market/makeMarket'
-import { MakeUser } from '@test/factories/modules/user/makeUser'
-import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
-import { MakeCompany } from '@test/factories/modules/company/makeCompany'
+import { PrismaService } from '@infra/database/prisma/index.service'
+import { ApiKey } from '@modules/company/entities/ApiKey'
+import { Company } from '@modules/company/entities/Company'
+import { Market } from '@modules/market/entities/Market'
+import { Owner } from '@modules/owner/entities/Owner'
+import { User } from '@modules/user/entities/User'
+import { INestApplication } from '@nestjs/common'
+import { Test } from '@nestjs/testing'
+import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { HandleHashGenerator } from '@providers/cryptography/contracts/handleHashGenerator'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
-import { User } from '@modules/user/entities/User'
-import { Company } from '@modules/company/entities/Company'
-import { Market } from '@modules/market/entities/Market'
-import { ApiKey } from '@modules/company/entities/ApiKey'
-import { Owner } from '@modules/owner/entities/Owner'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
+import { MakeApiKey } from '@test/factories/modules/company/makeApiKey'
+import { MakeCompany } from '@test/factories/modules/company/makeCompany'
+import { MakeMarket } from '@test/factories/modules/market/makeMarket'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { MakeUser } from '@test/factories/modules/user/makeUser'
+import request from 'supertest'
+import { Product } from '../entities/Product'
+import { MakeProduct } from '@test/factories/modules/product/makeProduct'
+import { Inventory } from '@modules/inventory/entities/Inventory'
+import { statusCode } from '@config/statusCode'
 import { makeInventory } from '@test/factories/modules/inventory/makeInventory'
 
-describe('Create product (E2E)', () => {
+describe('Create product variant (E2E)', async () => {
   let app: INestApplication
   let prisma: PrismaService
 
@@ -30,6 +33,7 @@ describe('Create product (E2E)', () => {
   let makeApiKey: MakeApiKey
   let makeUser: MakeUser
   let makeMarket: MakeMarket
+  let makeProduct: MakeProduct
 
   let encrypter: Encrypter
   let handleHashGenerator: HandleHashGenerator
@@ -40,21 +44,25 @@ describe('Create product (E2E)', () => {
   let company: Company
   let market: Market
   let apiKey: ApiKey
+  let product: Product
+  let inventory: Inventory
 
   let collaboratorAccessToken: string
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, CryptographyModule, DatabaseModule],
-      providers: [MakeCompany, MakeApiKey, MakeUser, MakeMarket],
+      providers: [MakeCompany, MakeApiKey, MakeUser, MakeMarket, MakeProduct],
     }).compile()
 
     app = moduleRef.createNestApplication()
     prisma = moduleRef.get(PrismaService)
+
     makeCompany = moduleRef.get(MakeCompany)
     makeApiKey = moduleRef.get(MakeApiKey)
     makeUser = moduleRef.get(MakeUser)
     makeMarket = moduleRef.get(MakeMarket)
+    makeProduct = moduleRef.get(MakeProduct)
 
     encrypter = moduleRef.get(Encrypter)
     hashGenerator = moduleRef.get(HashGenerator)
@@ -75,11 +83,13 @@ describe('Create product (E2E)', () => {
       companyId,
     )
 
+    inventory = makeInventory({
+      companyId,
+    })
+
     market = await makeMarket.create({
       companyId,
-      inventory: makeInventory({
-        companyId,
-      }),
+      inventory,
     })
 
     const secret = await handleHashGenerator.handleHash()
@@ -104,51 +114,44 @@ describe('Create product (E2E)', () => {
       },
     )
 
+    product = await makeProduct.create()
+
     await app.init()
   })
 
-  test('[POST] /products [201]', async () => {
+  test('[POST] /products/:productId/variants [201]', async () => {
     const response1 = await request(app.getHttpServer())
-      .post('/products')
+      .post(`/products/${product.id.toString()}/variants`)
       .set({
         'x-api-key': apiKey.key,
         'x-collaborator-access-token': collaboratorAccessToken,
       })
       .send({
-        name: 'product',
-        inventoryId: market.inventory?.id.toString(),
-        categories: ['product category', 'product category2'],
-        variants: [
-          {
-            name: 'variant',
-            pricePerUnit: 1000,
-            unitType: 'UN',
-            brand: 'vanilla',
-            barCode: '123456',
-            quantity: 10,
-          },
-        ],
+        name: 'variant-16',
+        pricePerUnit: 1000,
+        unitType: 'UN',
+        brand: 'vanilla',
+        barCode: '123456',
+        quantity: 10,
+        inventoryId: inventory.id.toString(),
       })
       .timeout({ deadline: 60000, response: 60000 })
 
     expect(response1.statusCode).toEqual(statusCode.Created)
     expect(response1.headers['x-location']).toBeTruthy()
-    expect(response1.body.errors).not.toBeTruthy()
 
-    const productOnDatabase = await prisma.product.findFirst({
+    const productVariantOnDatabase = await prisma.productVariant.findFirst({
       where: {
-        name: 'product',
+        name: 'variant-16',
       },
       include: {
-        _count: {
-          select: {
-            productVariants: true,
-          },
-        },
+        productVariantInventories: true,
       },
     })
 
-    expect(productOnDatabase).toBeTruthy()
-    expect(productOnDatabase?._count.productVariants).toEqual(1)
+    expect(productVariantOnDatabase).toBeTruthy()
+    expect(
+      productVariantOnDatabase?.productVariantInventories[0].quantity,
+    ).toEqual(10)
   })
 })

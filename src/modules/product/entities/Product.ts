@@ -58,6 +58,11 @@ export class Product extends AggregateRoot<ProductProps> {
     return this.props.productVariants
   }
 
+  set productVariants(productVariants: ProductVariantsList | null) {
+    this.props.productVariants = productVariants
+    this.touch()
+  }
+
   get productCategories() {
     return this.props.productCategories
   }
