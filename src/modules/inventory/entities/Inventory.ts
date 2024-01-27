@@ -45,6 +45,7 @@ export class Inventory extends AggregateRoot<InventoryProps> {
     productVariantInventories: ProductVariantInventoriesList | null,
   ) {
     this.props.productVariantInventories = productVariantInventories
+    this.touch()
   }
 
   get companyId() {

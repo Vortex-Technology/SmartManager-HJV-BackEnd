@@ -7,14 +7,21 @@ import { CreateProductCategoryService } from './services/CreateProductCategory.s
 import { InterceptorsModule } from '@modules/interceptors/Interceptors.module'
 import { ValidateApiKeyService } from '@modules/company/services/ValidateApiKey.service'
 import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
+import { CreateProductVariantController } from './controllers/CreateProductVariant.controller'
+import { CreateProductVariantService } from './services/CreateProductVariant.service'
 
 @Module({
   imports: [DatabaseModule, InterceptorsModule, CryptographyModule],
-  controllers: [CreateProductController, CreateProductCategoryController],
+  controllers: [
+    CreateProductController,
+    CreateProductCategoryController,
+    CreateProductVariantController,
+  ],
   providers: [
+    ValidateApiKeyService,
     CreateProductService,
     CreateProductCategoryService,
-    ValidateApiKeyService,
+    CreateProductVariantService,
   ],
 })
 export class ProductModule {}
