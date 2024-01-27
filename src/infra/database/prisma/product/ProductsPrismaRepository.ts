@@ -27,4 +27,35 @@ export class ProductsPrismaRepository
       await this.productVariantsRepository.createMany(productVariants, config)
     }
   }
+
+  async save(
+    product: Product,
+    config?: PrismaConfig | undefined,
+  ): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.product.update({
+      where: {
+        id: product.id.toString(),
+      },
+      data: ProductsPrismaMapper.toPrisma(product),
+    })
+
+    if (product.productVariants) {
+      const productVariants = product.productVariants.getNewItems()
+      await this.productVariantsRepository.createMany(productVariants, config)
+    }
+  }
+
+  async findById(id: string): Promise<Product | null> {
+    const product = await this.prisma.product.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    if (!product) return null
+
+    return ProductsPrismaMapper.toEntity(product)
+  }
 }
