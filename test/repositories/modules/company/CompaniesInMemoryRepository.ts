@@ -35,6 +35,21 @@ export class CompaniesInMemoryRepository implements CompaniesRepository {
     return company
   }
 
+  async findByIdAndFounderId(
+    companyId: string,
+    userId: string,
+  ): Promise<Company | null> {
+    const company = this.companies.find(
+      (company) =>
+        company.id.toString() === companyId &&
+        company.founderId.toString() === userId,
+    )
+
+    if (!company) return null
+
+    return company
+  }
+
   async save(company: Company): Promise<void> {
     const companyIndex = this.companies.findIndex((company) =>
       company.equals(company),
