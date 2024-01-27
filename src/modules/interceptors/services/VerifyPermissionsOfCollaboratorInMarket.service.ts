@@ -16,7 +16,8 @@ import { MarketsRepository } from '@modules/market/repositories/MarketsRepositor
 interface Request {
   acceptedRoles: CollaboratorRole[]
   companyId: string
-  collaboratorId: string
+  collaboratorId?: string
+  collaborator?: Collaborator
   marketId: string
 }
 
@@ -37,12 +38,18 @@ export class VerifyPermissionsOfCollaboratorInMarketService {
     collaboratorId,
     companyId,
     marketId,
+    collaborator: _collaborator,
   }: Request): Promise<Response> {
+    if (!_collaborator && !collaboratorId) {
+      return left(new CollaboratorNotFound())
+    }
+
     const response =
       await this.verifyPermissionsOfCollaboratorInCompanyService.execute({
         acceptedRoles,
         collaboratorId,
         companyId,
+        collaborator: _collaborator,
       })
 
     if (response.isLeft()) {

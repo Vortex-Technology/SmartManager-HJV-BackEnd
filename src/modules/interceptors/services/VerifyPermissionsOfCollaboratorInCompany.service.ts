@@ -14,7 +14,8 @@ import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepo
 interface Request {
   acceptedRoles: CollaboratorRole[]
   companyId: string
-  collaboratorId: string
+  collaboratorId?: string
+  collaborator?: Collaborator
 }
 
 type Response = Either<
@@ -33,9 +34,16 @@ export class VerifyPermissionsOfCollaboratorInCompanyService {
     acceptedRoles,
     collaboratorId,
     companyId,
+    collaborator: _collaborator,
   }: Request): Promise<Response> {
-    const collaborator =
-      await this.collaboratorsRepository.findById(collaboratorId)
+    if (!_collaborator && !collaboratorId) {
+      return left(new CollaboratorNotFound())
+    }
+
+    let collaborator: Collaborator | null = _collaborator ?? null
+    if (!_collaborator && collaboratorId) {
+      collaborator = await this.collaboratorsRepository.findById(collaboratorId)
+    }
 
     if (!collaborator) {
       return left(new CollaboratorNotFound())
