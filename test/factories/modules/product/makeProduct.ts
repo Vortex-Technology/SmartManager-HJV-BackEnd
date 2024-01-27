@@ -1,6 +1,6 @@
 import { fakerPT_BR } from '@faker-js/faker'
 import { PrismaService } from '@infra/database/prisma/index.service'
-import { ProductVariantPrismaMapper } from '@infra/database/prisma/product/ProductVariantPrismaMapper'
+import { ProductVariantsPrismaMapper } from '@infra/database/prisma/product/ProductVariantsPrismaMapper'
 import { ProductsPrismaMapper } from '@infra/database/prisma/product/ProductsPrismaMapper'
 import { Product, ProductProps } from '@modules/product/entities/Product'
 import { Injectable } from '@nestjs/common'
@@ -34,7 +34,7 @@ export class MakeProduct {
 
     if (productVariants.length >= 1) {
       await this.prisma.productVariant.createMany({
-        data: productVariants.map(ProductVariantPrismaMapper.toPrisma),
+        data: productVariants.map(ProductVariantsPrismaMapper.toPrisma),
       })
     }
 
