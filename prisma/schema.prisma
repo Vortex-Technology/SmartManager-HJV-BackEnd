@@ -93,10 +93,11 @@ model Company {
   founder   User   @relation(fields: [founderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   founderId String @map("founder_id")
 
-  markets     Market[]
-  apiKeys     ApiKey[]
-  inventories Inventory[]
-  owner       Collaborator?
+  markets                  Market[]
+  apiKeys                  ApiKey[]
+  inventories              Inventory[]
+  owner                    Collaborator?
+  refreshTokenCollaborator RefreshTokenCollaborator[]
 
   @@map("companies")
 }
@@ -107,8 +108,9 @@ model ApiKey {
   secret    String    @unique
   revokedAt DateTime? @map("revoked_at")
 
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  companyId String  @map("company_id")
+  company                  Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId                String                     @map("company_id")
+  refreshTokenCollaborator RefreshTokenCollaborator[]
 
   @@map("api_keys")
 }
@@ -129,9 +131,32 @@ model Market {
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inventoryId String    @unique @map("inventory_id")
 
-  collaborators Collaborator[]
+  collaborators            Collaborator[]
+  refreshTokenCollaborator RefreshTokenCollaborator[]
 
   @@map("markets")
+}
+
+model RefreshTokenCollaborator {
+  id        String    @id @unique @default(uuid())
+  token     String
+  expiresIn DateTime  @map("expires_in")
+  expiredAt DateTime? @map("expired_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketId String @map("market_id")
+
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  apiKeyId String @map("api_key_id")
+
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  collaboratorId String       @map("collaborator_id")
+
+  @@map("refresh_tokens_collaborators")
 }
 
 enum RoleCollaborator {
@@ -161,7 +186,8 @@ model Collaborator {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @map("user_id")
 
-  remunerations Remuneration[]
+  remunerations            Remuneration[]
+  refreshTokenCollaborator RefreshTokenCollaborator[]
 
   @@map("collaborators")
 }
