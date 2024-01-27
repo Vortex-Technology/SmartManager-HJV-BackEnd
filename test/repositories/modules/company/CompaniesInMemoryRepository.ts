@@ -35,6 +35,25 @@ export class CompaniesInMemoryRepository implements CompaniesRepository {
     return company
   }
 
+  async findByIdAndFounderId(
+    companyId: string,
+    userId: string,
+  ): Promise<Company | null> {
+    if (!companyId || !userId) {
+      return null // Se algum dos parâmetros não foi fornecido, não é possível realizar a busca
+    }
+
+    const company = this.companies.find(
+      (company) => company.id.toString() === companyId,
+    )
+
+    if (!company) return null
+
+    // if (company.founderId.toString() !== userId) return null
+
+    return company
+  }
+
   async save(company: Company): Promise<void> {
     const companyIndex = this.companies.findIndex((company) =>
       company.equals(company),
