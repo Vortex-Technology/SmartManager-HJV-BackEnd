@@ -8,6 +8,7 @@ import { UserModule } from '@modules/user/User.module'
 import { CompanyModule } from '@modules/company/Company.module'
 import { MarketModule } from '@modules/market/Market.module'
 import { ProductModule } from '@modules/product/Product.module'
+import { CollaboratorModule } from '@modules/collaborator/Collaborator.module'
 
 @Module({
   imports: [
@@ -15,10 +16,10 @@ import { ProductModule } from '@modules/product/Product.module'
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
-    // CollaboratorModule,
     // RefreshTokenModule,
     // SellerModule,
     UserModule,
+    CollaboratorModule,
     CompanyModule,
     MarketModule,
     SocketModule,
