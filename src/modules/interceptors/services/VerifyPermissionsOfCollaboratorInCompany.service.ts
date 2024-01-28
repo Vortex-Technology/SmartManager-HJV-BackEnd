@@ -8,8 +8,9 @@ import {
 import { Injectable } from '@nestjs/common'
 import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
-import { Company } from '@modules/company/entities/Company'
+import { Company, CompanyStatus } from '@modules/company/entities/Company'
 import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
+import { CompanyInactive } from '@modules/company/errors/CompanyInactive'
 
 interface Request {
   acceptedRoles: CollaboratorRole[]
@@ -60,6 +61,10 @@ export class VerifyPermissionsOfCollaboratorInCompanyService {
 
     if (collaborator.companyId && !collaborator.companyId.equals(company.id)) {
       return left(new PermissionDenied())
+    }
+
+    if (company.status === CompanyStatus.INACTIVE) {
+      return left(new CompanyInactive())
     }
 
     return right({ company, collaborator })

@@ -5,8 +5,6 @@ import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
-import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
-import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
@@ -89,6 +87,10 @@ export class LoginCollaboratorService {
     if (response.isLeft()) return left(response.value)
 
     const { company, market } = response.value
+
+    if (!apiKey.companyId.equals(company.id)) {
+      return left(new PermissionDenied())
+    }
 
     const passwordMatch = await this.hashComparer.compare(
       password,
