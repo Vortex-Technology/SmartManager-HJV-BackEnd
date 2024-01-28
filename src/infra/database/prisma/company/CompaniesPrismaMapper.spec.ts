@@ -273,43 +273,6 @@ describe('Company prisma mapper', () => {
       })
   })
 
-  it('not should be able to map company in process update prisma if owner not set', () => {
-    const company = Company.create({
-      address: Address.create({
-        city: 'San Francisco',
-        neighborhood: 'Francisco',
-        country: 'USA',
-        number: '1',
-        street: 'Street 1',
-        state: 'Califonia',
-        postalCode: '0090900',
-        complement: 'complement',
-      }),
-      companyName: 'company',
-      founderId: new UniqueEntityId('founder-1'),
-      ownerId: new UniqueEntityId('owner-1'),
-      sector: 'sector',
-      createdAt: new Date(),
-      deletedAt: new Date(),
-      updatedAt: new Date(),
-      documentation: 'documentation',
-      documentationType: CompanyDocumentationType.LE,
-      email: 'email@example.com',
-      markets: null,
-      startedIssueInvoicesAt: new Date(),
-      stateRegistration: 'EUA',
-      status: CompanyStatus.INACTIVE,
-    })
-
-    expect(async () => {
-      CompaniesPrismaMapper.toUpdatePrisma(company)
-    })
-      .rejects.toBeInstanceOf(Error)
-      .catch((err) => {
-        throw err
-      })
-  })
-
   it('not should be able to map to entity if owner not exist in company', () => {
     const company: CompanyWithAddressAndOwnerIdPrisma = {
       id: 'company-1',

@@ -466,7 +466,6 @@ describe('Login collaborator service', () => {
       marketId: 'market-1',
       apiKey: apiKey.key,
     })
-    console.log(response)
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(PermissionDenied)
