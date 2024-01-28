@@ -77,6 +77,6 @@ describe('Get user (E2E)', () => {
       })
       .timeout({ deadline: 60000, response: 60000 })
 
-    expect(response.statusCode).toEqual(statusCode.Conflict)
+    expect(response.statusCode).toEqual(statusCode.NotFound)
   })
 })
