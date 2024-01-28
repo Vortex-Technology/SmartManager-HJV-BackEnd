@@ -18,4 +18,32 @@ export class ProductsInMemoryRepository implements ProductsRepository {
 
     this.products.push(product)
   }
+
+  async save(product: Product): Promise<void> {
+    const productIndex = this.products.findIndex((existingProduct) =>
+      existingProduct.equals(product),
+    )
+
+    if (productIndex === -1) {
+      throw new Error('Make sure you already create product')
+    }
+
+    this.products[productIndex] = product
+
+    const productVariants = product.productVariants?.getNewItems()
+
+    if (productVariants) {
+      await this.productVariantsRepository.createMany(productVariants)
+    }
+  }
+
+  async findById(id: string): Promise<Product | null> {
+    const product = this.products.find(
+      (product) => product.id.toString() === id,
+    )
+
+    if (!product) return null
+
+    return product
+  }
 }
