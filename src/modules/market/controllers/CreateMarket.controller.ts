@@ -9,24 +9,19 @@ import {
   Controller,
   Post,
   HttpCode,
-  BadRequestException,
-  NotFoundException,
   UseGuards,
-  ConflictException,
   Res,
   ForbiddenException,
 } from '@nestjs/common'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
-import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { ApiKeyGuard } from '@providers/auth/guards/apiKey.guard'
 import { Response } from 'express'
-import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
-import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { Roles } from '@providers/auth/decorators/roles.decorator'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
 import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @UseGuards(ApiKeyGuard)
 @Controller('/markets')
@@ -59,24 +54,7 @@ export class CreateMarketController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case CompanyNotFound: {
-          throw new NotFoundException(error.message)
-        }
-
-        case CollaboratorNotFound: {
-          throw new ConflictException(error.message)
-        }
-
-        case PermissionDenied: {
-          throw new ForbiddenException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { market } = response.value

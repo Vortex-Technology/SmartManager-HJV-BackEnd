@@ -1,12 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  ForbiddenException,
-  HttpCode,
-  Post,
-} from '@nestjs/common'
-import { UserWrongCredentials } from '../errors/UserWrongCredentials'
+import { Body, Controller, HttpCode, Post } from '@nestjs/common'
 import { LoginUserService } from '../services/LoginUser.service'
 import { statusCode } from '@config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
@@ -14,6 +6,7 @@ import {
   LoginUserBody,
   loginUserBodyValidationPipe,
 } from '../gateways/LoginUser.gateway'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/users/login')
 export class LoginUserController {
@@ -32,16 +25,7 @@ export class LoginUserController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case UserWrongCredentials: {
-          throw new ForbiddenException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { accessToken, refreshToken } = response.value

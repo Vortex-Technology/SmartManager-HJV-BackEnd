@@ -1,16 +1,10 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Controller,
-  Get,
-  HttpCode,
-} from '@nestjs/common'
+import { Controller, Get, HttpCode } from '@nestjs/common'
 import { GetUserService } from '../services/GetUser.service'
 import { statusCode } from '@config/statusCode'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { UserPresenter } from '../presenters/UserPresenter'
-import { UserNotFound } from '../errors/UserNotFound'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/users')
 export class GetUserController {
@@ -27,16 +21,7 @@ export class GetUserController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case UserNotFound: {
-          throw new ConflictException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { user } = response.value

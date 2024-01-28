@@ -6,18 +6,13 @@ import {
   UseGuards,
   Get,
   ForbiddenException,
-  ConflictException,
-  BadRequestException,
 } from '@nestjs/common'
 import { ApiKeyGuard } from '@providers/auth/guards/apiKey.guard'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
-import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
-import { CollaboratorNotFound } from '../errors/CollaboratorNotFound'
-import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
-import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { CollaboratorPresenter } from '../presenters/CollaboratorPresenter'
 import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @UseGuards(ApiKeyGuard)
 @Controller('/collaborators')
@@ -46,22 +41,7 @@ export class GetCollaboratorController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case CompanyNotFound:
-        case CollaboratorNotFound:
-        case MarketNotFound: {
-          throw new ConflictException(error.message)
-        }
-
-        case PermissionDenied: {
-          throw new ForbiddenException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { collaborator } = response.value

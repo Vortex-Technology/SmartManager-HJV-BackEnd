@@ -1,7 +1,5 @@
 import {
-  BadRequestException,
   Body,
-  ConflictException,
   Controller,
   ForbiddenException,
   HttpCode,
@@ -13,19 +11,17 @@ import { statusCode } from '@config/statusCode'
 import { JwtRoleGuard } from '@providers/auth/guards/jwtRole.guard'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
-import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { Roles } from '@providers/auth/decorators/roles.decorator'
 import { Response } from 'express'
-import { ProductCategoryAlreadyExists } from '../errors/ProductCategoryAlreadyExists'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
 import { CreateProductCategoryService } from '../services/CreateProductCategory.service'
-import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import {
   CreateProductCategoryBody,
   createProductCategoryBodyValidationPipe,
 } from '../gateways/CreateProductCategory.gateway'
 import { ApiKeyGuard } from '@providers/auth/guards/apiKey.guard'
 import { AuthCollaborator } from '@providers/auth/decorators/authCollaborator.decorator'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @UseGuards(ApiKeyGuard)
 @Controller('/products/categories')
@@ -68,21 +64,7 @@ export class CreateProductCategoryController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case ProductCategoryAlreadyExists:
-        case CollaboratorNotFound: {
-          throw new ConflictException(error.message)
-        }
-
-        case PermissionDenied: {
-          throw new ForbiddenException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { productCategory } = response.value
