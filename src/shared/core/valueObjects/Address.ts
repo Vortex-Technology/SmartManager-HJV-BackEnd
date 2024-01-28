@@ -1,3 +1,4 @@
+import { ValueObject } from '../entities/ValueObject'
 import { Optional } from '../types/Optional'
 
 export interface AddressProps {
@@ -11,21 +12,7 @@ export interface AddressProps {
   complement: string | null
 }
 
-export class Address {
-  protected props: AddressProps
-
-  protected constructor(props: AddressProps) {
-    this.props = props
-  }
-
-  public equals(entity: Address) {
-    if (entity === this) {
-      return true
-    }
-
-    return JSON.stringify(this.props) === JSON.stringify(entity.props)
-  }
-
+export class Address extends ValueObject<AddressProps> {
   static create(props: Optional<AddressProps, 'country' | 'complement'>) {
     return new Address({
       ...props,
