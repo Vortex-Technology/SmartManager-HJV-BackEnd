@@ -5,9 +5,11 @@ on:
     branches: 
       - 'dev'
       - 'main'
+      - 'features'
   pull_request:
     branches: 
       - main
+      - dev
 
 jobs:
   test:
