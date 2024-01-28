@@ -9,6 +9,7 @@ import { CompanyModule } from '@modules/company/Company.module'
 import { MarketModule } from '@modules/market/Market.module'
 import { ProductModule } from '@modules/product/Product.module'
 import { CollaboratorModule } from '@modules/collaborator/Collaborator.module'
+import { OrderModule } from '@modules/order/Order.module'
 
 @Module({
   imports: [
@@ -16,8 +17,6 @@ import { CollaboratorModule } from '@modules/collaborator/Collaborator.module'
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
-    // RefreshTokenModule,
-    // SellerModule,
     UserModule,
     CollaboratorModule,
     CompanyModule,
@@ -26,6 +25,7 @@ import { CollaboratorModule } from '@modules/collaborator/Collaborator.module'
     ProductModule,
     AuthProvider,
     EnvModule,
+    OrderModule,
   ],
 })
 export class AppModule {}
