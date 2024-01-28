@@ -98,6 +98,7 @@ model Company {
   inventories              Inventory[]
   owner                    Collaborator?
   refreshTokenCollaborator RefreshTokenCollaborator[]
+  orders                   Order[]
 
   @@map("companies")
 }
@@ -133,6 +134,7 @@ model Market {
 
   collaborators            Collaborator[]
   refreshTokenCollaborator RefreshTokenCollaborator[]
+  orders                   Order[]
 
   @@map("markets")
 }
@@ -188,6 +190,8 @@ model Collaborator {
 
   remunerations            Remuneration[]
   refreshTokenCollaborator RefreshTokenCollaborator[]
+  ordersOpened             Order[]                    @relation(name: "openedBy")
+  ordersClosed             Order[]                    @relation(name: "closedBy")
 
   @@map("collaborators")
 }
@@ -244,6 +248,7 @@ model ProductVariant {
   productId String  @map("product_id")
 
   productVariantInventories ProductVariantInventory[]
+  ordersProductsVariants    OrderProductsVariants[]
 
   @@map("product_variants")
 }
@@ -295,4 +300,74 @@ model ProductVariantInventory {
   inventoryId String    @map("inventory_id")
 
   @@map("products_variants_inventories")
+}
+
+model OrderProductsVariants {
+  id       String @id @unique @default(uuid())
+  quantity Int
+
+  productsVariant  ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productVariantId String         @map("product_variant_id")
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId String @map("order_id")
+
+  @@map("orders_products_variants")
+}
+
+enum OrderPaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+}
+
+enum OrderPaymentStatus {
+  PENDING
+  PAYED
+  REFUSED
+  REFUNDED
+}
+
+model OrderPayment {
+  id          Int                @id @unique @default(autoincrement())
+  method      OrderPaymentMethod
+  processedAt DateTime           @default(now()) @map("processed_at")
+  amount      Int
+  status      OrderPaymentStatus
+
+  order Order?
+
+  @@map("orders_payments")
+}
+
+model Order {
+  id         String    @id @unique @default(uuid())
+  protocol   BigInt    @unique
+  subTotal   Int       @map("sub_total")
+  discount   Int?
+  total      Int
+  openedAt   DateTime  @default(now()) @map("opened_at")
+  closedAt   DateTime? @map("closed_at")
+  refundedAt DateTime? @map("refunded_at")
+  deletedAt  DateTime? @map("deleted_at")
+  updatedAt  DateTime? @map("updated_at")
+
+  openedBy               Collaborator @relation(name: "openedBy", fields: [openedByCollaboratorId], references: [id])
+  openedByCollaboratorId String       @map("opened_by_collaborator_id")
+
+  closedBy               Collaborator? @relation(name: "closedBy", fields: [closedByCollaboratorId], references: [id])
+  closedByCollaboratorId String?       @map("closed_by_collaborator_id")
+
+  market   Market @relation(fields: [marketId], references: [id])
+  marketId String @map("market_id")
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  orderPayment   OrderPayment? @relation(fields: [orderPaymentId], references: [id])
+  orderPaymentId Int?          @unique
+
+  orderProductsVariants OrderProductsVariants[]
+
+  @@map("orders")
 }
