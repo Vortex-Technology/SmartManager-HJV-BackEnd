@@ -4,7 +4,7 @@ import { Optional } from '@shared/core/types/Optional'
 
 export interface UserProps {
   name: string
-  image?: string | null
+  image: string | null
   email: string
   emailVerifiedAt: Date | null
   password: string
@@ -39,12 +39,27 @@ export class User extends AggregateRoot<UserProps> {
     return this.props.name
   }
 
+  set name(name: string) {
+    this.props.name = name
+    this.touch()
+  }
+
   get image() {
     return this.props.image
   }
 
+  set image(image: string | null) {
+    this.props.image = image
+    this.touch()
+  }
+
   get email() {
     return this.props.email
+  }
+
+  set email(email: string) {
+    this.props.email = email
+    this.touch()
   }
 
   get emailVerifiedAt() {
