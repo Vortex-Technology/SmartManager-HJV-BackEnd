@@ -3,7 +3,6 @@ import { FakeEncrypter } from '@test/repositories/providers/cryptography/fakeEnc
 import { FakeEnv } from '@test/config/env/fakeEnv'
 import { DayJs } from '@providers/date/implementations/dayJs'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
-import { RefreshTokensInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokensInMemoryRepository'
 import { CollaboratorsInMemoryRepository } from '@test/repositories/modules/collaborator/CollaboratorsInMemoryRepository'
 import { LoginCollaboratorService } from './LoginCollaborator.service'
 import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
@@ -24,7 +23,14 @@ import { EnvService } from '@infra/env/Env.service'
 import { ApiKeysInMemoryRepository } from '@test/repositories/modules/company/ApiKeysInMemoryRepository'
 import { makeApiKey } from '@test/factories/modules/company/makeApiKey'
 import { ApiKeyIsRevoked } from '@modules/company/errors/ApiKeyIsRevoked'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
+import { RefreshTokensCollaboratorsInMemoryRepository } from '@test/repositories/modules/refreshToken/RefreshTokensCollaboratorsInMemoryRepository'
 
+let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
+let verifyPermissionsOfCollaboratorInMarketService: VerifyPermissionsOfCollaboratorInMarketService
+let ownersInMemoryRepository: OwnersInMemoryRepository
 let apiKesInMemoryRepository: ApiKeysInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
@@ -35,16 +41,19 @@ let fakeHasher: FakeHasher
 let fakeEncrypter: FakeEncrypter
 let fakeEnv: FakeEnv
 let fakeDateProvider: DayJs
-let refreshTokensInMemoryRepository: RefreshTokensInMemoryRepository
+let refreshTokensCollaboratorsInMemoryRepository: RefreshTokensCollaboratorsInMemoryRepository
 
 let sut: LoginCollaboratorService
 
-describe('Login Collaborator', () => {
+describe('Login collaborator service', () => {
   beforeEach(() => {
     apiKesInMemoryRepository = new ApiKeysInMemoryRepository()
+
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
+
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
       productVariantInventoriesInMemoryRepository,
     )
@@ -52,25 +61,44 @@ describe('Login Collaborator', () => {
       collaboratorsInMemoryRepository,
       inventoriesInMemoryRepository,
     )
+
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
+
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
+      ownersInMemoryRepository,
     )
+
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
+    verifyPermissionsOfCollaboratorInMarketService =
+      new VerifyPermissionsOfCollaboratorInMarketService(
+        verifyPermissionsOfCollaboratorInCompanyService,
+        marketsInMemoryRepository,
+      )
+
     fakeHasher = new FakeHasher()
     fakeEncrypter = new FakeEncrypter()
     fakeEnv = new FakeEnv()
     fakeDateProvider = new DayJs()
-    refreshTokensInMemoryRepository = new RefreshTokensInMemoryRepository()
+    refreshTokensCollaboratorsInMemoryRepository =
+      new RefreshTokensCollaboratorsInMemoryRepository()
 
     sut = new LoginCollaboratorService(
       apiKesInMemoryRepository,
-      companiesInMemoryRepository,
-      marketsInMemoryRepository,
       collaboratorsInMemoryRepository,
-      refreshTokensInMemoryRepository,
+      refreshTokensCollaboratorsInMemoryRepository,
       fakeHasher,
       fakeEncrypter,
       fakeEnv as EnvService,
       fakeDateProvider,
+      verifyPermissionsOfCollaboratorInMarketService,
     )
   })
 
@@ -78,7 +106,7 @@ describe('Login Collaborator', () => {
     const company = makeCompany({}, new UniqueEntityId('company-1'))
     await companiesInMemoryRepository.create(company)
 
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const market = makeMarket(
@@ -150,7 +178,7 @@ describe('Login Collaborator', () => {
 
     const passwordHash = await fakeHasher.hash('12345678')
 
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const collaborator = makeManager({
@@ -188,7 +216,7 @@ describe('Login Collaborator', () => {
 
     const passwordHash = await fakeHasher.hash('12345678')
 
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const collaborator = makeManager({
@@ -221,7 +249,8 @@ describe('Login Collaborator', () => {
     marketsInMemoryRepository.markets.push(market)
 
     const passwordHash = await fakeHasher.hash('12345678')
-    const apiKey = makeApiKey()
+
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const collaborator = makeManager({
@@ -254,7 +283,7 @@ describe('Login Collaborator', () => {
     marketsInMemoryRepository.markets.push(market)
 
     const passwordHash = await fakeHasher.hash('12345678')
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const collaborator = makeManager({
@@ -286,7 +315,7 @@ describe('Login Collaborator', () => {
     )
     marketsInMemoryRepository.markets.push(market)
 
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const response = await sut.execute({
@@ -313,7 +342,7 @@ describe('Login Collaborator', () => {
 
     const passwordHash = await fakeHasher.hash('12345678')
 
-    const apiKey = makeApiKey()
+    const apiKey = makeApiKey({ companyId: company.id })
     await apiKesInMemoryRepository.create(apiKey)
 
     const collaborator = makeSeller({
@@ -324,7 +353,7 @@ describe('Login Collaborator', () => {
     await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
-      email: 'jonas@joans.com',
+      email: 'jonas@jonas.com',
       password: 'wrong-password',
       companyId: 'company-1',
       marketId: 'market-1',
@@ -355,8 +384,8 @@ describe('Login Collaborator', () => {
     await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
-      email: 'jonas@joans.com',
-      password: 'wrong-password',
+      email: 'jonas@jonas.com',
+      password: '12345678',
       companyId: 'company-1',
       marketId: 'market-1',
       apiKey: 'inexistent-api-key',
@@ -379,6 +408,7 @@ describe('Login Collaborator', () => {
     const passwordHash = await fakeHasher.hash('12345678')
 
     const apiKey = makeApiKey({
+      companyId: company.id,
       revokedAt: new Date(),
     })
     await apiKesInMemoryRepository.create(apiKey)
@@ -391,8 +421,8 @@ describe('Login Collaborator', () => {
     await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
-      email: 'jonas@joans.com',
-      password: 'wrong-password',
+      email: 'jonas@jonas.com',
+      password: '12345678',
       companyId: 'company-1',
       marketId: 'market-1',
       apiKey: apiKey.key,
@@ -400,5 +430,44 @@ describe('Login Collaborator', () => {
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(ApiKeyIsRevoked)
+  })
+
+  it('not should be able to create a new session to collaborator if api key is not belong to company', async () => {
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
+    await companiesInMemoryRepository.create(company)
+
+    const company2 = makeCompany({}, new UniqueEntityId('company-2'))
+    await companiesInMemoryRepository.create(company2)
+
+    const market = makeMarket(
+      { companyId: company.id },
+      new UniqueEntityId('market-1'),
+    )
+    marketsInMemoryRepository.markets.push(market)
+
+    const passwordHash = await fakeHasher.hash('12345678')
+
+    const apiKey = makeApiKey({
+      companyId: company2.id,
+    })
+    await apiKesInMemoryRepository.create(apiKey)
+
+    const collaborator = makeSeller({
+      email: 'jonas@jonas.com',
+      password: passwordHash,
+      marketId: market.id,
+    })
+    await collaboratorsInMemoryRepository.create(collaborator)
+
+    const response = await sut.execute({
+      email: 'jonas@jonas.com',
+      password: '12345678',
+      companyId: 'company-1',
+      marketId: 'market-1',
+      apiKey: apiKey.key,
+    })
+
+    expect(response.isLeft()).toBe(true)
+    expect(response.value).toBeInstanceOf(PermissionDenied)
   })
 })

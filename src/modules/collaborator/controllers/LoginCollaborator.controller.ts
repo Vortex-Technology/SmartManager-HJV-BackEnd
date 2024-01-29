@@ -1,15 +1,6 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  ForbiddenException,
-  HttpCode,
-  Param,
-  Post,
-} from '@nestjs/common'
+import { Body, Controller, HttpCode, Param, Post } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import { Public } from '@providers/auth/decorators/public.decorator'
-import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
 import { LoginCollaboratorService } from '../services/LoginCollaborator.service'
 import {
   LoginCollaboratorBody,
@@ -18,6 +9,7 @@ import {
   loginCollaboratorParamsValidationPipe,
 } from '../gateways/LoginCollaborator.gateway'
 import { CompanyApiKey } from '@providers/auth/decorators/companyApiKey.decorator'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/companies/:companyId/markets/:marketId/collaborators/login')
 export class LoginCollaboratorController {
@@ -47,16 +39,7 @@ export class LoginCollaboratorController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case CollaboratorWrongCredentials: {
-          throw new ForbiddenException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { accessToken, refreshToken } = response.value

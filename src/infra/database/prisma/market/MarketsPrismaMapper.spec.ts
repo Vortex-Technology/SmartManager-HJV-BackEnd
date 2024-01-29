@@ -49,8 +49,11 @@ describe('Markets prisma mapper', () => {
         createdAt: new Date(),
         deletedAt: new Date(),
         updatedAt: new Date(),
-        address: makeAddress(),
-        inventory: makeInventory({}, new UniqueEntityId('inventoryId-1')),
+        address: makeAddress({}),
+        inventory: makeInventory(
+          { companyId: new UniqueEntityId('companyId-1') },
+          new UniqueEntityId('inventoryId-1'),
+        ),
       },
       new UniqueEntityId('id-1'),
     )
@@ -107,5 +110,52 @@ describe('Markets prisma mapper', () => {
       })
   })
 
-  it.skip('should be able to map a market to create prisma')
+  it('should be able to map a market to create prisma', () => {
+    const market = Market.create(
+      {
+        companyId: new UniqueEntityId('company-1'),
+        inventory: makeInventory(
+          { companyId: new UniqueEntityId('company-1') },
+          new UniqueEntityId('inventory-1'),
+        ),
+        inventoryId: new UniqueEntityId('inventory-1'),
+        tradeName: 'tradeName-1',
+        createdAt: new Date(),
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+        address: makeAddress(),
+      },
+      new UniqueEntityId('market-1'),
+    )
+
+    const result = MarketsPrismaMapper.toCreatePrisma(market)
+
+    expect(result.company.connect?.id).toBe('company-1')
+    expect(result.inventory.create?.id).toBe('inventory-1')
+    expect(result.tradeName).toBe('tradeName-1')
+    expect(result.createdAt).toBeInstanceOf(Date)
+    expect(result.updatedAt).toBeInstanceOf(Date)
+    expect(result.deletedAt).toBeInstanceOf(Date)
+  })
+
+  it('not should be able to map a market to create prisma if market must have an inventory', () => {
+    const market = Market.create(
+      {
+        companyId: new UniqueEntityId('company-1'),
+        inventoryId: new UniqueEntityId('inventory-1'),
+        tradeName: 'tradeName-1',
+        createdAt: new Date(),
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+        address: makeAddress(),
+      },
+      new UniqueEntityId('market-1'),
+    )
+
+    expect(async () => MarketsPrismaMapper.toCreatePrisma(market))
+      .rejects.toBeInstanceOf(Error)
+      .catch((err) => {
+        throw err
+      })
+  })
 })

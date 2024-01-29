@@ -4,19 +4,18 @@ import { CollaboratorsRepository } from '../repositories/CollaboratorsRepository
 import { HashComparer } from '@providers/cryptography/contracts/hashComparer'
 import { Encrypter } from '@providers/cryptography/contracts/encrypter'
 import { DateAddition } from '@providers/date/contracts/dateAddition'
-import { RefreshTokensRepository } from '@modules/refreshToken/repositories/RefreshTokensRepository'
-import { RefreshToken } from '@modules/refreshToken/entities/RefreshToken'
 import { CollaboratorWrongCredentials } from '../errors/CollaboratorWrongCredentials'
-import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
-import { MarketsRepository } from '@modules/market/repositories/MarketsRepository'
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { CompanyInactive } from '@modules/company/errors/CompanyInactive'
-import { CompanyStatus } from '@modules/company/entities/Company'
 import { EnvService } from '@infra/env/Env.service'
 import { ApiKeysRepository } from '@modules/company/repositories/ApiKeysRepository'
 import { ApiKeyIsRevoked } from '@modules/company/errors/ApiKeyIsRevoked'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
+import { CollaboratorRole } from '../entities/Collaborator'
+import { RefreshTokensCollaboratorsRepository } from '@modules/refreshToken/repositories/RefreshTokensCollaboratorsRepository'
+import { RefreshTokenCollaborator } from '@modules/refreshToken/entities/RefreshTokenCollaborator'
 
 interface Request {
   email: string
@@ -43,14 +42,13 @@ type Response = Either<
 export class LoginCollaboratorService {
   constructor(
     private readonly apiKeysRepository: ApiKeysRepository,
-    private readonly companiesRepository: CompaniesRepository,
-    private readonly marketsRepository: MarketsRepository,
     private readonly collaboratorsRepository: CollaboratorsRepository,
-    private readonly refreshTokensRepository: RefreshTokensRepository,
+    private readonly refreshTokensCollaboratorsRepository: RefreshTokensCollaboratorsRepository,
     private readonly hashComparer: HashComparer,
     private readonly encrypter: Encrypter,
     private readonly env: EnvService,
     private readonly dateAddition: DateAddition,
+    private readonly verifyPermissions: VerifyPermissionsOfCollaboratorInMarketService,
   ) {}
 
   async execute({
@@ -61,7 +59,6 @@ export class LoginCollaboratorService {
     apiKey: key,
   }: Request): Promise<Response> {
     const apiKey = await this.apiKeysRepository.findByKey(key)
-
     if (!apiKey) {
       return left(new PermissionDenied())
     }
@@ -70,33 +67,28 @@ export class LoginCollaboratorService {
       return left(new ApiKeyIsRevoked())
     }
 
-    const company = await this.companiesRepository.findById(companyId)
-
-    if (!company) {
-      return left(new CompanyNotFound())
-    }
-
-    const market = await this.marketsRepository.findById(marketId)
-
-    if (!market) {
-      return left(new MarketNotFound())
-    }
-
-    if (!market.companyId.equals(company.id)) {
-      return left(new PermissionDenied())
-    }
-
-    if (company.status === CompanyStatus.INACTIVE) {
-      return left(new CompanyInactive())
-    }
-
     const collaborator = await this.collaboratorsRepository.findByEmail(email)
-
     if (!collaborator) {
       return left(new CollaboratorWrongCredentials())
     }
 
-    if (!collaborator.marketId?.equals(market.id)) {
+    const response = await this.verifyPermissions.execute({
+      acceptedRoles: [
+        CollaboratorRole.MANAGER,
+        CollaboratorRole.OWNER,
+        CollaboratorRole.SELLER,
+        CollaboratorRole.STOCKIST,
+      ],
+      collaborator,
+      companyId,
+      marketId,
+    })
+
+    if (response.isLeft()) return left(response.value)
+
+    const { company, market } = response.value
+
+    if (!apiKey.companyId.equals(company.id)) {
       return left(new PermissionDenied())
     }
 
@@ -137,15 +129,18 @@ export class LoginCollaboratorService {
       },
     )
 
-    const refreshToken = RefreshToken.create({
-      userId: collaborator.id,
+    const refreshToken = RefreshTokenCollaborator.create({
+      collaboratorId: collaborator.id,
+      apiKeyId: apiKey.id,
+      companyId: company.id,
+      marketId: market.id,
       token: _refreshToken,
       expiresIn: this.dateAddition.addDaysInCurrentDate(
         this.env.get('USER_REFRESH_EXPIRES_IN'),
       ),
     })
 
-    await this.refreshTokensRepository.create(refreshToken)
+    await this.refreshTokensCollaboratorsRepository.create(refreshToken)
 
     return right({
       accessToken,

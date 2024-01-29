@@ -93,9 +93,12 @@ model Company {
   founder   User   @relation(fields: [founderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   founderId String @map("founder_id")
 
-  markets Market[]
-  apiKeys ApiKey[]
-  owner   Collaborator?
+  markets                  Market[]
+  apiKeys                  ApiKey[]
+  inventories              Inventory[]
+  owner                    Collaborator?
+  refreshTokenCollaborator RefreshTokenCollaborator[]
+  orders                   Order[]
 
   @@map("companies")
 }
@@ -106,8 +109,9 @@ model ApiKey {
   secret    String    @unique
   revokedAt DateTime? @map("revoked_at")
 
-  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  companyId String  @map("company_id")
+  company                  Company                    @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId                String                     @map("company_id")
+  refreshTokenCollaborator RefreshTokenCollaborator[]
 
   @@map("api_keys")
 }
@@ -128,9 +132,33 @@ model Market {
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   inventoryId String    @unique @map("inventory_id")
 
-  collaborators Collaborator[]
+  collaborators            Collaborator[]
+  refreshTokenCollaborator RefreshTokenCollaborator[]
+  orders                   Order[]
 
   @@map("markets")
+}
+
+model RefreshTokenCollaborator {
+  id        String    @id @unique @default(uuid())
+  token     String
+  expiresIn DateTime  @map("expires_in")
+  expiredAt DateTime? @map("expired_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
+  market   Market @relation(fields: [marketId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  marketId String @map("market_id")
+
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  apiKeyId String @map("api_key_id")
+
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  collaboratorId String       @map("collaborator_id")
+
+  @@map("refresh_tokens_collaborators")
 }
 
 enum RoleCollaborator {
@@ -160,7 +188,10 @@ model Collaborator {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @map("user_id")
 
-  remunerations Remuneration[]
+  remunerations            Remuneration[]
+  refreshTokenCollaborator RefreshTokenCollaborator[]
+  ordersOpened             Order[]                    @relation(name: "openedBy")
+  ordersClosed             Order[]                    @relation(name: "closedBy")
 
   @@map("collaborators")
 }
@@ -217,6 +248,7 @@ model ProductVariant {
   productId String  @map("product_id")
 
   productVariantInventories ProductVariantInventory[]
+  ordersProductsVariants    OrderProductsVariants[]
 
   @@map("product_variants")
 }
@@ -246,6 +278,9 @@ model Inventory {
   address   Address? @relation(fields: [addressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   addressId Int?     @unique @map("address_id")
 
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  companyId String  @map("company_id")
+
   market Market?
 
   @@map("inventories")
@@ -265,4 +300,74 @@ model ProductVariantInventory {
   inventoryId String    @map("inventory_id")
 
   @@map("products_variants_inventories")
+}
+
+model OrderProductsVariants {
+  id       String @id @unique @default(uuid())
+  quantity Int
+
+  productsVariant  ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  productVariantId String         @map("product_variant_id")
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  orderId String @map("order_id")
+
+  @@map("orders_products_variants")
+}
+
+enum OrderPaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  CASH
+}
+
+enum OrderPaymentStatus {
+  PENDING
+  PAYED
+  REFUSED
+  REFUNDED
+}
+
+model OrderPayment {
+  id          Int                @id @unique @default(autoincrement())
+  method      OrderPaymentMethod
+  processedAt DateTime           @default(now()) @map("processed_at")
+  amount      Int
+  status      OrderPaymentStatus
+
+  order Order?
+
+  @@map("orders_payments")
+}
+
+model Order {
+  id         String    @id @unique @default(uuid())
+  protocol   BigInt    @unique
+  subTotal   Int       @map("sub_total")
+  discount   Int?
+  total      Int
+  openedAt   DateTime  @default(now()) @map("opened_at")
+  closedAt   DateTime? @map("closed_at")
+  refundedAt DateTime? @map("refunded_at")
+  deletedAt  DateTime? @map("deleted_at")
+  updatedAt  DateTime? @map("updated_at")
+
+  openedBy               Collaborator @relation(name: "openedBy", fields: [openedByCollaboratorId], references: [id])
+  openedByCollaboratorId String       @map("opened_by_collaborator_id")
+
+  closedBy               Collaborator? @relation(name: "closedBy", fields: [closedByCollaboratorId], references: [id])
+  closedByCollaboratorId String?       @map("closed_by_collaborator_id")
+
+  market   Market @relation(fields: [marketId], references: [id])
+  marketId String @map("market_id")
+
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String  @map("company_id")
+
+  orderPayment   OrderPayment? @relation(fields: [orderPaymentId], references: [id])
+  orderPaymentId Int?          @unique
+
+  orderProductsVariants OrderProductsVariants[]
+
+  @@map("orders")
 }

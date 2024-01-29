@@ -74,4 +74,28 @@ export class CompaniesPrismaRepository implements CompaniesRepository {
 
     return CompaniesPrismaMapper.toEntity(company)
   }
+
+  async findByIdAndFounderId(
+    companyId: string,
+    founderId: string,
+  ): Promise<Company | null> {
+    const company = await this.prisma.company.findFirst({
+      where: {
+        id: companyId,
+        founderId,
+      },
+      include: {
+        address: true,
+        owner: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    })
+
+    if (!company) return null
+
+    return CompaniesPrismaMapper.toEntity(company)
+  }
 }

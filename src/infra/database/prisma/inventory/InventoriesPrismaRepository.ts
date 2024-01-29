@@ -1,19 +1,23 @@
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../index.service'
+import { PrismaConfig, PrismaService } from '../index.service'
 import { ProductVariantInventoriesRepository } from '@modules/inventory/repositories/ProductVariantInventoriesRepository'
 import { InventoriesPrismaMapper } from './InventoriesPrismaMapper'
 
 @Injectable()
-export class InventoriesPrismaRepository implements InventoriesRepository {
+export class InventoriesPrismaRepository
+  implements InventoriesRepository<PrismaConfig>
+{
   constructor(
     private readonly prisma: PrismaService,
     private readonly productVariantInventoryRepository: ProductVariantInventoriesRepository,
   ) {}
 
-  async create(inventory: Inventory): Promise<void> {
-    await this.prisma.inventory.create({
+  async create(inventory: Inventory, config?: PrismaConfig): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.inventory.create({
       data: InventoriesPrismaMapper.toPrisma(inventory),
     })
 
@@ -23,12 +27,15 @@ export class InventoriesPrismaRepository implements InventoriesRepository {
     if (productVariantInventory) {
       await this.productVariantInventoryRepository.createMany(
         productVariantInventory,
+        config,
       )
     }
   }
 
-  async save(inventory: Inventory): Promise<void> {
-    await this.prisma.inventory.update({
+  async save(inventory: Inventory, config?: PrismaConfig): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.inventory.update({
       where: {
         id: inventory.id.toString(),
       },
@@ -41,6 +48,7 @@ export class InventoriesPrismaRepository implements InventoriesRepository {
     if (productVariantInventory) {
       await this.productVariantInventoryRepository.createMany(
         productVariantInventory,
+        config,
       )
     }
   }

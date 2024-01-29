@@ -28,6 +28,10 @@ import { ApiKeysRepository } from '@modules/company/repositories/ApiKeysReposito
 import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepository'
 import { TransactorService } from './transactor/contracts/TransactorService'
 import { TransactorManager } from './transactor/implementations/TransactorManager'
+import { RefreshTokensCollaboratorsRepository } from '@modules/refreshToken/repositories/RefreshTokensCollaboratorsRepository'
+import { RefreshTokensCollaboratorsPrismaRepository } from './prisma/refreshToken/RefreshTokensCollaboratorsPrismaRepository'
+import { OrdersRepository } from '@modules/order/repositories/OrdersRepository'
+import { OrdersPrismaRepository } from './prisma/order/OrdersPrismaRepository'
 
 @Module({
   providers: [
@@ -35,6 +39,10 @@ import { TransactorManager } from './transactor/implementations/TransactorManage
     {
       provide: RefreshTokensRepository,
       useClass: RefreshTokensPrismaRepository,
+    },
+    {
+      provide: RefreshTokensCollaboratorsRepository,
+      useClass: RefreshTokensCollaboratorsPrismaRepository,
     },
     {
       provide: CompaniesRepository,
@@ -89,6 +97,10 @@ import { TransactorManager } from './transactor/implementations/TransactorManage
       provide: TransactorService,
       useClass: TransactorManager,
     },
+    {
+      provide: OrdersRepository,
+      useClass: OrdersPrismaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -105,6 +117,8 @@ import { TransactorManager } from './transactor/implementations/TransactorManage
     OwnersRepository,
     ApiKeysRepository,
     TransactorService,
+    RefreshTokensCollaboratorsRepository,
+    OrdersRepository,
   ],
 })
 export class DatabaseModule {}

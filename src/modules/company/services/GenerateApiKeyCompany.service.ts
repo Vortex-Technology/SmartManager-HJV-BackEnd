@@ -8,42 +8,44 @@ import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
 import { HandleHashGenerator } from '@providers/cryptography/contracts/handleHashGenerator'
 import { ApiKeysRepository } from '../repositories/ApiKeysRepository'
 import { LotsOfExistingKeys } from '../errors/LotsOfExistingKeys'
-import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
+import { UsersRepository } from '@modules/user/repositories/UsersRepository'
+import { UserNotFound } from '@modules/user/errors/UserNotFound'
 
 interface Request {
-  requesterId: string
+  userId: string
   companyId: string
 }
 
 type Response = Either<
-  CompanyNotFound | PermissionDenied | LotsOfExistingKeys,
+  CompanyNotFound | PermissionDenied | LotsOfExistingKeys | UserNotFound,
   { apiKey: ApiKey }
 >
 
 @Injectable()
 export class GenerateApiKeyCompanyService {
   constructor(
-    private readonly ownersRepository: OwnersRepository,
+    private readonly usersRepository: UsersRepository,
     private readonly companiesRepository: CompaniesRepository,
     private readonly apisKeyRepository: ApiKeysRepository,
     private readonly hashGenerator: HashGenerator,
     private readonly handleHashGenerator: HandleHashGenerator,
   ) {}
 
-  async execute({ requesterId, companyId }: Request): Promise<Response> {
-    const owner = await this.ownersRepository.findById(requesterId)
-
-    if (!owner) {
-      return left(new PermissionDenied())
+  async execute({ userId, companyId }: Request): Promise<Response> {
+    const user = await this.usersRepository.findById(userId)
+    if (!user) {
+      return left(new UserNotFound())
     }
 
-    const company = await this.companiesRepository.findById(companyId)
-
+    const company = await this.companiesRepository.findByIdAndFounderId(
+      companyId,
+      userId,
+    )
     if (!company) {
       return left(new CompanyNotFound())
     }
 
-    if (!company.ownerId.equals(owner.id)) {
+    if (!company.founderId.equals(user.id)) {
       return left(new PermissionDenied())
     }
 
@@ -62,6 +64,7 @@ export class GenerateApiKeyCompanyService {
       secret,
       companyId: company.id,
     })
+    await this.apisKeyRepository.create(apiKey)
 
     return right({
       apiKey,

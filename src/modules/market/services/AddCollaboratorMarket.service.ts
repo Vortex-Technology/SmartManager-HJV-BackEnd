@@ -1,4 +1,3 @@
-import { CompaniesRepository } from '@modules/company/repositories/CompaniesRepository'
 import { UsersRepository } from '@modules/user/repositories/UsersRepository'
 import { Injectable } from '@nestjs/common'
 import { HashGenerator } from '@providers/cryptography/contracts/hashGenerator'
@@ -13,9 +12,9 @@ import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { MarketNotFound } from '../errors/MarketNorFound'
 import { User } from '@modules/user/entities/User'
 import { MarketCollaboratorsList } from '../entities/MarketCollaboratorsList'
-import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { TransactorService } from '@infra/database/transactor/contracts/TransactorService'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
 
 interface Request {
   name: string
@@ -40,11 +39,10 @@ type Response = Either<
 export class AddCollaboratorMarketService {
   constructor(
     private readonly usersRepository: UsersRepository,
-    private readonly companiesRepository: CompaniesRepository,
     private readonly marketsRepository: MarketsRepository,
-    private readonly collaboratorsRepository: CollaboratorsRepository,
     private readonly hasherGenerator: HashGenerator,
     private readonly transactorService: TransactorService,
+    private readonly verifyPermissions: VerifyPermissionsOfCollaboratorInMarketService,
   ) {}
 
   async execute({
@@ -58,36 +56,16 @@ export class AddCollaboratorMarketService {
     actualRemuneration,
     creatorId,
   }: Request): Promise<Response> {
-    const acceptCreationForRoles = [
-      CollaboratorRole.MANAGER,
-      CollaboratorRole.OWNER,
-    ]
+    const response = await this.verifyPermissions.execute({
+      acceptedRoles: [CollaboratorRole.MANAGER, CollaboratorRole.OWNER],
+      collaboratorId: creatorId,
+      companyId,
+      marketId,
+    })
 
-    const creator = await this.collaboratorsRepository.findById(creatorId)
-    if (!creator) {
-      return left(new CollaboratorNotFound())
-    }
+    if (response.isLeft()) return left(response.value)
 
-    const company = await this.companiesRepository.findById(companyId)
-    if (!company) {
-      return left(new CompanyNotFound())
-    }
-
-    const market = await this.marketsRepository.findById(marketId)
-    if (!market) {
-      return left(new MarketNotFound())
-    }
-
-    if (
-      !creator.marketId?.equals(market.id) &&
-      !creator.companyId?.equals(company.id)
-    ) {
-      return left(new PermissionDenied())
-    }
-
-    if (!acceptCreationForRoles.includes(creator.role)) {
-      return left(new PermissionDenied())
-    }
+    const { market } = response.value
 
     if (
       collaboratorRole === CollaboratorRole.OWNER ||

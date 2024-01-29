@@ -1,17 +1,23 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface UserProps {
-  name: string
-  image?: string | null
-  email: string
-  emailVerifiedAt: Date | null
-  password: string
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
-}
+const userPropsSchema = z.object({
+  name: z.string().min(2).max(30),
+  image: z.string().url().nullable(),
+  email: z.string().email(),
+  password: z.string().min(8),
+  emailVerifiedAt: z.date().nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+})
+
+const userValidator = new ZodEntityValidationPipe(userPropsSchema)
+
+export type UserProps = z.infer<typeof userPropsSchema>
 
 export class User extends AggregateRoot<UserProps> {
   static create(
@@ -20,7 +26,7 @@ export class User extends AggregateRoot<UserProps> {
       'createdAt' | 'updatedAt' | 'deletedAt' | 'emailVerifiedAt' | 'image'
     >,
     id?: UniqueEntityId,
-  ) {
+  ): User {
     const userProps: UserProps = {
       ...props,
       createdAt: props.createdAt ?? new Date(),
@@ -31,6 +37,7 @@ export class User extends AggregateRoot<UserProps> {
     }
 
     const user = new User(userProps, id)
+    user.validate(userValidator)
 
     return user
   }

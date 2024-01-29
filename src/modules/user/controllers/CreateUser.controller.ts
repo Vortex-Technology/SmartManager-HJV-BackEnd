@@ -1,22 +1,14 @@
-import {
-  BadRequestException,
-  Body,
-  ConflictException,
-  Controller,
-  HttpCode,
-  Post,
-  Res,
-} from '@nestjs/common'
+import { Body, Controller, HttpCode, Post, Res } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import { CreateUserService } from '../services/CreateUser.service'
 
-import { UserAlreadyExistsWithSameEmail } from '../errors/UserAlreadyExistsWithSameEmail'
 import { Response } from 'express'
 import { Public } from '@providers/auth/decorators/public.decorator'
 import {
   CreateUserBody,
   createUserBodyValidationPipe,
 } from '../gateways/CreateUser.gateway'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/users')
 export class CreateUserController {
@@ -40,16 +32,7 @@ export class CreateUserController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case UserAlreadyExistsWithSameEmail: {
-          throw new ConflictException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { user } = response.value

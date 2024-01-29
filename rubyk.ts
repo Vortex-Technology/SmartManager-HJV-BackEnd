@@ -13,6 +13,7 @@ export const config: Config = {
     'manager',
     'stockist',
     'seller',
+    'order',
   ],
   plugins: ['infraGenerators', 'nestGenerators', 'prismaGenerators'],
 }

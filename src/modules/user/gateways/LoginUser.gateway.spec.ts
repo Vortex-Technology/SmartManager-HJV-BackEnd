@@ -21,7 +21,6 @@ describe('Login user gateway', () => {
     })
       .rejects.toBeInstanceOf(BadRequestException)
       .catch((err) => {
-        console.log(err)
         throw err
       })
   })

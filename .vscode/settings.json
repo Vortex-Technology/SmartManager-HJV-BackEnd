@@ -15,6 +15,7 @@
     "repositories": "database",
     "implementations": "controller",
     "entities": "class",
+    "valueObjects": "class",
     "gateways": "typescript",
   },
   "cSpell.words": [
