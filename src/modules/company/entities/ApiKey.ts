@@ -1,13 +1,19 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface ApiKeyProps {
-  key: string
-  secret: string
-  revokedAt: Date | null
-  companyId: UniqueEntityId
-}
+const apiKeyPropsSchema = z.object({
+  key: z.string(),
+  secret: z.string(),
+  revokedAt: z.date().nullable(),
+  companyId: z.instanceof(UniqueEntityId),
+})
+
+const apiKeyValidationPipe = new ZodEntityValidationPipe(apiKeyPropsSchema)
+
+export type ApiKeyProps = z.infer<typeof apiKeyPropsSchema>
 
 export class ApiKey extends AggregateRoot<ApiKeyProps> {
   static create(
@@ -20,6 +26,7 @@ export class ApiKey extends AggregateRoot<ApiKeyProps> {
     }
 
     const apiKey = new ApiKey(apiKeyProps, id)
+    apiKey.validate(apiKeyValidationPipe)
 
     return apiKey
   }

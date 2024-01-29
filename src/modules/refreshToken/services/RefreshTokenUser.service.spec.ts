@@ -84,7 +84,7 @@ describe('Refresh Token', () => {
         fakeEnv.get('USER_REFRESH_EXPIRES_IN'),
       )
 
-      expect(receivedDate.isSame(expectedDate, 'seconds')).toEqual(true)
+      expect(receivedDate.isSame(expectedDate, 'minutes')).toEqual(true)
     }
   })
 

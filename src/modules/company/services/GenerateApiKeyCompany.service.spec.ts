@@ -137,7 +137,6 @@ describe('Generate api key', () => {
       userId: 'user-2',
       companyId: 'company-1',
     })
-    console.log(response)
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(CompanyNotFound)
@@ -175,7 +174,6 @@ describe('Generate api key', () => {
       userId: 'user-1',
       companyId: 'company-1',
     })
-    console.log(response)
 
     expect(response.isLeft()).toBe(true)
     expect(response.value).toBeInstanceOf(LotsOfExistingKeys)

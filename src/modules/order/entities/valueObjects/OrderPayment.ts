@@ -1,5 +1,7 @@
 import { ValueObject } from '@shared/core/entities/ValueObject'
 import { Optional } from '@shared/core/types/Optional'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
+import { z } from 'zod'
 
 export enum OrderPaymentStatus {
   PENDING = 'PENDING',
@@ -14,19 +16,30 @@ export enum OrderPaymentMethod {
   DEBIT_CARD = 'DEBIT_CARD',
 }
 
-export interface OrderPaymentProps {
-  method: OrderPaymentMethod
-  status: OrderPaymentStatus
-  processedAt: Date
-  amount: number
-}
+const orderPaymentPropsSchema = z.object({
+  method: z.nativeEnum(OrderPaymentMethod),
+  status: z.nativeEnum(OrderPaymentStatus),
+  processedAt: z.date(),
+  amount: z.number().min(0),
+})
+
+const orderPaymentValidationPipe = new ZodEntityValidationPipe(
+  orderPaymentPropsSchema,
+)
+
+export type OrderPaymentProps = z.infer<typeof orderPaymentPropsSchema>
 
 export class OrderPayment extends ValueObject<OrderPaymentProps> {
   static create(props: Optional<OrderPaymentProps, 'processedAt'>) {
-    return new OrderPayment({
+    const orderPaymentProps: OrderPaymentProps = {
       ...props,
       processedAt: props.processedAt ?? new Date(),
-    })
+    }
+
+    const orderPayment = new OrderPayment(orderPaymentProps)
+    orderPayment.validate(orderPaymentValidationPipe)
+
+    return orderPayment
   }
 
   get method() {

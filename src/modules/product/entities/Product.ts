@@ -3,6 +3,21 @@ import { ProductVariantsList } from './ProductVariantsList'
 import { ProductCategoriesList } from './ProductCategoriesList'
 import { Optional } from '@shared/core/types/Optional'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
+
+const productPropsSchema = z.object({
+  name: z.string().min(3).max(60),
+  productVariants: z.instanceof(ProductVariantsList).nullable(),
+  productCategories: z.instanceof(ProductCategoriesList).nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+})
+
+const productValidationPipe = new ZodEntityValidationPipe(productPropsSchema)
+
+export type ProductProps = z.infer<typeof productPropsSchema>
 
 export enum ProductUnitType {
   KILOS = 'KG',
@@ -11,17 +26,6 @@ export enum ProductUnitType {
   CENTIMETERS = 'CM',
   POL = 'PL',
   LITERS = 'LT',
-}
-
-export interface ProductProps {
-  name: string
-
-  productVariants: ProductVariantsList | null
-  productCategories: ProductCategoriesList | null
-
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
 }
 
 export class Product extends AggregateRoot<ProductProps> {
@@ -46,6 +50,7 @@ export class Product extends AggregateRoot<ProductProps> {
     }
 
     const product = new Product(productProps, id)
+    product.validate(productValidationPipe)
 
     return product
   }

@@ -2,21 +2,29 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { ProductUnitType } from './Product'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface ProductVariantProps {
-  name: string
-  description: string | null
-  model: string | null
-  pricePerUnit: number
-  brand: string
-  image: string | null
-  barCode: string
-  unitType: ProductUnitType
-  productId: UniqueEntityId
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
-}
+const productVariantPropsSchema = z.object({
+  name: z.string().min(3).max(60),
+  description: z.string().max(230).nullable(),
+  model: z.string().max(60).nullable(),
+  pricePerUnit: z.number().min(1),
+  brand: z.string().min(2).max(60),
+  image: z.string().url().nullable(),
+  barCode: z.string().max(48),
+  unitType: z.nativeEnum(ProductUnitType),
+  productId: z.instanceof(UniqueEntityId),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+})
+
+const productVariantValidationPipe = new ZodEntityValidationPipe(
+  productVariantPropsSchema,
+)
+
+export type ProductVariantProps = z.infer<typeof productVariantPropsSchema>
 
 export class ProductVariant extends AggregateRoot<ProductVariantProps> {
   static create(
@@ -42,6 +50,7 @@ export class ProductVariant extends AggregateRoot<ProductVariantProps> {
     }
 
     const productVariant = new ProductVariant(productVariantProps, id)
+    productVariant.validate(productVariantValidationPipe)
 
     return productVariant
   }
