@@ -7,7 +7,7 @@ import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
 const productVariantPropsSchema = z.object({
   name: z.string().min(3).max(60),
-  description: z.string().max(190).nullable(),
+  description: z.string().max(230).nullable(),
   model: z.string().max(60).nullable(),
   pricePerUnit: z.number().min(1),
   brand: z.string().min(2).max(60),

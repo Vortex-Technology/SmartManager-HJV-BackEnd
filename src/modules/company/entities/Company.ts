@@ -33,9 +33,7 @@ const companyPropsSchema = z.object({
   founderId: z.instanceof(UniqueEntityId),
   ownerId: z.instanceof(UniqueEntityId),
   owner: z.custom<Owner>((v): v is Owner => v instanceof Owner).nullable(),
-  address: z
-    .custom<Address>((v): v is Address => v instanceof Address)
-    .nullable(),
+  address: z.custom<Address>((v): v is Address => v instanceof Address),
 })
 
 const companyValidationPipe = new ZodEntityValidationPipe(companyPropsSchema)
