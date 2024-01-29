@@ -37,7 +37,7 @@ describe('Company prisma mapper', () => {
       owner: { id: 'owner-1' },
       startedIssueInvoicesAt: null,
       sector: 'sector',
-      stateRegistration: 'state-registration',
+      stateRegistration: '14',
       status: 'ACTIVE',
       updatedAt: new Date(),
     }
@@ -58,7 +58,7 @@ describe('Company prisma mapper', () => {
     expect(result.documentationType).toBe(CompanyDocumentationType.IE)
     expect(result.email).toBe('company-name@example.com')
     expect(result.startedIssueInvoicesAt).toBe(null)
-    expect(result.stateRegistration).toBe('state-registration')
+    expect(result.stateRegistration).toBe('14')
     expect(result.status).toBe(CompanyStatus.ACTIVE)
     expect(result.createdAt).toBeInstanceOf(Date)
     expect(result.updatedAt).toBeInstanceOf(Date)
