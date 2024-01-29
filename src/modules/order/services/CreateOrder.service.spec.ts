@@ -113,8 +113,6 @@ describe('Create order service', async () => {
       marketId: 'market-1',
     })
 
-    console.log(response)
-
     expect(response.isRight()).toBe(true)
   })
 })
