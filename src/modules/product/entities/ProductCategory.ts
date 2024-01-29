@@ -6,7 +6,7 @@ import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
 const productCategoryPropsSchema = z.object({
   name: z.string().min(3).max(60),
-  description: z.string().max(190).nullable(),
+  description: z.string().max(230).nullable(),
   createdAt: z.date(),
   deletedAt: z.date().nullable(),
 })
