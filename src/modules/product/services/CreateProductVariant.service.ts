@@ -90,10 +90,6 @@ export class CreateProductVariantService {
 
     if (response.isLeft()) return left(response.value)
 
-    if (quantity < 1) {
-      return left(new QuantityMustBeGreaterThanZero())
-    }
-
     const product = await this.productsRepository.findById(productId)
     if (!product) {
       return left(new ProductNotFound())
@@ -143,7 +139,7 @@ export class CreateProductVariantService {
     transaction.add((ex) => this.productsRepository.save(product, ex))
     transaction.add((ex) => this.inventoriesRepository.save(inventory, ex))
 
-    this.transactorService.execute(transaction)
+    await this.transactorService.execute(transaction)
 
     return right({
       productVariant,
