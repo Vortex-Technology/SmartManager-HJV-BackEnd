@@ -2,7 +2,7 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 import { z } from 'zod'
-import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
 const refreshTokenCollaboratorPropsSchema = z.object({
   token: z.string(),
@@ -15,7 +15,7 @@ const refreshTokenCollaboratorPropsSchema = z.object({
   apiKeyId: z.instanceof(UniqueEntityId),
 })
 
-const refreshTokenCollaboratorValidationPipe = new ZodValidationPipe(
+const refreshTokenCollaboratorValidationPipe = new ZodEntityValidationPipe(
   refreshTokenCollaboratorPropsSchema,
 )
 

@@ -142,7 +142,6 @@ describe('Markets prisma mapper', () => {
     const market = Market.create(
       {
         companyId: new UniqueEntityId('company-1'),
-        inventory: makeInventory(),
         inventoryId: new UniqueEntityId('inventory-1'),
         tradeName: 'tradeName-1',
         createdAt: new Date(),
@@ -153,9 +152,7 @@ describe('Markets prisma mapper', () => {
       new UniqueEntityId('market-1'),
     )
 
-    expect(async () => {
-      MarketsPrismaMapper.toCreatePrisma(market)
-    })
+    expect(async () => MarketsPrismaMapper.toCreatePrisma(market))
       .rejects.toBeInstanceOf(Error)
       .catch((err) => {
         throw err
