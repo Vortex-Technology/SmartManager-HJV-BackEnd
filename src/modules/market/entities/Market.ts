@@ -4,19 +4,26 @@ import { Optional } from '@shared/core/types/Optional'
 import { MarketCollaboratorsList } from './MarketCollaboratorsList'
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { Address } from '@shared/core/valueObjects/Address'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface MarketProps {
-  tradeName: string
-  companyId: UniqueEntityId
-  inventoryId: UniqueEntityId
-  collaborators: MarketCollaboratorsList | null
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
+const marketPropsSchema = z.object({
+  tradeName: z.string().min(3).max(60),
+  companyId: z.instanceof(UniqueEntityId),
+  inventoryId: z.instanceof(UniqueEntityId),
+  collaborators: z.instanceof(MarketCollaboratorsList).nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+  inventory: z
+    .custom<Inventory>((v): v is Inventory => v instanceof Inventory)
+    .nullable(),
+  address: z.custom<Address>((v): v is Address => v instanceof Address),
+})
 
-  inventory: Inventory | null
-  address: Address
-}
+const marketPropsValidationPipe = new ZodEntityValidationPipe(marketPropsSchema)
+
+export type MarketProps = z.infer<typeof marketPropsSchema>
 
 export class Market extends AggregateRoot<MarketProps> {
   static create(
@@ -36,6 +43,7 @@ export class Market extends AggregateRoot<MarketProps> {
     }
 
     const market = new Market(marketProps, id)
+    market.validate(marketPropsValidationPipe)
 
     return market
   }

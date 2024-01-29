@@ -1,17 +1,27 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
 
-export interface RefreshTokenCollaboratorProps {
-  token: string
-  expiresIn: Date
-  expiredAt: Date | null
-  createdAt: Date
-  companyId: UniqueEntityId
-  marketId: UniqueEntityId
-  apiKeyId: UniqueEntityId
-  collaboratorId: UniqueEntityId
-}
+const refreshTokenCollaboratorPropsSchema = z.object({
+  token: z.string(),
+  expiresIn: z.date(),
+  expiredAt: z.date().nullable(),
+  createdAt: z.date(),
+  companyId: z.instanceof(UniqueEntityId),
+  marketId: z.instanceof(UniqueEntityId),
+  collaboratorId: z.instanceof(UniqueEntityId),
+  apiKeyId: z.instanceof(UniqueEntityId),
+})
+
+const refreshTokenCollaboratorValidationPipe = new ZodValidationPipe(
+  refreshTokenCollaboratorPropsSchema,
+)
+
+export type RefreshTokenCollaboratorProps = z.infer<
+  typeof refreshTokenCollaboratorPropsSchema
+>
 
 export class RefreshTokenCollaborator extends AggregateRoot<RefreshTokenCollaboratorProps> {
   static create(
@@ -28,6 +38,8 @@ export class RefreshTokenCollaborator extends AggregateRoot<RefreshTokenCollabor
       refreshTokenCollaboratorProps,
       id,
     )
+
+    refreshTokenCollaborator.validate(refreshTokenCollaboratorValidationPipe)
 
     return refreshTokenCollaborator
   }

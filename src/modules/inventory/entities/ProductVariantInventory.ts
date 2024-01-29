@@ -2,6 +2,8 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 
+
+
 export interface ProductVariantInventoryProps {
   quantity: number
   productVariantId: UniqueEntityId

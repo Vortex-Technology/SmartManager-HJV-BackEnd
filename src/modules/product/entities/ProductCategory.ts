@@ -1,13 +1,21 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface ProductCategoryProps {
-  name: string
-  description: string | null
-  createdAt: Date
-  deletedAt: Date | null
-}
+const productCategoryPropsSchema = z.object({
+  name: z.string().min(3).max(60),
+  description: z.string().max(190).nullable(),
+  createdAt: z.date(),
+  deletedAt: z.date().nullable(),
+})
+
+const productCategoryValidationPipe = new ZodEntityValidationPipe(
+  productCategoryPropsSchema,
+)
+
+export type ProductCategoryProps = z.infer<typeof productCategoryPropsSchema>
 
 export class ProductCategory extends AggregateRoot<ProductCategoryProps> {
   static create(
@@ -25,6 +33,7 @@ export class ProductCategory extends AggregateRoot<ProductCategoryProps> {
     }
 
     const productCategory = new ProductCategory(productCategoryProps, id)
+    productCategory.validate(productCategoryValidationPipe)
 
     return productCategory
   }

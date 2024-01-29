@@ -4,6 +4,8 @@ import { Optional } from '@shared/core/types/Optional'
 import { CompanyMarketsList } from './CompanyMarketsList'
 import { Owner } from '@modules/owner/entities/Owner'
 import { Address } from '@shared/core/valueObjects/Address'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
 export enum CompanyDocumentationType {
   IE = 'IE', // individual person
@@ -15,24 +17,30 @@ export enum CompanyStatus {
   INACTIVE = 'INACTIVE',
 }
 
-export interface CompanyProps {
-  email: string | null
-  status: CompanyStatus
-  companyName: string
-  documentation: string | null
-  documentationType: CompanyDocumentationType | null
-  stateRegistration: string | null
-  sector: string
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
-  startedIssueInvoicesAt: Date | null
-  markets: CompanyMarketsList | null
-  founderId: UniqueEntityId
-  ownerId: UniqueEntityId
-  owner: Owner | null
-  address: Address
-}
+const companyPropsSchema = z.object({
+  email: z.string().email().nullable(),
+  status: z.nativeEnum(CompanyStatus),
+  companyName: z.string().min(3).max(60),
+  documentation: z.string().max(14).nullable(),
+  documentationType: z.nativeEnum(CompanyDocumentationType).nullable(),
+  stateRegistration: z.string().max(14).nullable(),
+  sector: z.string().min(2).max(60),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+  startedIssueInvoicesAt: z.date().nullable(),
+  markets: z.instanceof(CompanyMarketsList).nullable(),
+  founderId: z.instanceof(UniqueEntityId),
+  ownerId: z.instanceof(UniqueEntityId),
+  owner: z.custom<Owner>((v): v is Owner => v instanceof Owner).nullable(),
+  address: z
+    .custom<Address>((v): v is Address => v instanceof Address)
+    .nullable(),
+})
+
+const companyValidationPipe = new ZodEntityValidationPipe(companyPropsSchema)
+
+export type CompanyProps = z.infer<typeof companyPropsSchema>
 
 export class Company extends AggregateRoot<CompanyProps> {
   static create(
@@ -68,6 +76,7 @@ export class Company extends AggregateRoot<CompanyProps> {
     }
 
     const company = new Company(companyProps, id)
+    company.validate(companyValidationPipe)
 
     return company
   }
