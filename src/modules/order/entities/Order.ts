@@ -6,6 +6,7 @@ import { Protocol } from '@shared/core/valueObjects/Protocol'
 import { OrderProductsVariantsList } from './OrderProductsVariantsList'
 import { z } from 'zod'
 import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
+import { OrderProductVariant } from './OrderProductVariant'
 
 const orderPropsSchema = z.object({
   protocol: z.instanceof(Protocol),
@@ -126,5 +127,29 @@ export class Order extends AggregateRoot<OrderProps> {
 
   get protocol() {
     return this.props.protocol
+  }
+
+  get orderProductsVariants() {
+    return this.props.orderProductsVariants
+  }
+
+  set orderProductsVariants(
+    orderProductsVariants: OrderProductsVariantsList | null,
+  ) {
+    this.props.orderProductsVariants = orderProductsVariants
+    this.touch()
+  }
+
+  addOrderProductVariant(orderProductVariant: OrderProductVariant) {
+    if (!this.props.orderProductsVariants) {
+      this.props.orderProductsVariants = new OrderProductsVariantsList()
+    }
+
+    this.props.orderProductsVariants.add(orderProductVariant)
+    this.touch()
+  }
+
+  touch() {
+    this.props.updatedAt = new Date()
   }
 }
