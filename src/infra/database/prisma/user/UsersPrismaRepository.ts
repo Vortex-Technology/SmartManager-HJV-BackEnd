@@ -39,4 +39,11 @@ export class UsersPrismaRepository implements UsersRepository<PrismaConfig> {
 
     return UsersPrismaMapper.toEntity(user)
   }
+
+  async save(user: User): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: user.id.toString() },
+      data: UsersPrismaMapper.toPrisma(user),
+    })
+  }
 }
