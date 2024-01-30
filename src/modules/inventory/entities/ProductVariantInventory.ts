@@ -1,17 +1,25 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
+const productVariantInventoryPropsSchema = z.object({
+  quantity: z.number().min(0),
+  productVariantId: z.instanceof(UniqueEntityId),
+  inventoryId: z.instanceof(UniqueEntityId),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+})
 
+const productVariantInventoryValidationPipe = new ZodEntityValidationPipe(
+  productVariantInventoryPropsSchema,
+)
 
-export interface ProductVariantInventoryProps {
-  quantity: number
-  productVariantId: UniqueEntityId
-  inventoryId: UniqueEntityId
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
-}
+export type ProductVariantInventoryProps = z.infer<
+  typeof productVariantInventoryPropsSchema
+>
 
 export class ProductVariantInventory extends AggregateRoot<ProductVariantInventoryProps> {
   static create(
@@ -32,6 +40,7 @@ export class ProductVariantInventory extends AggregateRoot<ProductVariantInvento
       productVariantInventoryProps,
       id,
     )
+    productVariantInventory.validate(productVariantInventoryValidationPipe)
 
     return productVariantInventory
   }
@@ -58,6 +67,11 @@ export class ProductVariantInventory extends AggregateRoot<ProductVariantInvento
 
   get deletedAt() {
     return this.props.deletedAt
+  }
+
+  decreaseQuantity(quantity: number) {
+    this.props.quantity = this.props.quantity - quantity
+    this.touch()
   }
 
   touch() {
