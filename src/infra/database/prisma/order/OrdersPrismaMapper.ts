@@ -8,12 +8,16 @@ import {
   Prisma,
   Order as OrderBasePrisma,
   OrderPayment as OrderPaymentPrisma,
+  OrderProductsVariants as OrderProductsVariantsPrisma,
 } from '@prisma/client'
 import { Protocol } from '@shared/core/valueObjects/Protocol'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
+import { OrdersProductsVariantsPrismaMapper } from './OrdersProductsVariantsPrismaMapper'
+import { OrderProductsVariantsList } from '@modules/order/entities/OrderProductsVariantsList'
 
 export type OrderPrisma = OrderBasePrisma & {
-  orderPayment: OrderPaymentPrisma | null
+  orderPayment?: OrderPaymentPrisma | null
+  orderProductsVariants?: OrderProductsVariantsPrisma[]
 }
 
 export class OrdersPrismaMapper {
@@ -42,6 +46,13 @@ export class OrdersPrismaMapper {
               status: raw.orderPayment.status as OrderPaymentStatus,
               processedAt: raw.orderPayment.processedAt,
             })
+          : null,
+        orderProductsVariants: raw.orderProductsVariants
+          ? new OrderProductsVariantsList(
+              raw.orderProductsVariants.map(
+                OrdersProductsVariantsPrismaMapper.toEntity,
+              ),
+            )
           : null,
       },
       new UniqueEntityId(raw.id),
