@@ -100,7 +100,7 @@ export class AddProductOnOrderService {
       return left(new ProductVariantInventoryNotFound())
     }
 
-    if (productVariantInventory.quantity < quantity) {
+    if (productVariantInventory.quantity > quantity) {
       return left(new NotEnoughItems())
     }
 
