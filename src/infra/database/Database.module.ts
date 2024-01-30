@@ -32,6 +32,8 @@ import { RefreshTokensCollaboratorsRepository } from '@modules/refreshToken/repo
 import { RefreshTokensCollaboratorsPrismaRepository } from './prisma/refreshToken/RefreshTokensCollaboratorsPrismaRepository'
 import { OrdersRepository } from '@modules/order/repositories/OrdersRepository'
 import { OrdersPrismaRepository } from './prisma/order/OrdersPrismaRepository'
+import { OrdersProductsVariantsRepository } from '@modules/order/repositories/OrdersProductsVariantsRepository'
+import { OrdersProductsVariantsPrimaRepository } from './prisma/order/OrdersProductsVariantsPrismaRepository'
 
 @Module({
   providers: [
@@ -101,6 +103,10 @@ import { OrdersPrismaRepository } from './prisma/order/OrdersPrismaRepository'
       provide: OrdersRepository,
       useClass: OrdersPrismaRepository,
     },
+    {
+      provide: OrdersProductsVariantsRepository,
+      useClass: OrdersProductsVariantsPrimaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -119,6 +125,7 @@ import { OrdersPrismaRepository } from './prisma/order/OrdersPrismaRepository'
     TransactorService,
     RefreshTokensCollaboratorsRepository,
     OrdersRepository,
+    OrdersProductsVariantsRepository,
   ],
 })
 export class DatabaseModule {}
