@@ -1,14 +1,22 @@
 import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface RefreshTokenProps {
-  token: string
-  expiresIn: Date
-  expiredAt: Date | null
-  createdAt: Date
-  userId: UniqueEntityId
-}
+const refreshTokenPropsSchema = z.object({
+  token: z.string(),
+  expiresIn: z.date(),
+  expiredAt: z.date().nullable(),
+  createdAt: z.date(),
+  userId: z.instanceof(UniqueEntityId),
+})
+
+const refreshTokenValidationPipe = new ZodEntityValidationPipe(
+  refreshTokenPropsSchema,
+)
+
+export type RefreshTokenProps = z.infer<typeof refreshTokenPropsSchema>
 
 export class RefreshToken extends AggregateRoot<RefreshTokenProps> {
   static create(
@@ -22,6 +30,7 @@ export class RefreshToken extends AggregateRoot<RefreshTokenProps> {
     }
 
     const refreshToken = new RefreshToken(refreshTokenProps, id)
+    refreshToken.validate(refreshTokenValidationPipe)
 
     return refreshToken
   }

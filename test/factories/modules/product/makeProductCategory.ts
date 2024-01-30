@@ -16,7 +16,7 @@ export function makeProductCategory(
   return ProductCategory.create(
     {
       name: fakerPT_BR.commerce.productName(),
-      description: fakerPT_BR.lorem.paragraph(),
+      description: fakerPT_BR.commerce.productDescription(),
       ...override,
     },
     id,

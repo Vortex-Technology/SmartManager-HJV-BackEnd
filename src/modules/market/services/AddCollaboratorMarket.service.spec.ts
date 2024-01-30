@@ -17,26 +17,38 @@ import {
 import { MarketNotFound } from '../errors/MarketNorFound'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { makeSeller } from '@test/factories/modules/seller/makeSeller'
-import { AddCollaboratorService } from './AddCollaborator.service'
+import { AddCollaboratorMarketService } from './AddCollaboratorMarket.service'
 import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
 import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { makeOwner } from '@test/factories/modules/owner/makeOwner'
+import { FakeTransactor } from '@test/repositories/infra/transactor/fakeTransactor'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
 
+let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
+let verifyPermissionsOfCollaboratorInMarketService: VerifyPermissionsOfCollaboratorInMarketService
+let ownersInMemoryRepository: OwnersInMemoryRepository
 let usersInMemoryRepository: UsersInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
 let companiesInMemoryRepository: CompaniesInMemoryRepository
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
+let fakeTransactor: FakeTransactor
 let fakeHasher: FakeHasher
 
-let sut: AddCollaboratorService
+let sut: AddCollaboratorMarketService
 
 describe('Add collaborator', () => {
   beforeEach(() => {
+    fakeTransactor = new FakeTransactor()
+
     usersInMemoryRepository = new UsersInMemoryRepository()
+
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
     productVariantInventoriesInMemoryRepository =
       new ProductVariantInventoriesInMemoryRepository()
     inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
@@ -46,17 +58,36 @@ describe('Add collaborator', () => {
       collaboratorsInMemoryRepository,
       inventoriesInMemoryRepository,
     )
+
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
+
     companiesInMemoryRepository = new CompaniesInMemoryRepository(
       marketsInMemoryRepository,
+      ownersInMemoryRepository,
     )
+
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
+    verifyPermissionsOfCollaboratorInMarketService =
+      new VerifyPermissionsOfCollaboratorInMarketService(
+        verifyPermissionsOfCollaboratorInCompanyService,
+        marketsInMemoryRepository,
+      )
+
     fakeHasher = new FakeHasher()
 
-    sut = new AddCollaboratorService(
+    sut = new AddCollaboratorMarketService(
       usersInMemoryRepository,
-      companiesInMemoryRepository,
       marketsInMemoryRepository,
-      collaboratorsInMemoryRepository,
       fakeHasher,
+      fakeTransactor,
+      verifyPermissionsOfCollaboratorInMarketService,
     )
   })
 

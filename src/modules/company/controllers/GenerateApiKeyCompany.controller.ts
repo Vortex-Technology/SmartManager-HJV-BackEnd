@@ -1,14 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Controller,
-  ForbiddenException,
-  HttpCode,
-  NotFoundException,
-  Param,
-  Post,
-  Res,
-} from '@nestjs/common'
+import { Controller, HttpCode, Param, Post, Res } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import { Response } from 'express'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
@@ -17,10 +7,8 @@ import {
   GenerateApiKeyParams,
   generateApiKeyParamsValidationPipe,
 } from '../gateways/GenerateApiKey.gateway'
-import { CompanyNotFound } from '../errors/CompanyNotFound'
-import { LotsOfExistingKeys } from '../errors/LotsOfExistingKeys'
-import { PermissionDenied } from '@shared/errors/PermissionDenied'
 import { GenerateApiKeyCompanyService } from '../services/GenerateApiKeyCompany.service'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/companies/:companyId/apiKeys/generate')
 export class GenerateApiKeyCompanyController {
@@ -35,34 +23,17 @@ export class GenerateApiKeyCompanyController {
     @Param(generateApiKeyParamsValidationPipe) params: GenerateApiKeyParams,
     @Res() res: Response,
   ) {
-    const { sub: requesterId } = user
+    const { sub: userId } = user
     const { companyId } = params
 
     const response = await this.generateApiKeyCompanyService.execute({
       companyId,
-      requesterId,
+      userId,
     })
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case CompanyNotFound: {
-          throw new NotFoundException(error.message)
-        }
-
-        case PermissionDenied: {
-          throw new ForbiddenException(error.message)
-        }
-
-        case LotsOfExistingKeys: {
-          throw new ConflictException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { apiKey } = response.value

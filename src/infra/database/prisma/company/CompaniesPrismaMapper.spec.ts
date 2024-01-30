@@ -37,7 +37,7 @@ describe('Company prisma mapper', () => {
       owner: { id: 'owner-1' },
       startedIssueInvoicesAt: null,
       sector: 'sector',
-      stateRegistration: 'state-registration',
+      stateRegistration: '14',
       status: 'ACTIVE',
       updatedAt: new Date(),
     }
@@ -58,7 +58,7 @@ describe('Company prisma mapper', () => {
     expect(result.documentationType).toBe(CompanyDocumentationType.IE)
     expect(result.email).toBe('company-name@example.com')
     expect(result.startedIssueInvoicesAt).toBe(null)
-    expect(result.stateRegistration).toBe('state-registration')
+    expect(result.stateRegistration).toBe('14')
     expect(result.status).toBe(CompanyStatus.ACTIVE)
     expect(result.createdAt).toBeInstanceOf(Date)
     expect(result.updatedAt).toBeInstanceOf(Date)
@@ -266,43 +266,6 @@ describe('Company prisma mapper', () => {
 
     expect(async () => {
       CompaniesPrismaMapper.toCreatePrisma(company)
-    })
-      .rejects.toBeInstanceOf(Error)
-      .catch((err) => {
-        throw err
-      })
-  })
-
-  it('not should be able to map company in process update prisma if owner not set', () => {
-    const company = Company.create({
-      address: Address.create({
-        city: 'San Francisco',
-        neighborhood: 'Francisco',
-        country: 'USA',
-        number: '1',
-        street: 'Street 1',
-        state: 'Califonia',
-        postalCode: '0090900',
-        complement: 'complement',
-      }),
-      companyName: 'company',
-      founderId: new UniqueEntityId('founder-1'),
-      ownerId: new UniqueEntityId('owner-1'),
-      sector: 'sector',
-      createdAt: new Date(),
-      deletedAt: new Date(),
-      updatedAt: new Date(),
-      documentation: 'documentation',
-      documentationType: CompanyDocumentationType.LE,
-      email: 'email@example.com',
-      markets: null,
-      startedIssueInvoicesAt: new Date(),
-      stateRegistration: 'EUA',
-      status: CompanyStatus.INACTIVE,
-    })
-
-    expect(async () => {
-      CompaniesPrismaMapper.toUpdatePrisma(company)
     })
       .rejects.toBeInstanceOf(Error)
       .catch((err) => {

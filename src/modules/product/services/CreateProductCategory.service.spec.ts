@@ -8,7 +8,23 @@ import { CreateProductCategoryService } from './CreateProductCategory.service'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { makeSeller } from '@test/factories/modules/seller/makeSeller'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
+import { CompaniesInMemoryRepository } from '@test/repositories/modules/company/CompaniesInMemoryRepository'
+import { MarketsInMemoryRepository } from '@test/repositories/modules/market/MarketsInMemoryRepository'
+import { InventoriesInMemoryRepository } from '@test/repositories/modules/inventory/InventoriesInMemoryRepository'
+import { ProductVariantInventoriesInMemoryRepository } from '@test/repositories/modules/inventory/ProductVariantInventoriesInMemoryRepository'
+import { OwnersInMemoryRepository } from '@test/repositories/modules/owner/OwnersInMemoryRepository'
+import { makeCompany } from '@test/factories/modules/company/makeCompany'
+import { makeMarket } from '@test/factories/modules/market/makeMarket'
 
+let ownersInMemoryRepository: OwnersInMemoryRepository
+let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
+let inventoriesInMemoryRepository: InventoriesInMemoryRepository
+let marketsInMemoryRepository: MarketsInMemoryRepository
+let companiesInMemoryRepository: CompaniesInMemoryRepository
+let verifyPermissionsOfCollaboratorInCompanyService: VerifyPermissionsOfCollaboratorInCompanyService
+let verifyPermissionsOfCollaboratorInMarketService: VerifyPermissionsOfCollaboratorInMarketService
 let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let productCategoriesInMemoryRepository: ProductCategoriesInMemoryRepository
 
@@ -17,22 +33,68 @@ let sut: CreateProductCategoryService
 describe('Create product category', () => {
   beforeEach(() => {
     collaboratorsInMemoryRepository = new CollaboratorsInMemoryRepository()
+
     productCategoriesInMemoryRepository =
       new ProductCategoriesInMemoryRepository()
 
-    sut = new CreateProductCategoryService(
+    productVariantInventoriesInMemoryRepository =
+      new ProductVariantInventoriesInMemoryRepository()
+
+    inventoriesInMemoryRepository = new InventoriesInMemoryRepository(
+      productVariantInventoriesInMemoryRepository,
+    )
+
+    marketsInMemoryRepository = new MarketsInMemoryRepository(
       collaboratorsInMemoryRepository,
+      inventoriesInMemoryRepository,
+    )
+    ownersInMemoryRepository = new OwnersInMemoryRepository(
+      collaboratorsInMemoryRepository,
+    )
+
+    companiesInMemoryRepository = new CompaniesInMemoryRepository(
+      marketsInMemoryRepository,
+      ownersInMemoryRepository,
+    )
+
+    verifyPermissionsOfCollaboratorInCompanyService =
+      new VerifyPermissionsOfCollaboratorInCompanyService(
+        collaboratorsInMemoryRepository,
+        companiesInMemoryRepository,
+      )
+
+    verifyPermissionsOfCollaboratorInMarketService =
+      new VerifyPermissionsOfCollaboratorInMarketService(
+        verifyPermissionsOfCollaboratorInCompanyService,
+        marketsInMemoryRepository,
+      )
+
+    sut = new CreateProductCategoryService(
       productCategoriesInMemoryRepository,
+      verifyPermissionsOfCollaboratorInMarketService,
     )
   })
 
   it('should be able to create a new product category', async () => {
-    const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
+    await companiesInMemoryRepository.create(company)
 
+    const market = makeMarket(
+      { companyId: company.id },
+      new UniqueEntityId('market-1'),
+    )
+    marketsInMemoryRepository.markets.push(market)
+
+    const collaborator = makeManager(
+      { companyId: company.id, marketId: market.id },
+      new UniqueEntityId('manager-1'),
+    )
     await collaboratorsInMemoryRepository.create(collaborator)
 
     const response = await sut.execute({
       creatorId: 'manager-1',
+      companyId: 'company-1',
+      marketId: 'market-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
@@ -55,6 +117,8 @@ describe('Create product category', () => {
   it("not should be able to create a new product category if collaborator doesn't exist", async () => {
     const response = await sut.execute({
       creatorId: 'inexistent-creator-id',
+      companyId: 'company-1',
+      marketId: 'market-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
@@ -70,6 +134,8 @@ describe('Create product category', () => {
 
     const response = await sut.execute({
       creatorId: 'seller-1',
+      companyId: 'company-1',
+      marketId: 'market-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })
@@ -79,7 +145,21 @@ describe('Create product category', () => {
   })
 
   it('not should be able to create a new product category if already exist one with same name', async () => {
-    const collaborator = makeManager({}, new UniqueEntityId('manager-1'))
+    const company = makeCompany({}, new UniqueEntityId('company-1'))
+    await companiesInMemoryRepository.create(company)
+
+    const market = makeMarket(
+      { companyId: company.id },
+      new UniqueEntityId('market-1'),
+    )
+    marketsInMemoryRepository.markets.push(market)
+
+    const collaborator = makeManager(
+      { companyId: company.id, marketId: market.id },
+      new UniqueEntityId('manager-1'),
+    )
+    await collaboratorsInMemoryRepository.create(collaborator)
+
     const productCategory = makeProductCategory({
       name: 'product-category',
     })
@@ -89,6 +169,8 @@ describe('Create product category', () => {
 
     const response = await sut.execute({
       creatorId: 'manager-1',
+      companyId: 'company-1',
+      marketId: 'market-1',
       name: 'Product category',
       description: 'A new product category to test the creation',
     })

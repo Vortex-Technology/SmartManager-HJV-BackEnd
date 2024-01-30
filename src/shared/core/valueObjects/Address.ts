@@ -1,37 +1,35 @@
+import { z } from 'zod'
+import { ValueObject } from '../entities/ValueObject'
 import { Optional } from '../types/Optional'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface AddressProps {
-  street: string
-  number: string
-  neighborhood: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
-  complement: string | null
-}
+const addressPropsSchema = z.object({
+  street: z.string().min(3).max(60),
+  number: z.string().min(1).max(5),
+  neighborhood: z.string().min(3).max(60),
+  city: z.string().min(3).max(60),
+  state: z.string().min(2).max(24),
+  postalCode: z.string().min(0).max(9),
+  country: z.string().min(2).max(60),
+  complement: z.string().max(60).nullable(),
+})
 
-export class Address {
-  protected props: AddressProps
+const addressValidationPipe = new ZodEntityValidationPipe(addressPropsSchema)
 
-  protected constructor(props: AddressProps) {
-    this.props = props
-  }
+export type AddressProps = z.infer<typeof addressPropsSchema>
 
-  public equals(entity: Address) {
-    if (entity === this) {
-      return true
-    }
-
-    return JSON.stringify(this.props) === JSON.stringify(entity.props)
-  }
-
+export class Address extends ValueObject<AddressProps> {
   static create(props: Optional<AddressProps, 'country' | 'complement'>) {
-    return new Address({
+    const addressProps: AddressProps = {
       ...props,
       country: props.country ?? 'BR',
       complement: props.complement ?? null,
-    })
+    }
+
+    const address = new Address(addressProps)
+    address.validate(addressValidationPipe)
+
+    return address
   }
 
   get street() {
@@ -64,18 +62,5 @@ export class Address {
 
   get complement() {
     return this.props.complement
-  }
-
-  get address() {
-    return {
-      street: this.street,
-      number: this.number,
-      neighborhood: this.neighborhood,
-      city: this.city,
-      state: this.state,
-      postalCode: this.postalCode,
-      country: this.country,
-      complement: this.complement,
-    }
   }
 }

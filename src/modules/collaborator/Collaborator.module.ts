@@ -6,10 +6,23 @@ import { DatabaseModule } from '@infra/database/Database.module'
 import { DateModule } from '@providers/date/Date.module'
 import { CryptographyModule } from '@providers/cryptography/Cryptography.module'
 import { LoginCollaboratorController } from './controllers/LoginCollaborator.controller'
+import { GetCollaboratorController } from './controllers/GetCollaborator.controller'
+import { InterceptorsModule } from '@modules/interceptors/Interceptors.module'
+import { ValidateApiKeyService } from '@modules/company/services/ValidateApiKey.service'
 
 @Module({
-  controllers: [LoginCollaboratorController],
-  providers: [LoginCollaboratorService, GetCollaboratorService],
-  imports: [DatabaseModule, DateModule, EnvModule, CryptographyModule],
+  controllers: [LoginCollaboratorController, GetCollaboratorController],
+  providers: [
+    LoginCollaboratorService,
+    GetCollaboratorService,
+    ValidateApiKeyService,
+  ],
+  imports: [
+    DatabaseModule,
+    DateModule,
+    EnvModule,
+    CryptographyModule,
+    InterceptorsModule,
+  ],
 })
 export class CollaboratorModule {}

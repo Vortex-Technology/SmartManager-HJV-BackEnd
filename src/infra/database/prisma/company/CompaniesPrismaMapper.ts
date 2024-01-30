@@ -27,7 +27,7 @@ export type CompanyWithAddressAndOwnerIdPrisma = CompanyPrisma & {
 
 export class CompaniesPrismaMapper {
   static toEntity(raw: CompanyWithAddressAndOwnerIdPrisma): Company {
-    if (!raw.owner?.id) {
+    if (!raw.owner) {
       throw new Error('Owner not exist in company')
     }
 
@@ -99,10 +99,6 @@ export class CompaniesPrismaMapper {
   }
 
   static toUpdatePrisma(company: Company): Prisma.CompanyUpdateInput {
-    if (!company.owner) {
-      throw new Error('Owner not set in process update of company')
-    }
-
     return {
       companyNane: company.companyName,
       address: {

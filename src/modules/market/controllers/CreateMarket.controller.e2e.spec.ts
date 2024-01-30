@@ -89,9 +89,9 @@ describe('Create market (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /companies/:companyId/markets [201]', async () => {
+  test('[POST] /markets [201]', async () => {
     const response = await request(app.getHttpServer())
-      .post(`/companies/${company.id.toString()}/markets`)
+      .post(`/markets`)
       .set({
         'x-api-key': apiKey.key,
         'x-collaborator-access-token': collaboratorAccessToken,

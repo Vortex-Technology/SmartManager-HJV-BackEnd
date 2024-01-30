@@ -26,6 +26,14 @@ import { OwnersRepository } from '@modules/owner/repositories/OwnersRepository'
 import { OwnersPrismaRepository } from './prisma/owner/OwnersPrismaRepository'
 import { ApiKeysRepository } from '@modules/company/repositories/ApiKeysRepository'
 import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepository'
+import { TransactorService } from './transactor/contracts/TransactorService'
+import { TransactorManager } from './transactor/implementations/TransactorManager'
+import { RefreshTokensCollaboratorsRepository } from '@modules/refreshToken/repositories/RefreshTokensCollaboratorsRepository'
+import { RefreshTokensCollaboratorsPrismaRepository } from './prisma/refreshToken/RefreshTokensCollaboratorsPrismaRepository'
+import { OrdersRepository } from '@modules/order/repositories/OrdersRepository'
+import { OrdersPrismaRepository } from './prisma/order/OrdersPrismaRepository'
+import { OrdersProductsVariantsRepository } from '@modules/order/repositories/OrdersProductsVariantsRepository'
+import { OrdersProductsVariantsPrimaRepository } from './prisma/order/OrdersProductsVariantsPrismaRepository'
 
 @Module({
   providers: [
@@ -33,6 +41,10 @@ import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepositor
     {
       provide: RefreshTokensRepository,
       useClass: RefreshTokensPrismaRepository,
+    },
+    {
+      provide: RefreshTokensCollaboratorsRepository,
+      useClass: RefreshTokensCollaboratorsPrismaRepository,
     },
     {
       provide: CompaniesRepository,
@@ -83,6 +95,18 @@ import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepositor
       provide: ApiKeysRepository,
       useClass: ApiKeysPrismaRepository,
     },
+    {
+      provide: TransactorService,
+      useClass: TransactorManager,
+    },
+    {
+      provide: OrdersRepository,
+      useClass: OrdersPrismaRepository,
+    },
+    {
+      provide: OrdersProductsVariantsRepository,
+      useClass: OrdersProductsVariantsPrimaRepository,
+    },
   ],
   exports: [
     PrismaService,
@@ -98,6 +122,10 @@ import { ApiKeysPrismaRepository } from './prisma/company/ApiKeysPrismaRepositor
     CompaniesRepository,
     OwnersRepository,
     ApiKeysRepository,
+    TransactorService,
+    RefreshTokensCollaboratorsRepository,
+    OrdersRepository,
+    OrdersProductsVariantsRepository,
   ],
 })
 export class DatabaseModule {}

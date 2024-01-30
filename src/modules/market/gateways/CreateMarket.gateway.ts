@@ -17,12 +17,3 @@ export type CreateMarketBody = z.infer<typeof createMarketBodySchema>
 export const createMarketBodyValidationPipe = new ZodValidationPipe(
   createMarketBodySchema,
 )
-
-const createMarketParamsSchema = z.object({
-  companyId: z.string().uuid(),
-})
-
-export type CreateMarketParams = z.infer<typeof createMarketParamsSchema>
-export const createMarketParamsValidationPipe = new ZodValidationPipe(
-  createMarketParamsSchema,
-)

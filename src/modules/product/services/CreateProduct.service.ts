@@ -14,18 +14,20 @@ import { ProvideAtLeastOneProductVariant } from '../errors/ProvideAlmostOneProdu
 import { ProductsRepository } from '../repositories/ProductsRepository'
 import { InventoriesRepository } from '@modules/inventory/repositories/InventoriesRepository'
 import { InventoryNotFount } from '@modules/inventory/errors/InventoryNotFound'
-import { Inventory } from '@modules/inventory/entities/Inventory'
 import { ProductVariantInventoriesList } from '@modules/inventory/entities/ProductVariantInventoriesList'
 import { ProductVariantInventory } from '@modules/inventory/entities/ProductVariantInventory'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
-import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
+import { TransactorService } from '@infra/database/transactor/contracts/TransactorService'
+import { VerifyPermissionsOfCollaboratorInMarketService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInMarket.service'
 
 interface Request {
   creatorId: string
+  inventoryId: string
+  companyId: string
+  marketId: string
   name: string
   categories?: string[]
-  inventoryId?: string
   variants: Array<{
     name: string
     description?: string
@@ -54,11 +56,12 @@ type Response = Either<
 @Injectable()
 export class CreateProductService {
   constructor(
-    private readonly collaboratorsRepository: CollaboratorsRepository,
     private readonly productCategoriesRepository: ProductCategoriesRepository,
     private readonly productsRepository: ProductsRepository,
     private readonly productVariantsRepository: ProductVariantsRepository,
     private readonly inventoriesRepository: InventoriesRepository,
+    private readonly transactorService: TransactorService,
+    private readonly verifyPermissions: VerifyPermissionsOfCollaboratorInMarketService,
   ) {}
 
   async execute({
@@ -67,41 +70,29 @@ export class CreateProductService {
     inventoryId,
     categories = [],
     creatorId,
+    companyId,
+    marketId,
   }: Request): Promise<Response> {
-    const acceptCreateProductForRoles = [
-      CollaboratorRole.OWNER,
-      CollaboratorRole.MANAGER,
-      CollaboratorRole.STOCKIST,
-    ]
-
     if (variants.length < 1) {
       return left(new ProvideAtLeastOneProductVariant())
     }
 
-    const creator = await this.collaboratorsRepository.findById(creatorId)
-    if (!creator) {
-      return left(new CollaboratorNotFound())
-    }
+    const response = await this.verifyPermissions.execute({
+      acceptedRoles: [
+        CollaboratorRole.OWNER,
+        CollaboratorRole.MANAGER,
+        CollaboratorRole.STOCKIST,
+      ],
+      collaboratorId: creatorId,
+      companyId,
+      marketId,
+    })
 
-    if (!acceptCreateProductForRoles.includes(creator.role)) {
-      return left(new PermissionDenied())
-    }
+    if (response.isLeft()) return left(response.value)
 
-    let inventory: Inventory | null = null
-
-    if (inventoryId) {
-      inventory = await this.inventoriesRepository.findById(inventoryId)
-
-      if (!inventory) {
-        return left(new InventoryNotFount())
-      }
-    }
-
+    const inventory = await this.inventoriesRepository.findById(inventoryId)
     if (!inventory) {
-      inventory = Inventory.create({
-        name: 'Novo estoque',
-        productVariantInventories: new ProductVariantInventoriesList(),
-      })
+      return left(new InventoryNotFount())
     }
 
     const categoriesExistentsWithNullResults =
@@ -119,7 +110,11 @@ export class CreateProductService {
       }),
     )
 
-    await this.productCategoriesRepository.createMany(inexistentCategories)
+    const transaction = this.transactorService.start()
+
+    transaction.add((ex) =>
+      this.productCategoriesRepository.createMany(inexistentCategories, ex),
+    )
 
     const categoriesExistents = categoriesExistentsWithNullResults.filter(
       (category) => category !== null,
@@ -160,9 +155,7 @@ export class CreateProductService {
       ...inexistentCategories,
     ])
 
-    if (!inventory.productVariantInventories) {
-      inventory.productVariantInventories = new ProductVariantInventoriesList()
-    }
+    inventory.productVariantInventories = new ProductVariantInventoriesList()
 
     const product = Product.create({
       name,
@@ -184,7 +177,7 @@ export class CreateProductService {
       })
 
       const newProductVariantInventory = ProductVariantInventory.create({
-        inventoryId: (inventory as Inventory).id,
+        inventoryId: inventory.id,
         productVariantId: newProductVariant.id,
         quantity: variant.quantity,
       })
@@ -193,13 +186,10 @@ export class CreateProductService {
       inventory?.productVariantInventories?.add(newProductVariantInventory)
     })
 
-    await this.productsRepository.create(product)
+    transaction.add((ex) => this.productsRepository.create(product, ex))
+    transaction.add((ex) => this.inventoriesRepository.save(inventory, ex))
 
-    if (inventoryId) {
-      await this.inventoriesRepository.save(inventory)
-    } else {
-      await this.inventoriesRepository.create(inventory)
-    }
+    await this.transactorService.execute(transaction)
 
     return right({
       product,

@@ -1,8 +1,9 @@
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 import { UniqueEntityId } from '../valueObjects/UniqueEntityId'
+import { EntityValidator } from './EntityValidator'
 
-export class Entity<TypeProps> {
+export class Entity<TypeProps> implements EntityValidator {
   private _id: UniqueEntityId
-
   protected props: TypeProps
 
   get id() {
@@ -12,6 +13,10 @@ export class Entity<TypeProps> {
   protected constructor(props: TypeProps, id?: UniqueEntityId) {
     this._id = id ?? new UniqueEntityId()
     this.props = props
+  }
+
+  validate(schema: ZodEntityValidationPipe) {
+    schema.transform(this.props)
   }
 
   public equals(entity: Entity<unknown>) {

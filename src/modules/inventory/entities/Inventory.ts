@@ -2,14 +2,25 @@ import { AggregateRoot } from '@shared/core/entities/AggregateRoot'
 import { UniqueEntityId } from '@shared/core/valueObjects/UniqueEntityId'
 import { Optional } from '@shared/core/types/Optional'
 import { ProductVariantInventoriesList } from './ProductVariantInventoriesList'
+import { z } from 'zod'
+import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-export interface InventoryProps {
-  name: string
-  productVariantInventories: ProductVariantInventoriesList | null
-  createdAt: Date
-  updatedAt: Date | null
-  deletedAt: Date | null
-}
+const inventoryPropsSchema = z.object({
+  name: z.string().min(3).max(60),
+  companyId: z.instanceof(UniqueEntityId),
+  productVariantInventories: z
+    .instanceof(ProductVariantInventoriesList)
+    .nullable(),
+  createdAt: z.date(),
+  updatedAt: z.date().nullable(),
+  deletedAt: z.date().nullable(),
+})
+
+const inventoryValidationPipe = new ZodEntityValidationPipe(
+  inventoryPropsSchema,
+)
+
+export type InventoryProps = z.infer<typeof inventoryPropsSchema>
 
 export class Inventory extends AggregateRoot<InventoryProps> {
   static create(
@@ -28,6 +39,7 @@ export class Inventory extends AggregateRoot<InventoryProps> {
     }
 
     const inventory = new Inventory(inventoryProps, id)
+    inventory.validate(inventoryValidationPipe)
 
     return inventory
   }
@@ -44,6 +56,11 @@ export class Inventory extends AggregateRoot<InventoryProps> {
     productVariantInventories: ProductVariantInventoriesList | null,
   ) {
     this.props.productVariantInventories = productVariantInventories
+    this.touch()
+  }
+
+  get companyId() {
+    return this.props.companyId
   }
 
   get createdAt() {

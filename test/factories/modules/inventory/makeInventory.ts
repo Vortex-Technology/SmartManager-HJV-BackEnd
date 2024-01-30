@@ -15,6 +15,7 @@ export function makeInventory(
   const inventory = Inventory.create(
     {
       name: fakerPT_BR.person.fullName(),
+      companyId: new UniqueEntityId(),
       ...override,
     },
     id,

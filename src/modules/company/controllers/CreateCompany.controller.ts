@@ -1,25 +1,15 @@
-import {
-  BadRequestException,
-  Body,
-  ConflictException,
-  Controller,
-  HttpCode,
-  Post,
-  Res,
-} from '@nestjs/common'
+import { Body, Controller, HttpCode, Post, Res } from '@nestjs/common'
 import { statusCode } from '@config/statusCode'
 import { Response } from 'express'
 import { CreateCompanyService } from '../services/CreateCompany.service'
 import { CurrentLoggedUserDecorator } from '@providers/auth/decorators/currentLoggedUser.decorator'
 import { TokenPayloadSchema } from '@providers/auth/strategys/jwtStrategy'
 import { CompanyDocumentationType } from '../entities/Company'
-import { UserNotFound } from '@modules/user/errors/UserNotFound'
-import { DocumentationsIsMissing } from '../errors/DocumentationsIsMissing'
-import { InsufficientMarkets } from '../errors/InsufficientMarkets'
 import {
   CreateCompanyBody,
   createCompanyBodyValidationPipe,
 } from '../gateways/CreateCompany.gateway'
+import { ErrorPresenter } from '@infra/presenters/ErrorPresenter'
 
 @Controller('/companies')
 export class CreateCompanyController {
@@ -42,18 +32,7 @@ export class CreateCompanyController {
 
     if (response.isLeft()) {
       const error = response.value
-
-      switch (error.constructor) {
-        case UserNotFound:
-        case DocumentationsIsMissing:
-        case InsufficientMarkets: {
-          throw new ConflictException(error.message)
-        }
-
-        default: {
-          throw new BadRequestException(error.message)
-        }
-      }
+      return ErrorPresenter.toHTTP(error)
     }
 
     const { company } = response.value

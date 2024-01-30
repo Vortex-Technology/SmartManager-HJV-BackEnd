@@ -8,8 +8,8 @@ import { CompanyMarketsList } from '@modules/company/entities/CompanyMarketsList
 import { Inventory } from '@modules/inventory/entities/Inventory'
 import { Address } from '@shared/core/valueObjects/Address'
 import { CollaboratorRole } from '@modules/collaborator/entities/Collaborator'
-import { CollaboratorsRepository } from '@modules/collaborator/repositories/CollaboratorsRepository'
 import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorNotFound'
+import { VerifyPermissionsOfCollaboratorInCompanyService } from '@modules/interceptors/services/VerifyPermissionsOfCollaboratorInCompany.service'
 
 interface Request {
   tradeName: string
@@ -33,8 +33,8 @@ type Response = Either<
 @Injectable()
 export class CreateMarketService {
   constructor(
-    private readonly collaboratorsRepository: CollaboratorsRepository,
     private readonly companiesRepository: CompaniesRepository,
+    private readonly verifyPermissions: VerifyPermissionsOfCollaboratorInCompanyService,
   ) {}
 
   async execute({
@@ -50,30 +50,18 @@ export class CreateMarketService {
     complement,
     country,
   }: Request): Promise<Response> {
-    const acceptCreationForRoles = [
-      CollaboratorRole.MANAGER,
-      CollaboratorRole.OWNER,
-    ]
+    const response = await this.verifyPermissions.execute({
+      acceptedRoles: [CollaboratorRole.MANAGER, CollaboratorRole.OWNER],
+      collaboratorId: creatorId,
+      companyId,
+    })
 
-    const creator = await this.collaboratorsRepository.findById(creatorId)
-    if (!creator) {
-      return left(new CollaboratorNotFound())
-    }
+    if (response.isLeft()) return left(response.value)
 
-    const company = await this.companiesRepository.findByIdWithOwner(companyId)
-    if (!company) {
-      return left(new CompanyNotFound())
-    }
-
-    if (!acceptCreationForRoles.includes(creator.role)) {
-      return left(new PermissionDenied())
-    }
-
-    if (!creator.companyId?.equals(company.id)) {
-      return left(new PermissionDenied())
-    }
+    const { company } = response.value
 
     const inventory = Inventory.create({
+      companyId: company.id,
       name: `${tradeName} - Estoque`,
     })
 

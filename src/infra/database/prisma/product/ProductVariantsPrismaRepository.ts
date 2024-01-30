@@ -1,12 +1,12 @@
 import { ProductVariant } from '@modules/product/entities/ProductVariant'
 import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from '../index.service'
+import { PrismaConfig, PrismaService } from '../index.service'
 import { ProductVariantsPrismaMapper } from './ProductVariantsPrismaMapper'
 
 @Injectable()
 export class ProductVariantsPrismaRepository
-  implements ProductVariantsRepository
+  implements ProductVariantsRepository<PrismaConfig>
 {
   constructor(private readonly prisma: PrismaService) {}
 
@@ -16,8 +16,13 @@ export class ProductVariantsPrismaRepository
     })
   }
 
-  async createMany(productVariants: ProductVariant[]): Promise<void> {
-    await this.prisma.productVariant.createMany({
+  async createMany(
+    productVariants: ProductVariant[],
+    config?: PrismaConfig,
+  ): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.productVariant.createMany({
       data: productVariants.map(ProductVariantsPrismaMapper.toPrisma),
     })
   }
