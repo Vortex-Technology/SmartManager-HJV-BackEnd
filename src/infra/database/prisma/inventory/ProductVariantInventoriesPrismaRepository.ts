@@ -23,4 +23,39 @@ export class ProductVariantInventoriesPrismaRepository
       skipDuplicates: true,
     })
   }
+
+  async findByInventoryIdAndProductVariantId(
+    inventoryId: string,
+    productVariantId: string,
+  ): Promise<ProductVariantInventory | null> {
+    const productVariantInventory =
+      await this.prisma.productVariantInventory.findFirst({
+        where: {
+          inventoryId,
+          productVariantId,
+        },
+      })
+
+    if (!productVariantInventory) return null
+
+    return ProductVariantInventoriesPrismaMapper.toEntity(
+      productVariantInventory,
+    )
+  }
+
+  async save(
+    productVariantInventory: ProductVariantInventory,
+    config?: PrismaConfig | undefined,
+  ): Promise<void> {
+    const prisma = config ? config.prisma : this.prisma
+
+    await prisma.productVariantInventory.update({
+      where: {
+        id: productVariantInventory.id.toString(),
+      },
+      data: ProductVariantInventoriesPrismaMapper.toPrisma(
+        productVariantInventory,
+      ),
+    })
+  }
 }
