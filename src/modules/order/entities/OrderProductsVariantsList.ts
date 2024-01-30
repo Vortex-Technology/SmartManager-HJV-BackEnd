@@ -1,8 +1,8 @@
 import { WatchedList } from '@shared/core/entities/WatchedList'
-import { OrderProductsVariants } from './OrderProductsVariants'
+import { OrderProductVariant } from './OrderProductVariant'
 
-export class OrderProductsVariantsList extends WatchedList<OrderProductsVariants> {
-  compareItems(a: OrderProductsVariants, b: OrderProductsVariants): boolean {
+export class OrderProductsVariantsList extends WatchedList<OrderProductVariant> {
+  compareItems(a: OrderProductVariant, b: OrderProductVariant): boolean {
     return a.equals(b)
   }
 }
