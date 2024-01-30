@@ -19,7 +19,7 @@ export function makeProductVariant(
       barCode: fakerPT_BR.number.int().toString(),
       brand: fakerPT_BR.commerce.product(),
       description: fakerPT_BR.commerce.productDescription(),
-      pricePerUnit: fakerPT_BR.number.int(),
+      pricePerUnit: fakerPT_BR.number.int({ min: 10, max: 100000 }),
       productId: new UniqueEntityId(),
       unitType: ProductUnitType.KILOS,
       ...override,
