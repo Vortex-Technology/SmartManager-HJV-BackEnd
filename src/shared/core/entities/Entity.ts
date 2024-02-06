@@ -1,7 +1,11 @@
 import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 import { UniqueEntityId } from '../valueObjects/UniqueEntityId'
 import { EntityValidator } from './EntityValidator'
-
+/**
+ *
+ * Entity is a base class that can be extended to create a new entity
+ * The entity is responsible for validating the data and creating the id
+ */
 export class Entity<TypeProps> implements EntityValidator {
   private _id: UniqueEntityId
   protected props: TypeProps
