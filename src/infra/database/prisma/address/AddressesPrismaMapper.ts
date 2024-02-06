@@ -17,7 +17,7 @@ export class AddressesPrismaMapper {
 
   static toPrisma(address: Address): Prisma.AddressUncheckedCreateInput {
     return {
-      postalCode: address.postalCode,
+      postalCode: address.postalCode, pu
       street: address.street,
       number: address.number,
       complement: address.complement,

@@ -33,4 +33,16 @@ export class ProductVariantsInMemoryRepository
 
     return productVariants
   }
+
+  async findByIds(ids: string[]): Promise<(ProductVariant | null)[]> {
+    const productVariants: (ProductVariant | null)[] = []
+
+    ids.forEach(async (id) => {
+      productVariants.push(
+        this.productVariants.find((pv) => pv.id.toString() === id) ?? null,
+      )
+    })
+
+    return productVariants
+  }
 }

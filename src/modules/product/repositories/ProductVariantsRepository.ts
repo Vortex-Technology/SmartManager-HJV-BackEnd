@@ -11,4 +11,6 @@ export abstract class ProductVariantsRepository<ConfigT = unknown> {
   abstract findByBarCodes(
     barCodes: string[],
   ): Promise<Array<ProductVariant | null>>
+
+  abstract findByIds(ids: string[]): Promise<Array<ProductVariant | null>>
 }
