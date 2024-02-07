@@ -6,9 +6,12 @@ import {
 import { TransactorService } from '../contracts/TransactorService'
 import { Transaction, Transactor } from '../entities/Transactor'
 
+/**
+ * @class TransactorManager - It will be responsible for managing transactions using the Prisma Client at context execution
+ */
 @Injectable()
 export class TransactorManager implements TransactorService<PrismaConfig> {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   start(): Transactor<PrismaConfig> {
     return Transactor.create<PrismaConfig>({
