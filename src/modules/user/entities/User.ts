@@ -4,7 +4,6 @@ import { Optional } from '@shared/core/types/Optional'
 import { z } from 'zod'
 import { ZodEntityValidationPipe } from '@shared/pipes/ZodEntityValidation'
 
-
 const userPropsSchema = z.object({
   name: z.string().min(2).max(30),
   image: z.string().url().nullable(),
@@ -20,6 +19,14 @@ const userValidator = new ZodEntityValidationPipe(userPropsSchema)
 
 export type UserProps = z.infer<typeof userPropsSchema>
 
+/**
+ * @class User - Define an generic user on application
+ * @extends {AggregateRoot<UserProps>}
+ *
+ * ---
+ * Note: Exist validation on user creation
+ * @see {@link userPropsSchema}
+ */
 export class User extends AggregateRoot<UserProps> {
   static create(
     props: Optional<
