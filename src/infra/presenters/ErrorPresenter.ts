@@ -27,6 +27,9 @@ import {
 } from '@nestjs/common'
 import { ServiceError } from '@shared/core/error/ServiceError'
 
+/**
+ * @class ErrorPresenter - Present all possible application errors
+ */
 export class ErrorPresenter {
   static toHTTP(error: ServiceError) {
     switch (error.constructor) {

@@ -1,3 +1,6 @@
+/**
+ * statusCode - It defines all status codes used in API
+ */
 export const statusCode = {
   Ok: 200,
   Created: 201,

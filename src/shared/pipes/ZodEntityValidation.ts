@@ -2,8 +2,13 @@ import { InternalServerErrorException, PipeTransform } from '@nestjs/common'
 import { ZodError, ZodSchema } from 'zod'
 import { fromZodError } from 'zod-validation-error'
 
+/**
+ * @class ZodEntityValidationPipe - A validation pipe for entity
+ * It will validate the data on any entity created on application.
+ * Can be omited if not needed, but it *STRONGALY* not recommended
+ */
 export class ZodEntityValidationPipe implements PipeTransform {
-  constructor(private schema: ZodSchema) {}
+  constructor(private readonly schema: ZodSchema) { }
 
   transform(value: unknown) {
     try {

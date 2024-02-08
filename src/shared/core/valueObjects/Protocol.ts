@@ -1,3 +1,8 @@
+/**
+ * @class Protocol - Define a type protocol of a sale or purchase created on system
+ *
+ * It can be instantiated with a value or with the system time used to generate a unique identifier
+ */
 export class Protocol {
   private value: bigint
 

@@ -18,6 +18,21 @@ const addressValidationPipe = new ZodEntityValidationPipe(addressPropsSchema)
 
 export type AddressProps = z.infer<typeof addressPropsSchema>
 
+/**
+ * @class Address - It is a velue object that represent an address of any entity with one or more addresses.
+ *
+ * Note: It is a value object, so it can't be created directly. -
+ *
+ * Note: It can be created with the static method `create` -
+ *
+ * Note: This must be associated with an entity that needs -
+ *
+ * ---
+ * Verifications:
+ *
+ * Address have some validations rules, expicifieds in `Address.ts` @see {@link addressValidationPipe}
+ *
+ */
 export class Address extends ValueObject<AddressProps> {
   static create(props: Optional<AddressProps, 'country' | 'complement'>) {
     const addressProps: AddressProps = {
