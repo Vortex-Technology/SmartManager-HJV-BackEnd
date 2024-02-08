@@ -41,18 +41,18 @@ export class OrdersPrismaMapper {
         updatedAt: raw.updatedAt,
         payment: raw.orderPayment
           ? OrderPayment.create({
-              amount: raw.orderPayment.amount,
-              method: raw.orderPayment.method as OrderPaymentMethod,
-              status: raw.orderPayment.status as OrderPaymentStatus,
-              processedAt: raw.orderPayment.processedAt,
-            })
+            amount: raw.orderPayment.amount,
+            method: raw.orderPayment.method as OrderPaymentMethod,
+            status: raw.orderPayment.status as OrderPaymentStatus,
+            processedAt: raw.orderPayment.processedAt,
+          })
           : null,
         orderProductsVariants: raw.orderProductsVariants
           ? new OrderProductsVariantsList(
-              raw.orderProductsVariants.map(
-                OrdersProductsVariantsPrismaMapper.toEntity,
-              ),
-            )
+            raw.orderProductsVariants.map(
+              OrdersProductsVariantsPrismaMapper.toEntity,
+            ),
+          )
           : null,
       },
       new UniqueEntityId(raw.id),
