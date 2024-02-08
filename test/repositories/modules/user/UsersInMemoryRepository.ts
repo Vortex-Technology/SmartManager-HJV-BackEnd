@@ -28,13 +28,11 @@ export class UsersInMemoryRepository implements UsersRepository {
     const userIndex = this.users.findIndex((existingUser) =>
       existingUser.equals(user),
     )
-    console.log(userIndex)
 
     if (userIndex === -1) {
       throw new Error('User not found')
     }
 
     this.users[userIndex] = user
-    console.log(this.users)
   }
 }
