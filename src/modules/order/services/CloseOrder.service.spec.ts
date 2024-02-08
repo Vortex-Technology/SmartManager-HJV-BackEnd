@@ -14,6 +14,14 @@ import { makeMarket } from '@test/factories/modules/market/makeMarket'
 import { makeManager } from '@test/factories/modules/manager/makeManager'
 import { ProductVariantsInMemoryRepository } from '@test/repositories/modules/product/ProductVariantsInMemoryRepository'
 import { makeOrder } from '@test/factories/modules/order/makeOrder'
+import { OrderProductsVariantsList } from '../entities/OrderProductsVariantsList'
+import { makeProductVariant } from '@test/factories/modules/product/makeProductVariant'
+import { makeOrderProductVariant } from '@test/factories/modules/order/makeOrderProductVariant'
+import { makeOrderPayment } from '@test/factories/modules/order/makeOrderPayment'
+import { OrderPaymentMethod } from '../entities/valueObjects/OrderPayment'
+import { DocSM } from '@providers/docs/implementations/DocSM'
+import fs from 'fs'
+import path from 'path'
 
 let ownersInMemoryRepository: OwnersInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
@@ -25,8 +33,11 @@ let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let productVariantsInMemoryRepository: ProductVariantsInMemoryRepository
+let fakeDocSM: DocSM
 
 let sut: CloseOrderService
+
+const tempFolder = path.join(__dirname, '..', '..', '..', '..', 'temp')
 
 describe('Close order service', async () => {
   beforeEach(async () => {
@@ -90,11 +101,23 @@ describe('Close order service', async () => {
 
     productVariantsInMemoryRepository = new ProductVariantsInMemoryRepository()
 
+    fakeDocSM = new DocSM()
+
     sut = new CloseOrderService(
       verifyPermissionsOfCollaboratorInMarketService,
       ordersInMemoryRepository,
       productVariantsInMemoryRepository,
+      fakeDocSM,
+      fakeDocSM,
     )
+  })
+
+  afterAll(async () => {
+    fs.rmdirSync(tempFolder, {
+      recursive: true,
+    })
+
+    fs.mkdirSync(tempFolder)
   })
 
   it('should be able to close order service', async () => {
@@ -113,18 +136,51 @@ describe('Close order service', async () => {
     )
     await collaboratorsInMemoryRepository.create(manager)
 
-    const order = makeOrder({
-      marketId: market.id,
-      openedById: manager.id,
-      companyId: company.id,
+    const orderPayment = makeOrderPayment({
+      amount: 6000,
+      method: OrderPaymentMethod.CASH,
     })
+
+    const order = makeOrder(
+      {
+        marketId: market.id,
+        openedById: manager.id,
+        companyId: company.id,
+        orderProductsVariants: new OrderProductsVariantsList(),
+        payment: orderPayment,
+      },
+      new UniqueEntityId('order-1'),
+    )
+
+    for (let i = 1; i < 5; i++) {
+      const productVariant = makeProductVariant({
+        pricePerUnit: 100,
+      })
+
+      const orderProductVariant = makeOrderProductVariant({
+        productVariantId: productVariant.id,
+        quantity: i,
+      })
+
+      order.orderProductsVariants?.add(orderProductVariant)
+      await productVariantsInMemoryRepository.create(productVariant)
+    }
+
+    await ordersInMemoryRepository.create(order)
 
     const response = await sut.execute({
       collaboratorId: 'manager-1',
       companyId: 'company-1',
       marketId: 'market-1',
+      orderId: 'order-1',
     })
 
     expect(response.isRight()).toBe(true)
+
+    const reportExist = fs.existsSync(
+      path.join(tempFolder, `${order.protocol.toString()}.pdf`),
+    )
+
+    expect(reportExist).toBe(true)
   })
 })

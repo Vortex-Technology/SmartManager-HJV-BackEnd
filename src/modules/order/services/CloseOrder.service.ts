@@ -7,12 +7,13 @@ import { CollaboratorNotFound } from '@modules/collaborator/errors/CollaboratorN
 import { CompanyNotFound } from '@modules/company/errors/CompanyNotFound'
 import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
 import { PermissionDenied } from '@shared/errors/PermissionDenied'
-import JsPDF from 'jspdf'
 import { OrderNotFound } from '../errors/OrderNotFound'
 import { ProductVariantsRepository } from '@modules/product/repositories/ProductVariantsRepository'
 import { ProductVariantNotFound } from '@modules/product/errors/ProductVariantNotFound'
 import { OrderProductVariantNotFound } from '../errors/OrderProductVariantNotFound'
-import path from 'path'
+import { DocGenerator } from '@providers/docs/contracts/DocGenerator'
+import { DocPersistence } from '@providers/docs/contracts/DocPersistence'
+import { DocType } from '@providers/docs/entities/Doc'
 
 interface Request {
   collaboratorId: string
@@ -32,8 +33,9 @@ type Response = Either<
 >
 
 const translation = {
-  MONEY: 'Dinheiro',
-  CARD: 'Cartão',
+  CASH: 'Dinheiro',
+  CREDIT_CARD: 'Cartão de credito',
+  DEBIT_CARD: 'Cartão de debito',
   'NOT-PAYED': 'NÃO PAGO',
 }
 
@@ -43,7 +45,9 @@ export class CloseOrderService {
     private readonly verifyPermissions: VerifyPermissionsOfCollaboratorInMarketService,
     private readonly ordersRepository: OrdersRepository,
     private readonly productsVariantsRepository: ProductVariantsRepository,
-  ) {}
+    private readonly docGenerator: DocGenerator,
+    private readonly docPersistence: DocPersistence,
+  ) { }
 
   async execute({
     collaboratorId,
@@ -81,21 +85,40 @@ export class CloseOrderService {
     const productsVariants =
       await this.productsVariantsRepository.findByIds(productsVariantsId)
 
-    const doc = new JsPDF()
-    let finalIndex = 0
+    const doc = this.docGenerator.generate(
+      order.protocol.toString(),
+      DocType.PDF,
+    )
+
     let total = 0
 
-    doc.setFont('helvetica', '', 700)
-    doc.setFontSize(32)
-    doc.text(market.tradeName, 5, 10)
+    const topLine = doc.addLine()
+    topLine.addColumn({
+      fontSize: 28,
+      text: market.tradeName,
+    })
 
-    doc.setFontSize(14)
-    doc.text('PRODUTO', 5, 30)
-    doc.text('QNTD |', 70, 30)
-    doc.text('VLR UNT |', 120, 30)
-    doc.text('VLR TOTAL', 170, 30)
+    const defLine = doc.addLine({
+      yPosition: 20,
+    })
+    defLine.addColumn({
+      text: 'PRODUTO',
+    })
 
-    productsVariants.forEach((productVariant, i) => {
+    defLine.addColumn({
+      xPosition: 120,
+      text: 'QNTD',
+    })
+
+    defLine.addColumn({
+      text: 'VLR UNT',
+    })
+
+    defLine.addColumn({
+      text: 'VLR TOTAL',
+    })
+
+    productsVariants.forEach((productVariant) => {
       if (!productVariant) {
         return left(new ProductVariantNotFound())
       }
@@ -110,77 +133,103 @@ export class CloseOrderService {
         return left(new OrderProductVariantNotFound())
       }
 
-      doc.text(productVariant.name, 5, 39 + i * 6)
-      doc.text(orderProductsVariant.quantity.toString(), 70, 39 + i * 6)
-      doc.text(
-        (productVariant.pricePerUnit / 1000).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }),
-        120,
-        39 + i * 6,
-      )
+      const infoLine = doc.addLine()
+      infoLine.addColumn({
+        text: productVariant.name,
+      })
 
-      doc.text(
-        (
-          (productVariant.pricePerUnit * orderProductsVariant.quantity) /
-          1000
-        ).toLocaleString('pt-BR', {
-          style: 'currency',
-          currency: 'BRL',
-        }),
-        170,
-        39 + i * 6,
-      )
+      infoLine.addColumn({
+        xPosition: 120,
+        text: orderProductsVariant.quantity.toString(),
+      })
 
-      finalIndex = i + 1
-      total =
-        total + productVariant.pricePerUnit * orderProductsVariant.quantity
-    })
-
-    doc.text(
-      `Pago em: ${translation[order.payment?.method ?? 'NOT-PAYED']}`,
-      5,
-      48 + finalIndex * 6,
-    )
-    finalIndex++
-
-    doc.text(`Pagamento: `, 5, 48 + finalIndex * 6)
-    doc.text(
-      (Number(order.payment?.amount ?? 0) / 1000).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }),
-      170,
-      48 + finalIndex * 6,
-    )
-    finalIndex++
-
-    doc.text(`Valor total: `, 5, 48 + finalIndex * 6)
-    doc.text(
-      (total / 1000).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }),
-      170,
-      48 + finalIndex * 6,
-    )
-    finalIndex++
-
-    doc.text(`Troco: `, 5, 48 + finalIndex * 6)
-    doc.text(
-      ((order.payment?.amount ?? 0 - total) / 1000 <= 0
-        ? 0
-        : (order.payment?.amount ?? 0 - total) / 1000
+      const pricePerUnitFormated = (
+        productVariant.pricePerUnit / 100
       ).toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL',
-      }),
-      170,
-      48 + finalIndex * 6,
+      })
+
+      infoLine.addColumn({
+        text: pricePerUnitFormated,
+      })
+
+      const priceTotalFormated = (
+        (productVariant.pricePerUnit * orderProductsVariant.quantity) /
+        100
+      ).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      })
+
+      infoLine.addColumn({
+        text: priceTotalFormated,
+      })
+
+      total += productVariant.pricePerUnit * orderProductsVariant.quantity
+    })
+
+    doc.addLine()
+    doc.addLine()
+
+    const paymentTypeLine = doc.addLine()
+    paymentTypeLine.addColumn({
+      text: `PAGAMENTO: ${translation[order.payment?.method ?? 'NOT-PAYED']}`,
+    })
+    doc.addLine()
+
+    const paymentInfoLine = doc.addLine()
+    const paymentFormated = ((order.payment?.amount ?? 0) / 100).toLocaleString(
+      'pt-BR',
+      {
+        style: 'currency',
+        currency: 'BRL',
+      },
     )
 
-    doc.save(path.join(__dirname, 'pdf.pdf'))
+    paymentInfoLine.addColumn({
+      text: `VALOR PAGO:`,
+    })
+
+    paymentInfoLine.addColumn({
+      xPosition: 180,
+      text: paymentFormated,
+    })
+
+    const totalInfoLine = doc.addLine()
+    const totalFormated = (total / 100).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
+
+    totalInfoLine.addColumn({
+      text: `VALOR TOTAL:`,
+    })
+
+    totalInfoLine.addColumn({
+      xPosition: 180,
+      text: totalFormated,
+    })
+
+    const refundInfoLine = doc.addLine()
+    const refundFormated = (
+      ((order.payment?.amount ?? 0) - total) /
+      100
+    ).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
+
+    refundInfoLine.addColumn({
+      text: `TROCO:`,
+    })
+
+    refundInfoLine.addColumn({
+      text: refundFormated,
+      xPosition: 180,
+    })
+
+    await this.docPersistence.savePdf(doc)
 
     return right(null)
   }
