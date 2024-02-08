@@ -11,7 +11,7 @@ export class Protocol {
   }
 
   public toString() {
-    return this.value
+    return this.value.toString()
   }
 
   public toValue() {
