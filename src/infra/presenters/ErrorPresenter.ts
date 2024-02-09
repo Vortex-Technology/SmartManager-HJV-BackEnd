@@ -8,6 +8,7 @@ import { InventoryNotFount } from '@modules/inventory/errors/InventoryNotFound'
 import { NotEnoughItems } from '@modules/inventory/errors/NotEnoughItems'
 import { ProductVariantInventoryNotFound } from '@modules/inventory/errors/ProductVariantInventoryNotFound'
 import { MarketNotFound } from '@modules/market/errors/MarketNorFound'
+import { DocPersistenceError } from '@modules/order/errors/DocPersistenceError'
 import { OrderNotFound } from '@modules/order/errors/OrderNotFound'
 import { AllProductVariantAlreadyExists } from '@modules/product/errors/AllProductVariantAlreadyExists'
 import { ProductCategoryAlreadyExists } from '@modules/product/errors/ProductCategoryAlreadyExists'
@@ -22,6 +23,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
@@ -63,6 +65,10 @@ export class ErrorPresenter {
       case ApiKeyIsRevoked:
       case SessionExpired: {
         throw new UnauthorizedException(error.message)
+      }
+
+      case DocPersistenceError: {
+        throw new InternalServerErrorException(error.message)
       }
 
       default: {
