@@ -9,4 +9,5 @@ export const statusCode = {
   NotFound: 404,
   Conflict: 409,
   Forbidden: 403,
+  InternalServerError: 500,
 }
