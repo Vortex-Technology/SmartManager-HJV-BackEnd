@@ -8,7 +8,7 @@ import { ProductVariantsPrismaMapper } from './ProductVariantsPrismaMapper'
 export class ProductVariantsPrismaRepository
   implements ProductVariantsRepository<PrismaConfig>
 {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(productVariant: ProductVariant): Promise<void> {
     await this.prisma.productVariant.create({
@@ -57,6 +57,30 @@ export class ProductVariantsPrismaRepository
     })
 
     return productsVariantsWithNullValues.map((productVariant) =>
+      productVariant
+        ? ProductVariantsPrismaMapper.toEntity(productVariant)
+        : null,
+    )
+  }
+
+  async findByIds(ids: string[]): Promise<(ProductVariant | null)[]> {
+    const productVariants = await this.prisma.productVariant.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    })
+
+    const productVariantsWithNullValues = ids.map((id) => {
+      const productVariant = productVariants.find((pv) => pv.id === id)
+
+      if (!productVariant) return null
+
+      return productVariant
+    })
+
+    return productVariantsWithNullValues.map((productVariant) =>
       productVariant
         ? ProductVariantsPrismaMapper.toEntity(productVariant)
         : null,
