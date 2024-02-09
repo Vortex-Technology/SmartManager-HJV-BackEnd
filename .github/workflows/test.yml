@@ -29,6 +29,11 @@ jobs:
           echo "JWT_ADM_REFRESH_EXPIRES_IN=${{ secrets.JWT_ADM_REFRESH_EXPIRES_IN }}" >> .env
           echo "ADM_REFRESH_EXPIRES_IN=${{ secrets.ADM_REFRESH_EXPIRES_IN }}" >> .env
           echo "USER_REFRESH_EXPIRES_IN=${{ secrets.USER_REFRESH_EXPIRES_IN }}" >> .env
+          echo "CLOUDFLARE_END_POINT={{ secrets.CLOUDFLARE_END_POINT }}" >> .env
+          echo "CLOUDFLARE_ACCESS_KEY={{ secrets.CLOUDFLARE_ACCESS_KEY }}" >> .env
+          echo "CLOUDFLARE_ACCESS_KEY_ID={{ secrets.CLOUDFLARE_ACCESS_KEY_ID }}" >> .env
+          echo "CLOUDFLARE_BUCKET={{ secrets.CLOUDFLARE_BUCKET }}" >> .env
+
 
       - name: Setup Node
         uses: actions/setup-node@v3
