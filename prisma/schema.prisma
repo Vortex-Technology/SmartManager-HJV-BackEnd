@@ -346,6 +346,7 @@ model Order {
   subTotal   Int       @map("sub_total")
   discount   Int?
   total      Int
+  reportUrl  String?
   openedAt   DateTime  @default(now()) @map("opened_at")
   closedAt   DateTime? @map("closed_at")
   refundedAt DateTime? @map("refunded_at")
