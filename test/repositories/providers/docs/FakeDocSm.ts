@@ -1,16 +1,11 @@
 import JsPdf from 'jspdf'
-import { DocGenerator } from '../contracts/DocGenerator'
-import { DocPersistence } from '../contracts/DocPersistence'
-import { Doc, DocType } from '../entities/Doc'
 import path from 'path'
 import fs from 'fs'
-import { Injectable } from '@nestjs/common'
-import { StorageRepository } from '@infra/storage/contracts/StorageRepository'
+import { DocPersistence } from '@providers/docs/contracts/DocPersistence'
+import { DocGenerator } from '@providers/docs/contracts/DocGenerator'
+import { Doc, DocType } from '@providers/docs/entities/Doc'
 
-@Injectable()
-export class DocSM implements DocGenerator, DocPersistence {
-  constructor(private readonly storagerepository: StorageRepository) { }
-
+export class FakeDocSM implements DocGenerator, DocPersistence {
   async savePdf(doc: Doc): Promise<string | null> {
     if (doc.type !== DocType.PDF) {
       throw new Error('Invalid type')
@@ -40,8 +35,7 @@ export class DocSM implements DocGenerator, DocPersistence {
 
     pdf.save(filePath)
 
-    const url = await this.storagerepository.upload(filename)
-    return url
+    return filename
   }
 
   generate(name: string, type: DocType): Doc {

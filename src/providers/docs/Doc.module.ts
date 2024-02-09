@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { DocGenerator } from './contracts/DocGenerator'
 import { DocSM } from './implementations/DocSM'
 import { DocPersistence } from './contracts/DocPersistence'
+import { StorageModule } from '@infra/storage/Storage.module'
 
 @Module({
   providers: [
@@ -15,5 +16,6 @@ import { DocPersistence } from './contracts/DocPersistence'
     },
   ],
   exports: [DocGenerator, DocPersistence],
+  imports: [StorageModule],
 })
 export class DocModule { }
