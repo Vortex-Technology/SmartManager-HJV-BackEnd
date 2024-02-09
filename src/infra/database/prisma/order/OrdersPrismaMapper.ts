@@ -39,6 +39,7 @@ export class OrdersPrismaMapper {
         subTotal: raw.subTotal,
         total: raw.total,
         updatedAt: raw.updatedAt,
+        reportUrl: raw.reportUrl,
         payment: raw.orderPayment
           ? OrderPayment.create({
             amount: raw.orderPayment.amount,
@@ -75,6 +76,7 @@ export class OrdersPrismaMapper {
       total: order.total,
       updatedAt: order.updatedAt,
       id: order.id.toString(),
+      reportUrl: order.reportUrl,
     }
   }
 }
