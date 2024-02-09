@@ -22,6 +22,7 @@ const orderPropsSchema = z.object({
   closedById: z.instanceof(UniqueEntityId).nullable(),
   marketId: z.instanceof(UniqueEntityId),
   companyId: z.instanceof(UniqueEntityId),
+  reportUrl: z.string().nullable(),
   payment: z
     .custom<OrderPayment>((v): v is OrderPayment => v instanceof OrderPayment)
     .nullable(),
@@ -48,6 +49,7 @@ export class Order extends AggregateRoot<OrderProps> {
       | 'protocol'
       | 'total'
       | 'orderProductsVariants'
+      | 'reportUrl'
     >,
     id?: UniqueEntityId,
   ): Order {
@@ -65,6 +67,7 @@ export class Order extends AggregateRoot<OrderProps> {
       subTotal: props.subTotal ?? 0,
       total: props.total ?? 0,
       orderProductsVariants: props.orderProductsVariants ?? null,
+      reportUrl: props.reportUrl ?? null,
     }
 
     const order = new Order(orderProps, id)
@@ -77,8 +80,16 @@ export class Order extends AggregateRoot<OrderProps> {
     return this.props.subTotal
   }
 
+  set subTotal(subTotal: number) {
+    this.props.subTotal = subTotal
+  }
+
   get total() {
     return this.props.total
+  }
+
+  set total(total: number) {
+    this.props.total = total
   }
 
   get discount() {
@@ -113,6 +124,11 @@ export class Order extends AggregateRoot<OrderProps> {
     return this.props.closedById
   }
 
+  set closedById(closedById: UniqueEntityId | null) {
+    this.props.closedById = closedById
+    this.touch()
+  }
+
   get marketId() {
     return this.props.marketId
   }
@@ -140,12 +156,26 @@ export class Order extends AggregateRoot<OrderProps> {
     this.touch()
   }
 
+  get reportUrl() {
+    return this.props.reportUrl
+  }
+
+  set reportUrl(reportUrl: string | null) {
+    this.props.reportUrl = reportUrl
+    this.touch()
+  }
+
   addOrderProductVariant(orderProductVariant: OrderProductVariant) {
     if (!this.props.orderProductsVariants) {
       this.props.orderProductsVariants = new OrderProductsVariantsList()
     }
 
     this.props.orderProductsVariants.add(orderProductVariant)
+    this.touch()
+  }
+
+  close() {
+    this.props.closedAt = new Date()
     this.touch()
   }
 

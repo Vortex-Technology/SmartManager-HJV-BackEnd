@@ -1,7 +1,11 @@
+import { ZodValidationPipe } from '@shared/pipes/ZodValidation'
 import { z } from 'zod'
 
-export type CloseOrderBody = z.infer<typeof closeOrderBodySchema> & {}
+const closeOrderParamsSchema = z.object({
+  orderId: z.string(),
+})
 
-export class CloseOrderGateway {
-  constructor() { }
-}
+export type CloseOrderParams = z.infer<typeof closeOrderParamsSchema>
+export const closeOrderParamValidationPipe = new ZodValidationPipe(
+  closeOrderParamsSchema,
+)

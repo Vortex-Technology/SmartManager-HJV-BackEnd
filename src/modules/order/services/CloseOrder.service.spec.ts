@@ -19,9 +19,9 @@ import { makeProductVariant } from '@test/factories/modules/product/makeProductV
 import { makeOrderProductVariant } from '@test/factories/modules/order/makeOrderProductVariant'
 import { makeOrderPayment } from '@test/factories/modules/order/makeOrderPayment'
 import { OrderPaymentMethod } from '../entities/valueObjects/OrderPayment'
-import { DocSM } from '@providers/docs/implementations/DocSM'
 import fs from 'fs'
 import path from 'path'
+import { FakeDocSM } from '@test/repositories/providers/docs/FakeDocSm'
 
 let ownersInMemoryRepository: OwnersInMemoryRepository
 let marketsInMemoryRepository: MarketsInMemoryRepository
@@ -33,7 +33,7 @@ let collaboratorsInMemoryRepository: CollaboratorsInMemoryRepository
 let inventoriesInMemoryRepository: InventoriesInMemoryRepository
 let productVariantInventoriesInMemoryRepository: ProductVariantInventoriesInMemoryRepository
 let productVariantsInMemoryRepository: ProductVariantsInMemoryRepository
-let fakeDocSM: DocSM
+let fakeDocSM: FakeDocSM
 
 let sut: CloseOrderService
 
@@ -101,7 +101,7 @@ describe('Close order service', async () => {
 
     productVariantsInMemoryRepository = new ProductVariantsInMemoryRepository()
 
-    fakeDocSM = new DocSM()
+    fakeDocSM = new FakeDocSM()
 
     sut = new CloseOrderService(
       verifyPermissionsOfCollaboratorInMarketService,
@@ -177,10 +177,17 @@ describe('Close order service', async () => {
 
     expect(response.isRight()).toBe(true)
 
-    const reportExist = fs.existsSync(
-      path.join(tempFolder, `${order.protocol.toString()}.pdf`),
-    )
+    if (response.isRight()) {
+      const orderSaved = await ordersInMemoryRepository.findByIdWithProducts(
+        order.id.toString(),
+      )
 
-    expect(reportExist).toBe(true)
+      const reportExist = fs.existsSync(
+        path.join(tempFolder, `${order.protocol.toString()}.pdf`),
+      )
+
+      expect(reportExist).toBe(true)
+      expect(orderSaved?.reportUrl).toBeTruthy()
+    }
   })
 })

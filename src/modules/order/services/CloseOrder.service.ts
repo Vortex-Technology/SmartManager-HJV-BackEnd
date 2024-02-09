@@ -14,6 +14,7 @@ import { OrderProductVariantNotFound } from '../errors/OrderProductVariantNotFou
 import { DocGenerator } from '@providers/docs/contracts/DocGenerator'
 import { DocPersistence } from '@providers/docs/contracts/DocPersistence'
 import { DocType } from '@providers/docs/entities/Doc'
+import { DocPersistenceError } from '../errors/DocPersistenceError'
 
 interface Request {
   collaboratorId: string
@@ -28,7 +29,8 @@ type Response = Either<
   | PermissionDenied
   | MarketNotFound
   | OrderNotFound
-  | ProductVariantNotFound,
+  | ProductVariantNotFound
+  | DocPersistenceError,
   null
 >
 
@@ -69,7 +71,7 @@ export class CloseOrderService {
 
     if (response.isLeft()) return left(response.value)
 
-    const { market } = response.value
+    const { market, collaborator } = response.value
 
     const order = await this.ordersRepository.findByIdWithProducts(orderId)
     if (!order) {
@@ -229,7 +231,19 @@ export class CloseOrderService {
       xPosition: 180,
     })
 
-    await this.docPersistence.savePdf(doc)
+    const url = await this.docPersistence.savePdf(doc)
+
+    if (!url) {
+      return left(new DocPersistenceError())
+    }
+
+    order.reportUrl = url
+    order.closedById = collaborator.id
+    order.subTotal = total
+    order.total = total
+    order.close()
+
+    await this.ordersRepository.save(order)
 
     return right(null)
   }
